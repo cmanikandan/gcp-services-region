@@ -523,6 +523,7 @@ def filter_gcp_discovery_items(items: list[dict[str, Any]]) -> list[dict[str, An
             name in referenced_apis
             or "cloud.google.com" in doc_link
             or "firebase.google.com" in doc_link
+            or "ai.google.dev" in doc_link
             or any(k in name.lower() or k in title.lower() for k in gcp_keywords)
         )
         if not is_gcp:
@@ -857,22 +858,40 @@ def harvest_all(
             if svc["regions"]:
                 svc["scope"] = "Regional + Global"
 
-    # Map each service to its Discovery APIs & capabilities
+    # Map each service to its Discovery APIs & capabilities (supports brand-new GCP services automatically)
     used_apis: set[str] = set()
+    stop_words = {"google", "cloud", "api", "apis", "service", "services", "for", "the", "and", "in", "to", "enterprise", "managed", "platform"}
+
+    def _extract_doc_slug(url_str: str) -> str:
+        m = re.search(r"cloud\.google\.com/([a-z0-9-]+)", (url_str or "").lower())
+        if m and m.group(1) not in {"about", "products", "docs", "solutions", "security", "compute"}:
+            return m.group(1)
+        return ""
+
     for pname, svc in services_dict.items():
         mapped_api_names = list(PRODUCT_TO_API_MAP.get(pname, []))
         if not mapped_api_names:
-            # Heuristic match by slug/name
-            norm = re.sub(r"[^a-z0-9]", "", pname.lower().replace("google", "").replace("cloud", ""))
-            for api_name in api_specs:
-                if norm and (norm == api_name or norm in api_name or api_name in norm):
+            # 1. Match by cloud.google.com/<product-slug> in documentationLink
+            svc_doc_slug = _extract_doc_slug(svc.get("url", ""))
+            # 2. Match by normalized name and title tokens
+            norm = re.sub(r"[^a-z0-9]", "", pname.lower().replace("google", "").replace("cloud", "").replace("api", ""))
+            pname_tokens = {t for t in re.findall(r"[a-z0-9]+", pname.lower()) if t not in stop_words and len(t) > 2}
+
+            for api_name, spec in api_specs.items():
+                api_doc_slug = _extract_doc_slug(spec.get("documentation_link", ""))
+                title_tokens = {t for t in re.findall(r"[a-z0-9]+", spec.get("title", "").lower()) if t not in stop_words and len(t) > 2}
+                if svc_doc_slug and svc_doc_slug == api_doc_slug:
+                    mapped_api_names.append(api_name)
+                elif norm and (norm == api_name or (len(norm) >= 5 and (norm in api_name or api_name in norm))):
+                    mapped_api_names.append(api_name)
+                elif pname_tokens and title_tokens and pname_tokens == title_tokens:
                     mapped_api_names.append(api_name)
 
         apis_detail = []
         total_methods = 0
         sample_methods = []
         resources_set = set()
-        for api_name in mapped_api_names:
+        for api_name in dict.fromkeys(mapped_api_names):
             if api_name in api_specs:
                 used_apis.add(api_name)
                 spec = api_specs[api_name]
@@ -991,19 +1010,63 @@ def harvest_all(
         try:
             prev_data = json.loads(prev_snapshots[-1].read_text(encoding="utf-8"))
             prev_svc_map = {s["name"]: set(s["regions"]) for s in prev_data.get("services", [])}
-            for s in serialized_services:
-                old_regs = prev_svc_map.get(s["name"], set())
-                added_regs = sorted(set(s["regions"]) - old_regs)
-                for rid in added_regs:
-                    r_obj = regions_dict.get(rid, {})
+            prev_regions = set(prev_data.get("regions", []))
+            prev_apis = set(prev_data.get("apis", []))
+
+            # Detect brand-new regions
+            for r in serialized_regions:
+                if prev_regions and r["region_id"] not in prev_regions:
                     whats_new.append(
                         {
                             "date": today_str,
-                            "type": "Regional Expansion",
+                            "type": "New GCP Region",
+                            "service": f"{r['service_count']} Regional Services",
+                            "region_id": r["region_id"],
+                            "region_name": r["region_name"],
+                            "details": f"New GCP Region {r['display_name']} launched in {r['full_location']}",
+                        }
+                    )
+
+            # Detect brand-new services & regional expansions of existing services
+            for s in serialized_services:
+                if s["name"] not in prev_svc_map:
+                    whats_new.append(
+                        {
+                            "date": today_str,
+                            "type": "New GCP Service",
                             "service": s["name"],
-                            "region_id": rid,
-                            "region_name": r_obj.get("region_name", rid),
-                            "details": f"{s['name']} added to {r_obj.get('display_name', rid)}",
+                            "region_id": f"{s['region_count']} regions" if s["region_count"] else s["scope"],
+                            "region_name": s["category"],
+                            "details": f"New GCP service '{s['name']}' launched ({s['scope']}, {s['region_count']} regions)",
+                        }
+                    )
+                else:
+                    old_regs = prev_svc_map[s["name"]]
+                    added_regs = sorted(set(s["regions"]) - old_regs)
+                    for rid in added_regs:
+                        r_obj = regions_dict.get(rid, {})
+                        whats_new.append(
+                            {
+                                "date": today_str,
+                                "type": "Regional Expansion",
+                                "service": s["name"],
+                                "region_id": rid,
+                                "region_name": r_obj.get("region_name", rid),
+                                "details": f"{s['name']} added to {r_obj.get('display_name', rid)}",
+                            }
+                        )
+
+            # Detect brand-new Discovery REST APIs
+            for a in serialized_apis:
+                if prev_apis and a["service_endpoint"] not in prev_apis:
+                    whats_new.append(
+                        {
+                            "date": today_str,
+                            "type": "New Discovery API",
+                            "service": a["title"],
+                            "region_id": a["service_endpoint"],
+                            "region_name": a["preferred_version"],
+                            "details": f"New Google Cloud REST API {a['service_endpoint']} ({a['method_count']} operations)",
                         }
                     )
         except Exception:
@@ -1091,6 +1154,8 @@ def harvest_all(
                 {
                     "date": today_str,
                     "generated_at": now_iso,
+                    "regions": [r["region_id"] for r in serialized_regions],
+                    "apis": [a["service_endpoint"] for a in serialized_apis],
                     "services": [
                         {"name": s["name"], "regions": s["regions"]}
                         for s in serialized_services

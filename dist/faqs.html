@@ -3,16 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FAQs &amp; CLI Usage | GCP Services &amp; Regional Capabilities</title>
+  <title>FAQs &amp; CLI Usage | GCP Services &amp; Regional Capabilities (Unofficial)</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+  <div class="unofficial-ribbon">
+    <div class="unofficial-ribbon-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource:</strong> This is an independent community reference and is <strong>not affiliated with or endorsed by Google Cloud</strong>.
+      </div>
+      <div>
+        Always verify production availability in the
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official GCP Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation ↗</a>
+      </div>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="index.html">
         <div class="brand-logo">GCP</div>
         <div>
-          GCP Services &amp; Regions
+          <div class="brand-title-row">
+            <span>GCP Services &amp; Regions</span>
+            <span class="unofficial-pill">Unofficial</span>
+          </div>
           <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
         </div>
       </a>
@@ -26,8 +43,9 @@
 <li><a href="faqs.html" class="nav-link active">FAQs & CLI</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 15:56:39 UTC</span>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 16:27:53 UTC</span>
+        <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -35,25 +53,33 @@
   <main class="container">
     <div class="status-bar">
       <div>
-        <strong>Updated on:</strong> 2026-10-09 15:56:39 UTC —
-        with <strong>153</strong> unique <a href="index.html">GCP Services</a>,
-        <strong>43</strong> available <a href="regions.html">Regions</a>
+        <strong>Snapshot Updated:</strong> 2026-10-09 16:27:53 UTC —
+        <strong>153</strong> <a href="index.html">GCP Services</a>,
+        <strong>43</strong> <a href="regions.html">Regions</a>
         (+<strong>4</strong> upcoming),
         <strong>130</strong> <a href="pops.html">Availability Zones</a>,
         <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
         <strong>10,501</strong> REST API Operations.
       </div>
-      <div>
-        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
+        <span class="badge badge-blue">24h Local Cache + Exponential Backoff</span>
       </div>
     </div>
     
     <div class="section-card">
       <h2 class="section-title">❓ Frequently Asked Questions (FAQs) &amp; Local CLI Guide</h2>
 
-      <p><strong>Q: Why was this tool created?</strong></p>
+      <p><strong>Q: Is this an official Google Cloud website or product?</strong></p>
       <ul>
-        <li>Finding out which Google Cloud services, APIs, machine series, or GPUs are available in a specific GCP region—or conversely, finding all regions where a specific GCP service is deployed—often requires cross-referencing multiple documentation pages. This tool harvests all official GCP location feeds, zone hardware matrices, and Google Discovery REST APIs into a single local, cached, instant-search application.</li>
+        <li><strong>No.</strong> This is an <strong>unofficial, independent community resource</strong> and is not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
+        <li>While data is automatically harvested from public Google Cloud feeds and Discovery APIs, it is provided "as-is" without warranty. Always consult the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones Documentation</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> before making production decisions.</li>
+      </ul>
+
+      <p><strong>Q: What happens when Google Cloud launches a brand-new service, region, zone, or API?</strong></p>
+      <ul>
+        <li><strong>Zero-Touch Dynamic Discovery:</strong> Every daily harvest dynamically pulls the live product/region feeds (<code>data.json</code>, <code>locations_map.json</code>, <code>multi-region-data.json</code>, <code>global-data.json</code>), live Compute Engine zone/GPU tables, and the live Google APIs Discovery directory (<code>discovery.googleapis.com/discovery/v1/apis</code>).</li>
+        <li>Any newly launched service, region, zone, machine series, GPU, or REST API is automatically ingested, matched via documentation URL slug and title similarity, given its own detail page, and highlighted in the <a href="whatsnew.html">What's New</a> tab without requiring any code changes.</li>
       </ul>
 
       <p><strong>Q: How often is the data refreshed, and how are API quota issues prevented?</strong></p>
@@ -64,7 +90,7 @@
       </ul>
 
       <p><strong>Q: How do I run the application locally?</strong></p>
-      <pre style="background:#f1f3f4;padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
+      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
 python3 server.py --port 8080
 
 # 2. Or open the static HTML files directly in any browser:
@@ -75,7 +101,7 @@ python3 cli.py service "Vertex AI"
 python3 cli.py service alloydb
 python3 cli.py region us-central1
 python3 cli.py region asia-south1
-python3 cli.py compare us-central1 europe-west1 asia-south1
+python3 cli.py compare us-central1 europe-west1 asia-south1 --diff
 
 # 4. Force an immediate live re-harvest &amp; static site rebuild:
 python3 cli.py refresh --force</pre>
@@ -84,9 +110,19 @@ python3 cli.py refresh --force</pre>
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
-      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    <div class="footer-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource Disclaimer:</strong> This application is an independent, unofficial utility and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud.
+        Data is harvested once daily from public Google Cloud Location feeds, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+      </div>
+      <div style="margin-top:6px;">
+        For authoritative service availability, SLAs, and compliance information, always refer to the official documentation:
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
+        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
+        Google Cloud and all GCP service names are trademarks of Google LLC.
+      </div>
     </div>
   </footer>
   <script src="assets/app.js"></script>

@@ -1,3 +1,42 @@
+// Theme initialization & toggle (Light / Dark mode)
+(function initTheme() {
+  const saved = localStorage.getItem('gcp_explorer_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  if (next === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  localStorage.setItem('gcp_explorer_theme', next);
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  }
+  // Press '/' to quickly focus the primary search box on any page
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+      const search = document.querySelector('input[type="search"]');
+      if (search) {
+        e.preventDefault();
+        search.focus();
+      }
+    }
+  });
+});
+
 // Shared table sorting, filtering, and local refresh trigger
 function setupTableFilter(config) {
   const searchInput = document.getElementById(config.searchId);

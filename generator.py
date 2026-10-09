@@ -51,46 +51,113 @@ def write_shared_assets() -> None:
   --gcp-red-light: #fce8e6;
   --gcp-purple: #681da8;
   --gcp-purple-light: #f3e8fd;
-  --bg-page: #f8f9fa;
+  --bg-page: #f4f6f9;
   --bg-card: #ffffff;
-  --text-main: #202124;
+  --bg-header: rgba(255, 255, 255, 0.88);
+  --bg-subtle: #f8fafd;
+  --bg-row-even: #fafbfd;
+  --bg-row-hover: #eef5ff;
+  --bg-chip: #f1f3f4;
+  --text-main: #1f2937;
   --text-muted: #5f6368;
   --border-color: #dadce0;
-  --border-subtle: #e8eaed;
+  --border-subtle: #e5e7eb;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.07), 0 2px 4px rgba(15, 23, 42, 0.04);
+}
+
+html[data-theme="dark"] {
+  --gcp-blue: #60a5fa;
+  --gcp-blue-dark: #3b82f6;
+  --gcp-blue-light: rgba(59, 130, 246, 0.18);
+  --gcp-green: #4ade80;
+  --gcp-green-light: rgba(34, 197, 94, 0.18);
+  --gcp-yellow: #fbbf24;
+  --gcp-yellow-light: rgba(245, 158, 11, 0.18);
+  --gcp-red: #f87171;
+  --gcp-red-light: rgba(239, 68, 68, 0.18);
+  --gcp-purple: #c084fc;
+  --gcp-purple-light: rgba(168, 85, 247, 0.18);
+  --bg-page: #0b0f19;
+  --bg-card: #111827;
+  --bg-header: rgba(17, 24, 39, 0.88);
+  --bg-subtle: #1e293b;
+  --bg-row-even: #131c2e;
+  --bg-row-hover: #1e293b;
+  --bg-chip: #1e293b;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --border-subtle: #1f2937;
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.45);
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Google Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-page);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.55;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 a {
   color: var(--gcp-blue);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 a:hover {
   text-decoration: underline;
 }
 
-/* Header & Navigation */
+/* Unofficial Top Disclaimer Ribbon */
+.unofficial-ribbon {
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 50%, #eff6ff 100%);
+  border-bottom: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 12.5px;
+  padding: 7px 24px;
+}
+html[data-theme="dark"] .unofficial-ribbon {
+  background: linear-gradient(90deg, rgba(146, 64, 14, 0.28) 0%, rgba(30, 58, 138, 0.28) 100%);
+  border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fde68a;
+}
+.unofficial-ribbon-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.unofficial-ribbon a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+/* Header & Glassmorphic Navigation */
 .site-header {
-  background: #ffffff;
+  background: var(--bg-header);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 1px 3px rgba(60,64,67,0.06);
+  box-shadow: var(--shadow-sm);
 }
 .header-inner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 10px 24px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -102,25 +169,42 @@ a:hover {
   align-items: center;
   gap: 12px;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
+  letter-spacing: -0.2px;
   color: var(--text-main);
   text-decoration: none !important;
 }
 .brand-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc05 75%, #ea4335 100%);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 45%, #fbbc05 75%, #ea4335 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-weight: 800;
-  font-size: 15px;
-  box-shadow: 0 2px 6px rgba(26,115,232,0.25);
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(66, 133, 244, 0.3);
+}
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.unofficial-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--gcp-yellow-light);
+  color: var(--gcp-yellow);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 .brand-subtitle {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-muted);
   display: block;
@@ -129,17 +213,20 @@ a:hover {
 .nav-pills {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 4px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
   flex-wrap: wrap;
 }
 .nav-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 14px;
   border-radius: 20px;
   font-weight: 600;
   font-size: 13px;
@@ -148,27 +235,27 @@ a:hover {
   text-decoration: none !important;
 }
 .nav-link:hover {
-  background: #f1f3f4;
   color: var(--text-main);
+  background: var(--bg-card);
 }
 .nav-link.active {
   background: var(--gcp-blue);
   color: #ffffff;
-  box-shadow: 0 1px 4px rgba(26,115,232,0.3);
+  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 12px;
 }
 .cache-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  border-radius: 16px;
+  padding: 6px 12px;
+  border-radius: 20px;
   background: var(--gcp-green-light);
   color: var(--gcp-green);
   font-weight: 600;
@@ -178,19 +265,21 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  border-radius: 6px;
+  padding: 7px 13px;
+  border-radius: 8px;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 12.5px;
   cursor: pointer;
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--bg-card);
   color: var(--text-main);
-  transition: all 0.15s;
+  transition: all 0.15s ease;
   text-decoration: none !important;
+  box-shadow: var(--shadow-sm);
 }
 .btn:hover {
-  background: #f1f3f4;
+  border-color: var(--gcp-blue);
+  transform: translateY(-1px);
 }
 .btn-primary {
   background: var(--gcp-blue);
@@ -199,75 +288,97 @@ a:hover {
 }
 .btn-primary:hover {
   background: var(--gcp-blue-dark);
+  color: #ffffff;
 }
 
 /* Main Container */
 .container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 20px 24px 48px;
+  padding: 22px 24px 56px;
 }
 
-/* Status & KPI Banner */
+/* Status & Summary Banner */
 .status-bar {
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-left: 5px solid var(--gcp-blue);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px 20px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-sm);
 }
 
+/* Interactive KPI Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
 }
 .kpi-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 16px 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+  opacity: 0.85;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--gcp-blue);
 }
 .kpi-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .kpi-value {
-  font-size: 26px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
   color: var(--gcp-blue);
 }
 .kpi-sub {
   font-size: 12px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* Filter & Search Bar */
 .toolbar {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px 18px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
+  box-shadow: var(--shadow-sm);
 }
 .toolbar-group {
   display: flex;
@@ -279,39 +390,52 @@ a:hover {
 .search-input {
   min-width: 280px;
   flex: 1;
-  max-width: 440px;
-  padding: 9px 14px;
+  max-width: 460px;
+  padding: 10px 14px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-}
-.search-input:focus {
-  border-color: var(--gcp-blue);
-  box-shadow: 0 0 0 2px var(--gcp-blue-light);
-}
-.select-input {
-  padding: 9px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 13px;
-  background: #fff;
+  border-radius: 9px;
+  font-size: 13.5px;
+  background: var(--bg-subtle);
   color: var(--text-main);
   outline: none;
+  transition: all 0.15s ease;
+}
+.search-input:focus {
+  background: var(--bg-card);
+  border-color: var(--gcp-blue);
+  box-shadow: 0 0 0 3px var(--gcp-blue-light);
+}
+.select-input {
+  padding: 9px 13px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+}
+.select-input:focus {
+  border-color: var(--gcp-blue);
 }
 .count-label {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
 }
 
 /* Data Tables */
 .table-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-sm);
 }
 .table-scroll {
   overflow-x: auto;
@@ -323,34 +447,35 @@ table.data-table {
   font-size: 13.5px;
 }
 table.data-table thead tr {
-  background: #f8f9fa;
+  background: var(--bg-subtle);
   border-bottom: 2px solid var(--border-color);
 }
 table.data-table th {
-  padding: 12px 16px;
-  font-size: 11.5px;
+  padding: 13px 16px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   color: var(--text-muted);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 table.data-table th:hover {
   color: var(--gcp-blue);
-  background: #f1f3f4;
+  background: var(--bg-row-hover);
 }
 table.data-table td {
-  padding: 11px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
   vertical-align: middle;
 }
 table.data-table tbody tr:nth-child(even) {
-  background-color: #fafbfc;
+  background-color: var(--bg-row-even);
 }
 table.data-table tbody tr:hover {
-  background-color: #f0f6ff;
+  background-color: var(--bg-row-hover);
 }
 
 /* Badges & Pills */
@@ -358,8 +483,8 @@ table.data-table tbody tr:hover {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 9px;
-  border-radius: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
   white-space: nowrap;
@@ -369,16 +494,16 @@ table.data-table tbody tr:hover {
 .badge-yellow { background: var(--gcp-yellow-light); color: var(--gcp-yellow); }
 .badge-red { background: var(--gcp-red-light); color: var(--gcp-red); }
 .badge-purple { background: var(--gcp-purple-light); color: var(--gcp-purple); }
-.badge-gray { background: #f1f3f4; color: #3c4043; }
+.badge-gray { background: var(--bg-chip); color: var(--text-muted); }
 
 .code-chip {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
-  background: #f1f3f4;
-  color: #202124;
-  padding: 2px 7px;
-  border-radius: 5px;
-  border: 1px solid #e0e2e5;
+  background: var(--bg-chip);
+  color: var(--text-main);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
   display: inline-block;
   margin: 1px 2px;
 }
@@ -390,15 +515,15 @@ table.data-table tbody tr:hover {
   gap: 10px;
 }
 .cov-bar {
-  width: 90px;
+  width: 92px;
   height: 7px;
-  background: #e8eaed;
+  background: var(--border-subtle);
   border-radius: 4px;
   overflow: hidden;
 }
 .cov-fill {
   height: 100%;
-  background: var(--gcp-blue);
+  background: linear-gradient(90deg, #1a73e8, #34a853);
   border-radius: 4px;
 }
 
@@ -407,30 +532,31 @@ table.data-table tbody tr:hover {
   font-family: ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
   display: inline-block;
-  min-width: 54px;
+  min-width: 56px;
   text-align: center;
 }
-.verb-GET { background: #e8f0fe; color: #1967d2; }
-.verb-POST { background: #e6f4ea; color: #137333; }
-.verb-PATCH, .verb-PUT { background: #fef7e0; color: #b06000; }
-.verb-DELETE { background: #fce8e6; color: #c5221f; }
+.verb-GET { background: var(--gcp-blue-light); color: var(--gcp-blue); }
+.verb-POST { background: var(--gcp-green-light); color: var(--gcp-green); }
+.verb-PATCH, .verb-PUT { background: var(--gcp-yellow-light); color: var(--gcp-yellow); }
+.verb-DELETE { background: var(--gcp-red-light); color: var(--gcp-red); }
 
 /* Section Cards */
 .section-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  padding: 22px 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
 }
 .section-title {
   margin: 0 0 12px 0;
   font-size: 18px;
   font-weight: 700;
+  letter-spacing: -0.2px;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -439,18 +565,62 @@ table.data-table tbody tr:hover {
 
 /* Footer */
 .site-footer {
-  margin-top: 40px;
-  padding: 20px 24px;
+  margin-top: 48px;
+  padding: 24px;
   border-top: 1px solid var(--border-color);
   color: var(--text-muted);
   font-size: 12.5px;
   text-align: center;
-  background: #ffffff;
+  background: var(--bg-card);
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 """
     (assets_dir / "style.css").write_text(css.strip() + "\n", encoding="utf-8")
 
     js = """
+// Theme initialization & toggle (Light / Dark mode)
+(function initTheme() {
+  const saved = localStorage.getItem('gcp_explorer_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  if (next === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+  localStorage.setItem('gcp_explorer_theme', next);
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (btn) {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  }
+  // Press '/' to quickly focus the primary search box on any page
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+      const search = document.querySelector('input[type="search"]');
+      if (search) {
+        e.preventDefault();
+        search.focus();
+      }
+    }
+  });
+});
+
 // Shared table sorting, filtering, and local refresh trigger
 function setupTableFilter(config) {
   const searchInput = document.getElementById(config.searchId);
@@ -578,16 +748,33 @@ def render_layout(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{esc(title)} | GCP Services &amp; Regional Capabilities</title>
+  <title>{esc(title)} | GCP Services &amp; Regional Capabilities (Unofficial)</title>
   <link rel="stylesheet" href="{root_prefix}assets/style.css">
 </head>
 <body>
+  <div class="unofficial-ribbon">
+    <div class="unofficial-ribbon-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource:</strong> This is an independent community reference and is <strong>not affiliated with or endorsed by Google Cloud</strong>.
+      </div>
+      <div>
+        Always verify production availability in the
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official GCP Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation ↗</a>
+      </div>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="{root_prefix}index.html">
         <div class="brand-logo">GCP</div>
         <div>
-          GCP Services &amp; Regions
+          <div class="brand-title-row">
+            <span>GCP Services &amp; Regions</span>
+            <span class="unofficial-pill">Unofficial</span>
+          </div>
           <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
         </div>
       </a>
@@ -596,7 +783,8 @@ def render_layout(
       </ul>
       <div class="header-actions">
         <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • {esc(gen_at)}</span>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+        <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -604,25 +792,36 @@ def render_layout(
   <main class="container">
     <div class="status-bar">
       <div>
-        <strong>Updated on:</strong> {esc(gen_at)} —
-        with <strong>{counts.get('total_services', 0)}</strong> unique <a href="{root_prefix}index.html">GCP Services</a>,
-        <strong>{counts.get('available_regions', 0)}</strong> available <a href="{root_prefix}regions.html">Regions</a>
+        <strong>Snapshot Updated:</strong> {esc(gen_at)} —
+        <strong>{counts.get('total_services', 0)}</strong> <a href="{root_prefix}index.html">GCP Services</a>,
+        <strong>{counts.get('available_regions', 0)}</strong> <a href="{root_prefix}regions.html">Regions</a>
         (+<strong>{counts.get('future_regions', 0)}</strong> upcoming),
         <strong>{counts.get('total_zones', 0)}</strong> <a href="{root_prefix}pops.html">Availability Zones</a>,
         <strong>{counts.get('discovery_apis', 0)}</strong> <a href="{root_prefix}capabilities.html">Discovery APIs</a>, and
         <strong>{counts.get('total_api_methods', 0):,}</strong> REST API Operations.
       </div>
-      <div>
-        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
+        <span class="badge badge-blue">24h Local Cache + Exponential Backoff</span>
       </div>
     </div>
     {body_html}
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
-      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    <div class="footer-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource Disclaimer:</strong> This application is an independent, unofficial utility and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud.
+        Data is harvested once daily from public Google Cloud Location feeds, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+      </div>
+      <div style="margin-top:6px;">
+        For authoritative service availability, SLAs, and compliance information, always refer to the official documentation:
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
+        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
+        Google Cloud and all GCP service names are trademarks of Google LLC.
+      </div>
     </div>
   </footer>
   <script src="{root_prefix}assets/app.js"></script>
@@ -1275,14 +1474,14 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
         <div>
           <h2 class="section-title" style="margin-bottom:4px;">🔍 Multi-Region Capabilities &amp; Gap Comparison Matrix</h2>
-          <p style="margin:0;color:#5f6368;font-size:13px;">
-            Inspired by <code>builder.aws.com/build/capabilities</code> — compare up to 4 GCP Regions side-by-side across Services, Hardware Machine Series, GPU Accelerators, and API Operations.
+          <p style="margin:0;color:var(--text-muted);font-size:13px;">
+            Compare up to 4 GCP Regions side-by-side across Regional Services, Hardware Machine Series, GPU Accelerators, and Discovery REST API Operations.
           </p>
         </div>
         <button class="btn btn-primary" onclick="exportComparisonCSV()">⬇ Export Matrix CSV</button>
       </div>
 
-      <div class="toolbar" style="background:#f8f9fa;">
+      <div class="toolbar">
         <div class="toolbar-group">
           <div>
             <label style="font-size:11px;font-weight:700;color:#5f6368;display:block;">PRIMARY REGION (A)</label>
@@ -1625,16 +1824,14 @@ def generate_whatsnew_page(catalog: dict[str, Any]) -> None:
 
 
 def generate_arch_page(catalog: dict[str, Any]) -> None:
-    """Generate dist/arch.html (Architecture & Cost Breakdown, modeled on aws-services.info/arch.html)."""
+    """Generate dist/arch.html (Architecture & Cost Breakdown)."""
     meta = catalog["meta"]
     body = """
     <div class="section-card">
       <h2 class="section-title">🏗️ Solution Architecture (Local Cache Mode &amp; Serverless GCP Mode)</h2>
       <p>
-        Inspired by <a href="https://www.aws-services.info/arch.html" target="_blank" rel="noopener">aws-services.info/arch.html</a> and
-        <a href="https://builder.aws.com/build/capabilities" target="_blank" rel="noopener">builder.aws.com/build/capabilities</a>,
-        this solution is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
-        and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.78/month).
+        This unofficial explorer is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
+        and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.30/month).
       </p>
 
       <div style="background:#f8f9fa;border:1px solid #dadce0;border-radius:10px;padding:20px;margin:18px 0;overflow-x:auto;">
@@ -1660,7 +1857,7 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
 
           <rect x="30" y="184" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="206" font-size="12" font-weight="bold" fill="#202124">Google Discovery REST API</text>
-          <text x="42" y="222" font-size="10.5" fill="#5f6368">200+ $discovery/rest Specs (11k+ Methods)</text>
+          <text x="42" y="222" font-size="10.5" fill="#5f6368">200+ $discovery/rest Specs (10.5k+ Methods)</text>
 
           <rect x="30" y="246" width="220" height="44" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="267" font-size="12" font-weight="bold" fill="#202124">Edge &amp; CDN PoP Feeds</text>
@@ -1710,7 +1907,7 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
     <div class="section-card">
       <h2 class="section-title">🛡️ Quota &amp; Rate-Limit Protection Architecture</h2>
       <ul>
-        <li><strong>Daily 24-Hour Cache TTL (`data/cache/gcp_catalog.json`):</strong> All user searches, region lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream GCP endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
+        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream GCP endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
         <li><strong>Token-Bucket Rate Limiting:</strong> Outbound requests during the daily harvest are paced through a thread-safe token-bucket rate limiter (default 15 requests/sec across 8 bounded worker threads) to prevent burst quota exhaustion on <code>discovery.googleapis.com</code>.</li>
         <li><strong>Exponential Backoff with Full Jitter &amp; <code>Retry-After</code> Parsing:</strong> Any HTTP <code>429 Too Many Requests</code>, <code>403 Rate Limit Exceeded</code>, or <code>5xx</code> response automatically honors the server's <code>Retry-After</code> header or backs off using <code>random.uniform(0.5 * base * 2^attempt, base * 2^attempt)</code> up to 5 attempts.</li>
         <li><strong>Per-API Disk Checkpointing &amp; Graceful Stale-Cache Fallback:</strong> Every Discovery REST spec (<code>data/cache/discovery/{api}_{version}.json</code>) is atomically written to disk as soon as it arrives. If network connectivity drops mid-run, re-running resumes instantly without re-fetching completed specs, and falls back to the last known good cached spec if an upstream endpoint is temporarily unreachable.</li>
@@ -1718,50 +1915,50 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
     </div>
 
     <div class="section-card">
-      <h2 class="section-title">☁️ Equivalent Serverless Google Cloud Production Architecture &amp; Cost</h2>
-      <p>Just like <a href="https://www.aws-services.info/arch.html" target="_blank" rel="noopener">aws-services.info/arch.html</a> uses ECR + Lambda + EventBridge + S3 + CloudFront + WAF, here is the 1-to-1 Google Cloud Serverless mapping and monthly cost breakdown:</p>
+      <h2 class="section-title">☁️ Serverless Google Cloud Hosting Architecture &amp; Monthly Cost Breakdown</h2>
+      <p>If deployed to Google Cloud in addition to running locally, the daily harvester and static site can be hosted serverlessly at near-zero cost:</p>
       <div class="table-scroll">
         <table class="data-table">
           <thead>
             <tr>
               <th>Component Role</th>
-              <th>AWS Reference (aws-services.info)</th>
               <th>Google Cloud Native Service</th>
+              <th>Configuration &amp; Sizing</th>
               <th>Monthly GCP Cost Estimate (Excl. Free Tier)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><strong>Container Registry</strong></td>
-              <td>Amazon ECR</td>
-              <td><strong>Artifact Registry</strong> (1 GB container image)</td>
+              <td><strong>Artifact Registry</strong></td>
+              <td>1 GB container image storage</td>
               <td><code>1 GB × $0.10/GB = $0.10 / month</code></td>
             </tr>
             <tr>
-              <td><strong>Serverless Harvester Runtime</strong></td>
-              <td>AWS Lambda + EventBridge</td>
-              <td><strong>Cloud Run Jobs + Cloud Scheduler</strong> (1 run/day × 30s × 1 vCPU / 1 GiB)</td>
+              <td><strong>Daily Harvester Runtime</strong></td>
+              <td><strong>Cloud Run Jobs + Cloud Scheduler</strong></td>
+              <td>1 run/day × 30s × 1 vCPU / 1 GiB RAM</td>
               <td><code>900 vCPU-s &amp; 900 GiB-s = $0.03 / month</code></td>
             </tr>
             <tr>
               <td><strong>Static Site Object Storage</strong></td>
-              <td>Amazon S3 (Private Bucket)</td>
-              <td><strong>Cloud Storage (Standard, Private Bucket)</strong> (1 GB storage + 10k PUT/GET ops)</td>
+              <td><strong>Cloud Storage (Standard Bucket)</strong></td>
+              <td>1 GB storage + 10k PUT/GET operations</td>
               <td><code>$0.020 + $0.054 = $0.08 / month</code></td>
             </tr>
             <tr>
-              <td><strong>Global CDN Delivery</strong></td>
-              <td>Amazon CloudFront</td>
-              <td><strong>Cloud CDN</strong> (1 GB cache egress + 10k HTTPS requests)</td>
+              <td><strong>Global Edge Caching</strong></td>
+              <td><strong>Cloud CDN + Global External Application LB</strong></td>
+              <td>1 GB cache egress + 10k HTTPS requests</td>
               <td><code>1 GB × $0.08 + requests = $0.09 / month</code></td>
             </tr>
             <tr>
               <td><strong>Edge Security / WAF (Optional)</strong></td>
-              <td>AWS WAF</td>
-              <td><strong>Google Cloud Armor Standard</strong> (1 Policy + Rules + 1M requests)</td>
+              <td><strong>Google Cloud Armor Standard</strong></td>
+              <td>1 Security Policy + Rules + 1M requests</td>
               <td><code>$5.00 policy + rules (Optional)</code></td>
             </tr>
-            <tr style="background:#e8f0fe;font-weight:700;">
+            <tr style="background:var(--gcp-blue-light);font-weight:700;">
               <td colspan="3">Total Monthly Cost (Local Workstation Mode / Cloud Serverless Mode without optional WAF)</td>
               <td>$0.00 Locally / ~$0.30/month on GCP</td>
             </tr>
@@ -1783,9 +1980,16 @@ def generate_faqs_page(catalog: dict[str, Any]) -> None:
     <div class="section-card">
       <h2 class="section-title">❓ Frequently Asked Questions (FAQs) &amp; Local CLI Guide</h2>
 
-      <p><strong>Q: Why was this tool created?</strong></p>
+      <p><strong>Q: Is this an official Google Cloud website or product?</strong></p>
       <ul>
-        <li>Finding out which Google Cloud services, APIs, machine series, or GPUs are available in a specific GCP region—or conversely, finding all regions where a specific GCP service is deployed—often requires cross-referencing multiple documentation pages. This tool harvests all official GCP location feeds, zone hardware matrices, and Google Discovery REST APIs into a single local, cached, instant-search application.</li>
+        <li><strong>No.</strong> This is an <strong>unofficial, independent community resource</strong> and is not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
+        <li>While data is automatically harvested from public Google Cloud feeds and Discovery APIs, it is provided "as-is" without warranty. Always consult the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones Documentation</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> before making production decisions.</li>
+      </ul>
+
+      <p><strong>Q: What happens when Google Cloud launches a brand-new service, region, zone, or API?</strong></p>
+      <ul>
+        <li><strong>Zero-Touch Dynamic Discovery:</strong> Every daily harvest dynamically pulls the live product/region feeds (<code>data.json</code>, <code>locations_map.json</code>, <code>multi-region-data.json</code>, <code>global-data.json</code>), live Compute Engine zone/GPU tables, and the live Google APIs Discovery directory (<code>discovery.googleapis.com/discovery/v1/apis</code>).</li>
+        <li>Any newly launched service, region, zone, machine series, GPU, or REST API is automatically ingested, matched via documentation URL slug and title similarity, given its own detail page, and highlighted in the <a href="whatsnew.html">What's New</a> tab without requiring any code changes.</li>
       </ul>
 
       <p><strong>Q: How often is the data refreshed, and how are API quota issues prevented?</strong></p>
@@ -1796,7 +2000,7 @@ def generate_faqs_page(catalog: dict[str, Any]) -> None:
       </ul>
 
       <p><strong>Q: How do I run the application locally?</strong></p>
-      <pre style="background:#f1f3f4;padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
+      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
 python3 server.py --port 8080
 
 # 2. Or open the static HTML files directly in any browser:
@@ -1807,7 +2011,7 @@ python3 cli.py service "Vertex AI"
 python3 cli.py service alloydb
 python3 cli.py region us-central1
 python3 cli.py region asia-south1
-python3 cli.py compare us-central1 europe-west1 asia-south1
+python3 cli.py compare us-central1 europe-west1 asia-south1 --diff
 
 # 4. Force an immediate live re-harvest &amp; static site rebuild:
 python3 cli.py refresh --force</pre>

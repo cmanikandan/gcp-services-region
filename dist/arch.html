@@ -3,16 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Architecture &amp; Cost | GCP Services &amp; Regional Capabilities</title>
+  <title>Architecture &amp; Cost | GCP Services &amp; Regional Capabilities (Unofficial)</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
+  <div class="unofficial-ribbon">
+    <div class="unofficial-ribbon-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource:</strong> This is an independent community reference and is <strong>not affiliated with or endorsed by Google Cloud</strong>.
+      </div>
+      <div>
+        Always verify production availability in the
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official GCP Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation ↗</a>
+      </div>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="index.html">
         <div class="brand-logo">GCP</div>
         <div>
-          GCP Services &amp; Regions
+          <div class="brand-title-row">
+            <span>GCP Services &amp; Regions</span>
+            <span class="unofficial-pill">Unofficial</span>
+          </div>
           <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
         </div>
       </a>
@@ -26,8 +43,9 @@
 <li><a href="faqs.html" class="nav-link ">FAQs & CLI</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 15:56:39 UTC</span>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 16:27:53 UTC</span>
+        <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -35,26 +53,25 @@
   <main class="container">
     <div class="status-bar">
       <div>
-        <strong>Updated on:</strong> 2026-10-09 15:56:39 UTC —
-        with <strong>153</strong> unique <a href="index.html">GCP Services</a>,
-        <strong>43</strong> available <a href="regions.html">Regions</a>
+        <strong>Snapshot Updated:</strong> 2026-10-09 16:27:53 UTC —
+        <strong>153</strong> <a href="index.html">GCP Services</a>,
+        <strong>43</strong> <a href="regions.html">Regions</a>
         (+<strong>4</strong> upcoming),
         <strong>130</strong> <a href="pops.html">Availability Zones</a>,
         <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
         <strong>10,501</strong> REST API Operations.
       </div>
-      <div>
-        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
+        <span class="badge badge-blue">24h Local Cache + Exponential Backoff</span>
       </div>
     </div>
     
     <div class="section-card">
       <h2 class="section-title">🏗️ Solution Architecture (Local Cache Mode &amp; Serverless GCP Mode)</h2>
       <p>
-        Inspired by <a href="https://www.aws-services.info/arch.html" target="_blank" rel="noopener">aws-services.info/arch.html</a> and
-        <a href="https://builder.aws.com/build/capabilities" target="_blank" rel="noopener">builder.aws.com/build/capabilities</a>,
-        this solution is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
-        and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.78/month).
+        This unofficial explorer is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
+        and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.30/month).
       </p>
 
       <div style="background:#f8f9fa;border:1px solid #dadce0;border-radius:10px;padding:20px;margin:18px 0;overflow-x:auto;">
@@ -80,7 +97,7 @@
 
           <rect x="30" y="184" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="206" font-size="12" font-weight="bold" fill="#202124">Google Discovery REST API</text>
-          <text x="42" y="222" font-size="10.5" fill="#5f6368">200+ $discovery/rest Specs (11k+ Methods)</text>
+          <text x="42" y="222" font-size="10.5" fill="#5f6368">200+ $discovery/rest Specs (10.5k+ Methods)</text>
 
           <rect x="30" y="246" width="220" height="44" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="267" font-size="12" font-weight="bold" fill="#202124">Edge &amp; CDN PoP Feeds</text>
@@ -130,7 +147,7 @@
     <div class="section-card">
       <h2 class="section-title">🛡️ Quota &amp; Rate-Limit Protection Architecture</h2>
       <ul>
-        <li><strong>Daily 24-Hour Cache TTL (`data/cache/gcp_catalog.json`):</strong> All user searches, region lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream GCP endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
+        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream GCP endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
         <li><strong>Token-Bucket Rate Limiting:</strong> Outbound requests during the daily harvest are paced through a thread-safe token-bucket rate limiter (default 15 requests/sec across 8 bounded worker threads) to prevent burst quota exhaustion on <code>discovery.googleapis.com</code>.</li>
         <li><strong>Exponential Backoff with Full Jitter &amp; <code>Retry-After</code> Parsing:</strong> Any HTTP <code>429 Too Many Requests</code>, <code>403 Rate Limit Exceeded</code>, or <code>5xx</code> response automatically honors the server's <code>Retry-After</code> header or backs off using <code>random.uniform(0.5 * base * 2^attempt, base * 2^attempt)</code> up to 5 attempts.</li>
         <li><strong>Per-API Disk Checkpointing &amp; Graceful Stale-Cache Fallback:</strong> Every Discovery REST spec (<code>data/cache/discovery/{api}_{version}.json</code>) is atomically written to disk as soon as it arrives. If network connectivity drops mid-run, re-running resumes instantly without re-fetching completed specs, and falls back to the last known good cached spec if an upstream endpoint is temporarily unreachable.</li>
@@ -138,50 +155,50 @@
     </div>
 
     <div class="section-card">
-      <h2 class="section-title">☁️ Equivalent Serverless Google Cloud Production Architecture &amp; Cost</h2>
-      <p>Just like <a href="https://www.aws-services.info/arch.html" target="_blank" rel="noopener">aws-services.info/arch.html</a> uses ECR + Lambda + EventBridge + S3 + CloudFront + WAF, here is the 1-to-1 Google Cloud Serverless mapping and monthly cost breakdown:</p>
+      <h2 class="section-title">☁️ Serverless Google Cloud Hosting Architecture &amp; Monthly Cost Breakdown</h2>
+      <p>If deployed to Google Cloud in addition to running locally, the daily harvester and static site can be hosted serverlessly at near-zero cost:</p>
       <div class="table-scroll">
         <table class="data-table">
           <thead>
             <tr>
               <th>Component Role</th>
-              <th>AWS Reference (aws-services.info)</th>
               <th>Google Cloud Native Service</th>
+              <th>Configuration &amp; Sizing</th>
               <th>Monthly GCP Cost Estimate (Excl. Free Tier)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><strong>Container Registry</strong></td>
-              <td>Amazon ECR</td>
-              <td><strong>Artifact Registry</strong> (1 GB container image)</td>
+              <td><strong>Artifact Registry</strong></td>
+              <td>1 GB container image storage</td>
               <td><code>1 GB × $0.10/GB = $0.10 / month</code></td>
             </tr>
             <tr>
-              <td><strong>Serverless Harvester Runtime</strong></td>
-              <td>AWS Lambda + EventBridge</td>
-              <td><strong>Cloud Run Jobs + Cloud Scheduler</strong> (1 run/day × 30s × 1 vCPU / 1 GiB)</td>
+              <td><strong>Daily Harvester Runtime</strong></td>
+              <td><strong>Cloud Run Jobs + Cloud Scheduler</strong></td>
+              <td>1 run/day × 30s × 1 vCPU / 1 GiB RAM</td>
               <td><code>900 vCPU-s &amp; 900 GiB-s = $0.03 / month</code></td>
             </tr>
             <tr>
               <td><strong>Static Site Object Storage</strong></td>
-              <td>Amazon S3 (Private Bucket)</td>
-              <td><strong>Cloud Storage (Standard, Private Bucket)</strong> (1 GB storage + 10k PUT/GET ops)</td>
+              <td><strong>Cloud Storage (Standard Bucket)</strong></td>
+              <td>1 GB storage + 10k PUT/GET operations</td>
               <td><code>$0.020 + $0.054 = $0.08 / month</code></td>
             </tr>
             <tr>
-              <td><strong>Global CDN Delivery</strong></td>
-              <td>Amazon CloudFront</td>
-              <td><strong>Cloud CDN</strong> (1 GB cache egress + 10k HTTPS requests)</td>
+              <td><strong>Global Edge Caching</strong></td>
+              <td><strong>Cloud CDN + Global External Application LB</strong></td>
+              <td>1 GB cache egress + 10k HTTPS requests</td>
               <td><code>1 GB × $0.08 + requests = $0.09 / month</code></td>
             </tr>
             <tr>
               <td><strong>Edge Security / WAF (Optional)</strong></td>
-              <td>AWS WAF</td>
-              <td><strong>Google Cloud Armor Standard</strong> (1 Policy + Rules + 1M requests)</td>
+              <td><strong>Google Cloud Armor Standard</strong></td>
+              <td>1 Security Policy + Rules + 1M requests</td>
               <td><code>$5.00 policy + rules (Optional)</code></td>
             </tr>
-            <tr style="background:#e8f0fe;font-weight:700;">
+            <tr style="background:var(--gcp-blue-light);font-weight:700;">
               <td colspan="3">Total Monthly Cost (Local Workstation Mode / Cloud Serverless Mode without optional WAF)</td>
               <td>$0.00 Locally / ~$0.30/month on GCP</td>
             </tr>
@@ -193,9 +210,19 @@
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
-      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    <div class="footer-inner">
+      <div>
+        <strong>⚠️ Unofficial Resource Disclaimer:</strong> This application is an independent, unofficial utility and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud.
+        Data is harvested once daily from public Google Cloud Location feeds, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+      </div>
+      <div style="margin-top:6px;">
+        For authoritative service availability, SLAs, and compliance information, always refer to the official documentation:
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
+        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
+        Google Cloud and all GCP service names are trademarks of Google LLC.
+      </div>
     </div>
   </footer>
   <script src="assets/app.js"></script>
