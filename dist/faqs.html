@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQs &amp; CLI Usage | GCP Services &amp; Regional Capabilities</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-logo">GCP</div>
+        <div>
+          GCP Services &amp; Regions
+          <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
+        </div>
+      </a>
+      <ul class="nav-pills">
+        <li><a href="index.html" class="nav-link ">Services</a></li>
+<li><a href="regions.html" class="nav-link ">Regions</a></li>
+<li><a href="capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
+<li><a href="pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
+<li><a href="whatsnew.html" class="nav-link ">What's New</a></li>
+<li><a href="arch.html" class="nav-link ">Architecture</a></li>
+<li><a href="faqs.html" class="nav-link active">FAQs & CLI</a></li>
+      </ul>
+      <div class="header-actions">
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 15:56:39 UTC</span>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="status-bar">
+      <div>
+        <strong>Updated on:</strong> 2026-10-09 15:56:39 UTC —
+        with <strong>153</strong> unique <a href="index.html">GCP Services</a>,
+        <strong>43</strong> available <a href="regions.html">Regions</a>
+        (+<strong>4</strong> upcoming),
+        <strong>130</strong> <a href="pops.html">Availability Zones</a>,
+        <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
+        <strong>10,501</strong> REST API Operations.
+      </div>
+      <div>
+        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      </div>
+    </div>
+    
+    <div class="section-card">
+      <h2 class="section-title">❓ Frequently Asked Questions (FAQs) &amp; Local CLI Guide</h2>
+
+      <p><strong>Q: Why was this tool created?</strong></p>
+      <ul>
+        <li>Finding out which Google Cloud services, APIs, machine series, or GPUs are available in a specific GCP region—or conversely, finding all regions where a specific GCP service is deployed—often requires cross-referencing multiple documentation pages. This tool harvests all official GCP location feeds, zone hardware matrices, and Google Discovery REST APIs into a single local, cached, instant-search application.</li>
+      </ul>
+
+      <p><strong>Q: How often is the data refreshed, and how are API quota issues prevented?</strong></p>
+      <ul>
+        <li>By default, the dataset is refreshed <strong>once per day (24-hour TTL = 86,400 seconds)</strong>.</li>
+        <li>All UI interactions, searches, region comparisons, and CLI queries read from the local cache (<code>data/cache/gcp_catalog.json</code>) and pre-rendered static HTML files in <code>dist/</code>—making <strong>zero external API calls</strong> during normal usage.</li>
+        <li>When the daily harvest runs, <code>ResilientFetcher</code> enforces a token-bucket rate limit, checkpoints every individual API specification to disk, and automatically retries any <code>429</code> / <code>403</code> / <code>5xx</code> responses using exponential backoff with full jitter.</li>
+      </ul>
+
+      <p><strong>Q: How do I run the application locally?</strong></p>
+      <pre style="background:#f1f3f4;padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
+python3 server.py --port 8080
+
+# 2. Or open the static HTML files directly in any browser:
+open dist/index.html
+
+# 3. Query from the terminal using cli.py (uses the local 24h cache):
+python3 cli.py service "Vertex AI"
+python3 cli.py service alloydb
+python3 cli.py region us-central1
+python3 cli.py region asia-south1
+python3 cli.py compare us-central1 europe-west1 asia-south1
+
+# 4. Force an immediate live re-harvest &amp; static site rebuild:
+python3 cli.py refresh --force</pre>
+    </div>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
+      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    </div>
+  </footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>

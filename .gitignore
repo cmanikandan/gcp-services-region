@@ -1,0 +1,8 @@
+# Ignore raw & per-API discovery cache files (keep master gcp_catalog.json & generated static site)
+data/cache/raw/
+data/cache/discovery/
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+*.tmp

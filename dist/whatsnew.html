@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What&#x27;s New | GCP Services &amp; Regional Capabilities</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-logo">GCP</div>
+        <div>
+          GCP Services &amp; Regions
+          <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
+        </div>
+      </a>
+      <ul class="nav-pills">
+        <li><a href="index.html" class="nav-link ">Services</a></li>
+<li><a href="regions.html" class="nav-link ">Regions</a></li>
+<li><a href="capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
+<li><a href="pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
+<li><a href="whatsnew.html" class="nav-link active">What's New</a></li>
+<li><a href="arch.html" class="nav-link ">Architecture</a></li>
+<li><a href="faqs.html" class="nav-link ">FAQs & CLI</a></li>
+      </ul>
+      <div class="header-actions">
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 15:56:39 UTC</span>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="status-bar">
+      <div>
+        <strong>Updated on:</strong> 2026-10-09 15:56:39 UTC —
+        with <strong>153</strong> unique <a href="index.html">GCP Services</a>,
+        <strong>43</strong> available <a href="regions.html">Regions</a>
+        (+<strong>4</strong> upcoming),
+        <strong>130</strong> <a href="pops.html">Availability Zones</a>,
+        <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
+        <strong>10,501</strong> REST API Operations.
+      </div>
+      <div>
+        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      </div>
+    </div>
+    
+    <div class="section-card">
+      <h2 class="section-title">🆕 What's New — Regional Launches &amp; Daily Snapshot Diffs</h2>
+      <p style="margin:0 0 14px 0;color:#5f6368;">
+        Every daily run of <code>harvester.py</code> saves a dated snapshot to <code>data/cache/snapshots/YYYY-MM-DD.json</code> and automatically computes newly added services per region, alongside chronological GCP region launches and announced future regions.
+      </p>
+      <div class="toolbar" style="margin-bottom:12px;">
+        <input id="wn-search" type="search" class="search-input" placeholder="Search recent region launches, upcoming regions, or service expansions...">
+        <div id="wn-count" class="count-label">Showing 18 of 18</div>
+      </div>
+      <div class="table-scroll">
+        <table id="wn-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="str">Date / Year ⇅</th>
+              <th data-sort="str">Change Type ⇅</th>
+              <th data-sort="str">Service / Scope ⇅</th>
+              <th data-sort="str">Region ⇅</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td data-val="2026"><strong>2026</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>40 Regional Services</strong></td><td>Bangkok (<a href="regions/asia-southeast3.html"><code>asia-southeast3</code></a>)</td><td>GCP Region Bangkok (asia-southeast3) launched in Bangkok, Thailand, APAC (3 zones)</td></tr><tr><td data-val="2025"><strong>2025</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>51 Regional Services</strong></td><td>Mexico* (<a href="regions/northamerica-south1.html"><code>northamerica-south1</code></a>)</td><td>GCP Region Mexico* (northamerica-south1) launched in Queretaro, Mexico, North America (3 zones)</td></tr><tr><td data-val="2025"><strong>2025</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>62 Regional Services</strong></td><td>Stockholm* (<a href="regions/europe-north2.html"><code>europe-north2</code></a>)</td><td>GCP Region Stockholm* (europe-north2) launched in Stockholm, Sweden, Europe (3 zones)</td></tr><tr><td data-val="2024"><strong>2024</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>71 Regional Services</strong></td><td>Johannesburg (<a href="regions/africa-south1.html"><code>africa-south1</code></a>)</td><td>GCP Region Johannesburg (africa-south1) launched in Johannesburg, South Africa (3 zones)</td></tr><tr><td data-val="2023"><strong>2023</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>72 Regional Services</strong></td><td>Dammam (<a href="regions/me-central2.html"><code>me-central2</code></a>)</td><td>GCP Region Dammam (me-central2) launched in Dammam, Saudi Arabia, Middle East (3 zones)</td></tr><tr><td data-val="2023"><strong>2023</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>71 Regional Services</strong></td><td>Doha (<a href="regions/me-central1.html"><code>me-central1</code></a>)</td><td>GCP Region Doha (me-central1) launched in Doha, Qatar, Middle East (3 zones)</td></tr><tr><td data-val="2023"><strong>2023</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>75 Regional Services</strong></td><td>Turin (<a href="regions/europe-west12.html"><code>europe-west12</code></a>)</td><td>GCP Region Turin (europe-west12) launched in Turin, Italy, Europe (3 zones)</td></tr><tr><td data-val="2023"><strong>2023</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>65 Regional Services</strong></td><td>Berlin (<a href="regions/europe-west10.html"><code>europe-west10</code></a>)</td><td>GCP Region Berlin (europe-west10) launched in Berlin, Germany, Europe (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>73 Regional Services</strong></td><td>Dallas (<a href="regions/us-south1.html"><code>us-south1</code></a>)</td><td>GCP Region Dallas (us-south1) launched in Dallas, Texas, North America (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>77 Regional Services</strong></td><td>Columbus (<a href="regions/us-east5.html"><code>us-east5</code></a>)</td><td>GCP Region Columbus (us-east5) launched in Columbus, Ohio, North America (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>73 Regional Services</strong></td><td>Tel Aviv (<a href="regions/me-west1.html"><code>me-west1</code></a>)</td><td>GCP Region Tel Aviv (me-west1) launched in Tel Aviv, Israel, Middle East (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>77 Regional Services</strong></td><td>Paris (<a href="regions/europe-west9.html"><code>europe-west9</code></a>)</td><td>GCP Region Paris (europe-west9) launched in Paris, France, Europe (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>78 Regional Services</strong></td><td>Milan (<a href="regions/europe-west8.html"><code>europe-west8</code></a>)</td><td>GCP Region Milan (europe-west8) launched in Milan, Italy, Europe (3 zones)</td></tr><tr><td data-val="2022"><strong>2022</strong></td><td><span class="badge badge-blue">Region Launch</span></td><td><strong>75 Regional Services</strong></td><td>Madrid (<a href="regions/europe-southwest1.html"><code>europe-southwest1</code></a>)</td><td>GCP Region Madrid (europe-southwest1) launched in Madrid, Spain, Europe (3 zones)</td></tr><tr><td data-val="Upcoming"><strong>Upcoming</strong></td><td><span class="badge badge-yellow">Announced Future Region</span></td><td><strong>Core GCP Launch Bundle</strong></td><td>Phoenix (<code>future-phoenix</code>)</td><td>Announced upcoming GCP region in Phoenix (North America)</td></tr><tr><td data-val="Upcoming"><strong>Upcoming</strong></td><td><span class="badge badge-yellow">Announced Future Region</span></td><td><strong>Core GCP Launch Bundle</strong></td><td>Kuwait (<code>future-kuwait</code>)</td><td>Announced upcoming GCP region in Kuwait (Middle East)</td></tr><tr><td data-val="Upcoming"><strong>Upcoming</strong></td><td><span class="badge badge-yellow">Announced Future Region</span></td><td><strong>Core GCP Launch Bundle</strong></td><td>Ankara (<code>future-ankara</code>)</td><td>Announced upcoming GCP region in Ankara (Europe)</td></tr><tr><td data-val="Upcoming"><strong>Upcoming</strong></td><td><span class="badge badge-yellow">Announced Future Region</span></td><td><strong>Core GCP Launch Bundle</strong></td><td>Kuala Lumpur (<code>future-kuala-lumpur</code>)</td><td>Announced upcoming GCP region in Kuala Lumpur (Asia Pacific)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        setupTableFilter({ searchId: 'wn-search', tableId: 'wn-table', countId: 'wn-count' });
+      });
+    </script>
+    
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
+      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    </div>
+  </footer>
+  <script src="assets/app.js"></script>
+</body>
+</html>

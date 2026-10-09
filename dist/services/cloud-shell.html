@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloud Shell - GCP Regional Availability | GCP Services &amp; Regional Capabilities</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../index.html">
+        <div class="brand-logo">GCP</div>
+        <div>
+          GCP Services &amp; Regions
+          <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
+        </div>
+      </a>
+      <ul class="nav-pills">
+        <li><a href="../index.html" class="nav-link active">Services</a></li>
+<li><a href="../regions.html" class="nav-link ">Regions</a></li>
+<li><a href="../capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
+<li><a href="../pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
+<li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
+<li><a href="../arch.html" class="nav-link ">Architecture</a></li>
+<li><a href="../faqs.html" class="nav-link ">FAQs & CLI</a></li>
+      </ul>
+      <div class="header-actions">
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 15:56:39 UTC</span>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh Cache</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="status-bar">
+      <div>
+        <strong>Updated on:</strong> 2026-10-09 15:56:39 UTC —
+        with <strong>153</strong> unique <a href="../index.html">GCP Services</a>,
+        <strong>43</strong> available <a href="../regions.html">Regions</a>
+        (+<strong>4</strong> upcoming),
+        <strong>130</strong> <a href="../pops.html">Availability Zones</a>,
+        <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a>, and
+        <strong>10,501</strong> REST API Operations.
+      </div>
+      <div>
+        <span class="badge badge-blue">Quota-Resilient Harvester (24h Cache TTL + Exponential Backoff)</span>
+      </div>
+    </div>
+    
+        <div class="section-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:12px;color:#5f6368;margin-bottom:4px;">
+                <a href="../index.html">← Back to All GCP Services</a> • Category: <strong>Management tools</strong>
+              </div>
+              <h1 style="margin:0 0 8px 0;font-size:24px;color:#1a73e8;">Cloud Shell</h1>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                <span class="badge badge-blue">Global</span>
+                <span class="badge badge-green">0 / 43 Regions (0.0%)</span>
+                <span class="badge badge-purple">10 API Operations</span>
+                <a href="https://docs.cloud.google.com/shell/docs" target="_blank" rel="noopener" class="btn">Official Documentation ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h2 class="section-title">🌍 Regional Availability for "Cloud Shell" (0 Regions)</h2>
+          <div class="toolbar" style="margin-bottom:12px;">
+            <input id="svc-reg-search" type="search" class="search-input" placeholder="Filter regions for Cloud Shell...">
+            <div id="svc-reg-count" class="count-label">Showing 0 of 0</div>
+          </div>
+          <div class="table-scroll">
+            <table id="svc-reg-table" class="data-table">
+              <thead>
+                <tr>
+                  <th data-sort="str">Region Code ⇅</th>
+                  <th data-sort="str">Region Name ⇅</th>
+                  <th data-sort="str">Geographic Location ⇅</th>
+                  <th>Availability Zones</th>
+                  <th>Regional API Target / Location</th>
+                  <th data-sort="str">Region Launch Year ⇅</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="6">This is a Global / Multi-Region GCP Service served across Google Cloud global edge & control plane endpoints.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <h2 class="section-title">⚠️ Regions Where "Cloud Shell" Is Not Listed (43 Regions)</h2>
+          <div><a href="../regions/africa-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">africa-south1 (Johannesburg)</a> <a href="../regions/asia-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east1 (Taiwan)</a> <a href="../regions/asia-east2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east2 (Hong Kong)</a> <a href="../regions/asia-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast1 (Tokyo)</a> <a href="../regions/asia-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast2 (Osaka*)</a> <a href="../regions/asia-northeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast3 (Seoul)</a> <a href="../regions/asia-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south1 (Mumbai)</a> <a href="../regions/asia-south2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south2 (Delhi)</a> <a href="../regions/asia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast1 (Singapore)</a> <a href="../regions/asia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast2 (Jakarta)</a> <a href="../regions/asia-southeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast3 (Bangkok)</a> <a href="../regions/australia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast1 (Sydney)</a> <a href="../regions/australia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast2 (Melbourne)</a> <a href="../regions/europe-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-central2 (Warsaw)</a> <a href="../regions/europe-north1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north1 (Finland)</a> <a href="../regions/europe-north2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north2 (Stockholm*)</a> <a href="../regions/europe-southwest1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-southwest1 (Madrid)</a> <a href="../regions/europe-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west1 (Belgium)</a> <a href="../regions/europe-west10.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west10 (Berlin)</a> <a href="../regions/europe-west12.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west12 (Turin)</a> <a href="../regions/europe-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west2 (London)</a> <a href="../regions/europe-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west3 (Frankfurt)</a> <a href="../regions/europe-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west4 (Netherlands)</a> <a href="../regions/europe-west6.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west6 (Zurich)</a> <a href="../regions/europe-west8.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west8 (Milan)</a> <a href="../regions/europe-west9.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west9 (Paris)</a> <a href="../regions/me-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central1 (Doha)</a> <a href="../regions/me-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central2 (Dammam)</a> <a href="../regions/me-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-west1 (Tel Aviv)</a> <a href="../regions/northamerica-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast1 (Montréal*)</a> <a href="../regions/northamerica-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast2 (Toronto)</a> <a href="../regions/northamerica-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-south1 (Mexico*)</a> <a href="../regions/southamerica-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-east1 (São Paulo)</a> <a href="../regions/southamerica-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-west1 (Santiago)</a> <a href="../regions/us-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-central1 (Iowa)</a> <a href="../regions/us-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east1 (South Carolina)</a> <a href="../regions/us-east4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east4 (North Virginia)</a> <a href="../regions/us-east5.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east5 (Columbus)</a> <a href="../regions/us-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-south1 (Dallas)</a> <a href="../regions/us-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west1 (Oregon)</a> <a href="../regions/us-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west2 (Los Angeles)</a> <a href="../regions/us-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west3 (Salt Lake City)</a> <a href="../regions/us-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west4 (Las Vegas)</a></div>
+        </div>
+
+        <div class="section-card" id="api-methods">
+          <h2 class="section-title">⚙️ Google Cloud Discovery APIs &amp; Capabilities (10 Operations)</h2>
+          <div style="padding:14px;border:1px solid #e8eaed;border-radius:8px;margin-bottom:10px;background:#fafbfc;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><strong>Cloud Shell API</strong> <span class="code-chip" style="color:#1a73e8;font-weight:700;">cloudshell.googleapis.com</span></div><div><span class="badge badge-blue">Preferred: v1</span> <span class="badge badge-gray">Versions: v1</span> <span class="badge badge-green">10 REST Methods (0 regional)</span></div></div><div style="margin-top:8px;font-size:12.5px;color:#5f6368;">Top-Level Resources: <span class="code-chip">operations</span> <span class="code-chip">users</span></div></div>
+          
+          <div class="toolbar" style="margin-top:14px;margin-bottom:12px;">
+            <input id="api-m-search" type="search" class="search-input" placeholder="Search REST API method ID, HTTP verb (POST, GET, DELETE), path, or description...">
+            <div id="api-m-count" class="count-label">Showing 10 of 10</div>
+          </div>
+          <div class="table-scroll">
+            <table id="api-m-table" class="data-table">
+              <thead>
+                <tr>
+                  <th data-sort="str">HTTP ⇅</th>
+                  <th data-sort="str">Method ID ⇅</th>
+                  <th data-sort="str">REST Endpoint Path ⇅</th>
+                  <th data-sort="str">Scope ⇅</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.operations.cancel</span></td><td><span class="code-chip">v1/operations/{operationsId}:cancel</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn&#x27;t support this method, it returns `google.rpc.Co...</td></tr><tr><td><span class="verb verb-DELETE">DELETE</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.operations.delete</span></td><td><span class="code-chip">v1/operations/{operationsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn&#x27;t support this method, it returns `google....</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.operations.get</span></td><td><span class="code-chip">v1/operations/{operationsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.operations.list</span></td><td><span class="code-chip">v1/operations</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Lists operations that match the specified filter in the request. If the server doesn&#x27;t support this method, it returns `UNIMPLEMENTED`.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.addPublicKey</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}:addPublicKey</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Adds a public SSH key to an environment, allowing clients with the corresponding private key to connect to that environment via SSH. If a key with the same content already exists, this will error with ALREADY_EXISTS.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.authorize</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}:authorize</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Sends OAuth credentials to a running environment on behalf of a user. When this completes, the environment will be authorized to run various Google Cloud command line tools without requiring the user to manually authe...</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.generateAccessToken</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}:generateAccessToken</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Generates an access token for the user&#x27;s environment.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.get</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Gets an environment. Returns NOT_FOUND if the environment does not exist.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.removePublicKey</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}:removePublicKey</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Removes a public SSH key from an environment. Clients will no longer be able to connect to the environment using the corresponding private key. If a key with the same content is not present, this will error with NOT_F...</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">cloudshell.users.environments.start</span></td><td><span class="code-chip">v1/users/{usersId}/environments/{environmentsId}:start</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Starts an existing environment, allowing clients to connect to it. The returned operation will contain an instance of StartEnvironmentMetadata in its metadata field. Users can wait for the environment to start by poll...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+        </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            setupTableFilter({ searchId: 'svc-reg-search', tableId: 'svc-reg-table', countId: 'svc-reg-count' });
+            setupTableFilter({ searchId: 'api-m-search', tableId: 'api-m-table', countId: 'api-m-count' });
+          });
+        </script>
+        
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Disclaimer:</strong> The data on this application is harvested once daily from public Google Cloud Location feeds, Compute Zone/GPU matrices, and Google APIs Discovery REST specifications (`discovery.googleapis.com`) and served locally via static HTML &amp; JSON cache.
+      Google Cloud and all GCP services listed are trademarks of Google LLC.
+    </div>
+  </footer>
+  <script src="../assets/app.js"></script>
+</body>
+</html>
