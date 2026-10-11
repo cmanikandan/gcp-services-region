@@ -105,6 +105,30 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
             self._send_json({"count": len(items), "regions": items, "future_regions": cat.get("future_regions", [])})
             return
 
+        if path == "/api/models":
+            cat = get_catalog()
+            q = (qs.get("q", [""])[0]).strip().lower()
+            family = (qs.get("family", [""])[0]).strip().lower()
+            region = (qs.get("region", [""])[0]).strip().lower()
+            items = cat.get("models", [])
+            if q:
+                items = [
+                    m for m in items
+                    if q in m["model_id"].lower()
+                    or q in m["model_name"].lower()
+                    or q in m["family"].lower()
+                    or q in m["modality"].lower()
+                ]
+            if family:
+                items = [m for m in items if family in m.get("family", "").lower()]
+            if region:
+                if region == "global":
+                    items = [m for m in items if m.get("global_endpoint")]
+                else:
+                    items = [m for m in items if region in [r.lower() for r in m.get("regions", [])]]
+            self._send_json({"count": len(items), "models": items})
+            return
+
         if path == "/api/compare":
             cat = get_catalog()
             rids = [r.strip() for r in qs.get("regions", ["us-central1,europe-west1"])[0].split(",") if r.strip()]
@@ -133,7 +157,7 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="GCP Services & Regional Capabilities Local Web Server")
+    parser = argparse.ArgumentParser(description="Google Cloud Services, AI Models & Regional Capabilities Local Web Server (Unofficial)")
     parser.add_argument("--host", default="127.0.0.1", help="Bind host (default: 127.0.0.1)")
     parser.add_argument("--port", type=int, default=8080, help="Bind port (default: 8080)")
     parser.add_argument("--ttl", type=int, default=DEFAULT_TTL_SECONDS, help="Cache TTL in seconds (default: 86400)")
@@ -149,14 +173,17 @@ def main() -> None:
     t.start()
 
     server = ThreadingHTTPServer((args.host, args.port), GCPExplorerHandler)
-    print("=" * 72)
-    print(f"🚀 GCP Services & Regional Capabilities Explorer running locally!")
+    print("=" * 76)
+    print("🚀 Google Cloud Services & Regional Capabilities Explorer running locally!")
+    print("   ⚠️  Unofficial tool — refer to official Google Cloud docs for latest info.")
     print(f"   Web UI (Services)     : http://{args.host}:{args.port}/index.html")
     print(f"   Web UI (Regions)      : http://{args.host}:{args.port}/regions.html")
+    print(f"   Web UI (AI Models)    : http://{args.host}:{args.port}/models.html")
     print(f"   Web UI (Capabilities) : http://{args.host}:{args.port}/capabilities.html")
     print(f"   Web UI (Architecture) : http://{args.host}:{args.port}/arch.html")
     print(f"   JSON API Status       : http://{args.host}:{args.port}/api/status")
-    print("=" * 72)
+    print(f"   JSON API AI Models    : http://{args.host}:{args.port}/api/models")
+    print("=" * 76)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
@@ -166,3 +193,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -448,6 +448,148 @@ def parse_gpu_zones_html(raw_html: str) -> dict[str, dict[str, Any]]:
     return gpu_by_zone
 
 
+def parse_vertex_ai_models_html(raw_html: str) -> list[dict[str, Any]]:
+    """Parse Vertex AI Generative & Partner Models regional availability from vertex-ai/generative-ai/docs/learn/locations."""
+    tables = re.findall(r"<table.*?</table>", raw_html, re.S | re.I)
+    models: dict[str, dict[str, Any]] = {}
+
+    for t in tables:
+        trs = re.findall(r"<tr[^>]*>(.*?)</tr>", t, re.S | re.I)
+        if not trs:
+            continue
+        ths = [
+            html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", h)).strip())
+            for h in re.findall(r"<th[^>]*>(.*?)</th>", trs[0], re.S | re.I)
+        ]
+        if len(ths) < 2 or "(" not in ths[1]:
+            continue
+        col_locs: list[str] = []
+        for h in ths[1:]:
+            m = re.search(r"\(([^)]+)\)", h)
+            col_locs.append(m.group(1).strip() if m else h)
+
+        current_family = "Gemini models"
+        for r in trs[1:]:
+            if "vertex-ai-table-heading" in r or "colspan=" in r:
+                heading = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", r)).strip())
+                if heading:
+                    current_family = heading
+                continue
+            tds = re.findall(r"(<td[^>]*>)(.*?)(</td>)", r, re.S | re.I)
+            if len(tds) < 2:
+                continue
+            first_open, first_inner, _ = tds[0]
+            is_preview = "preview" in first_inner.lower()
+            href_m = re.search(r'href="([^"]+)"', first_inner)
+            doc_url = href_m.group(1) if href_m else "https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations"
+            if doc_url.startswith("/"):
+                doc_url = f"https://cloud.google.com{doc_url}"
+
+            code_m = re.search(r"<code[^>]*>\(?([^)<]+)\)?</code>", first_inner, re.I)
+            clean_name = re.sub(r"<span[^>]*vertex-ai-not-ga[^>]*>.*?</span>", "", first_inner, flags=re.S | re.I)
+            clean_name = re.sub(r"<code[^>]*>.*?</code>", "", clean_name, flags=re.S | re.I)
+            clean_name = html_lib.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", clean_name)).strip())
+            clean_name = clean_name.replace("\xa0", " ").strip()
+            if not clean_name:
+                continue
+
+            if code_m:
+                raw_code = html_lib.unescape(code_m.group(1).strip())
+                raw_code = re.sub(r"[\[\]\'\"`]", "", raw_code).strip()
+                model_id = raw_code
+            else:
+                mg_m = re.search(r"/model-garden/([a-z0-9._-]+)", doc_url, re.I)
+                if mg_m and mg_m.group(1) not in ("claude", "mistral", "llama"):
+                    model_id = mg_m.group(1)
+                else:
+                    slug_base = re.sub(r"\s+on\s+google\s+cloud.*$", "", clean_name, flags=re.I)
+                    slug_base = re.sub(r"^anthropic['’]?s\s+", "", slug_base, flags=re.I)
+                    slug_base = re.sub(r"\(deprecated\)", "", slug_base, flags=re.I).strip()
+                    if "claude" in slug_base.lower():
+                        model_id = re.sub(r"[^a-z0-9]+", "-", slug_base.lower()).strip("-")
+                    else:
+                        model_id = re.sub(r"[^a-z0-9.]+", "-", slug_base.lower()).strip("-")
+
+            low_name = f"{clean_name} {current_family}".lower()
+            if "veo" in low_name or "video" in low_name:
+                modality = "Video Generation"
+            elif "image" in low_name or "banana" in low_name or "try-on" in low_name or "imagen" in low_name:
+                modality = "Image Generation"
+            elif any(w in low_name for w in ("speech", "tts", "chirp", "transcribe", "audio", "voice")):
+                modality = "Audio, Speech & TTS"
+            elif "embedding" in low_name or "e5" in low_name:
+                modality = "Embeddings"
+            elif "codestral" in low_name or "coder" in low_name:
+                modality = "Code & Reasoning"
+            elif "live" in low_name:
+                modality = "Live Real-Time Streaming"
+            else:
+                modality = "Text & Multimodal"
+
+            stage = "Deprecated" if "deprecated" in clean_name.lower() else ("Preview" if is_preview else "GA")
+            family_clean = current_family.replace(
+                "Veo on Gemini Enterprise Agent Platform models",
+                "Veo Video models",
+            )
+
+            entry = models.setdefault(
+                clean_name,
+                {
+                    "name": clean_name,
+                    "model_id": model_id,
+                    "family": family_clean,
+                    "modality": modality,
+                    "stage": stage,
+                    "url": doc_url,
+                    "global_endpoint": False,
+                    "multi_regions": set(),
+                    "regions": set(),
+                },
+            )
+            for idx, (td_open, td_inner, _) in enumerate(tds[1:]):
+                if idx >= len(col_locs):
+                    break
+                loc = col_locs[idx]
+                supported = ("supported" in td_open.lower()) or ("check" in td_inner.lower())
+                if supported:
+                    if loc == "global":
+                        entry["global_endpoint"] = True
+                    elif loc in ("us", "eu", "asia"):
+                        entry["multi_regions"].add(loc.upper())
+                    else:
+                        entry["regions"].add(loc)
+
+    out: list[dict[str, Any]] = []
+    for _, v in models.items():
+        regs = sorted(v["regions"])
+        mrs = sorted(v["multi_regions"])
+        scope_parts = []
+        if v["global_endpoint"]:
+            scope_parts.append("Global")
+        if mrs:
+            scope_parts.append(f"Multi-Region ({'/'.join(mrs)})")
+        if regs:
+            scope_parts.append(f"Regional ({len(regs)})")
+        out.append(
+            {
+                "name": v["name"],
+                "model_name": v["name"],
+                "model_id": v["model_id"],
+                "family": v["family"],
+                "modality": v["modality"],
+                "stage": v["stage"],
+                "url": v["url"],
+                "docs_url": v["url"],
+                "global_endpoint": v["global_endpoint"],
+                "multi_regions": mrs,
+                "regions": regs,
+                "region_count": len(regs),
+                "endpoint_scope": " + ".join(scope_parts) if scope_parts else "Regional",
+            }
+        )
+    return out
+
+
 def extract_discovery_methods(doc: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
     """Recursively extract all REST API methods and top-level resources from a Google Discovery document."""
     methods: list[dict[str, Any]] = []
@@ -608,7 +750,7 @@ def harvest_all(
         cache_path=RAW_CACHE_DIR / "media_cdn_markers.json",
     )
 
-    print("[Harvester] Step 2/5: Fetching GCP Availability Zones, Machine Series, CPUs & GPU matrices...")
+    print("[Harvester] Step 2/5: Fetching Google Cloud Availability Zones, Machine Series, CPUs, GPUs & AI Models...")
     regions_zones_html = fetcher.fetch_text(
         "https://cloud.google.com/compute/docs/regions-zones",
         cache_path=RAW_CACHE_DIR / "regions_zones.html",
@@ -617,8 +759,13 @@ def harvest_all(
         "https://cloud.google.com/compute/docs/gpus/gpu-regions-zones",
         cache_path=RAW_CACHE_DIR / "gpu_regions_zones.html",
     )
+    vertex_ai_models_html = fetcher.fetch_text(
+        "https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations",
+        cache_path=RAW_CACHE_DIR / "vertex_ai_models_locations.html",
+    )
     zones_by_region = parse_zones_html(regions_zones_html)
     gpu_by_zone = parse_gpu_zones_html(gpu_zones_html)
+    ai_models_list = parse_vertex_ai_models_html(vertex_ai_models_html)
 
     # Enrich zones with GPU accelerator models
     for r_zones in zones_by_region.values():
@@ -920,12 +1067,31 @@ def harvest_all(
         svc["resources"] = sorted(resources_set)
         svc["methods"] = sample_methods
 
-    #Finalize serializable lists for regions and services
+    # Map AI models per region
+    models_by_region: dict[str, list[dict[str, Any]]] = {rid: [] for rid in regions_dict}
+    for m in ai_models_list:
+        for rid in m.get("regions", []):
+            if rid in models_by_region:
+                models_by_region[rid].append(
+                    {
+                        "name": m["name"],
+                        "model_name": m["name"],
+                        "model_id": m["model_id"],
+                        "family": m["family"],
+                        "modality": m["modality"],
+                        "stage": m["stage"],
+                        "url": m["url"],
+                        "docs_url": m["url"],
+                    }
+                )
+
+    # Finalize serializable lists for regions and services
     total_available_regions = len(regions_dict)
     serialized_regions: list[dict[str, Any]] = []
     for rid in sorted(regions_dict.keys()):
         rinfo = regions_dict[rid]
         svc_list = sorted(rinfo["services"])
+        reg_models = models_by_region.get(rid, [])
         serialized_regions.append(
             {
                 "region_id": rinfo["region_id"],
@@ -947,6 +1113,8 @@ def harvest_all(
                 "confidential_options": rinfo["confidential_options"],
                 "services": svc_list,
                 "service_count": len(svc_list),
+                "ai_models": reg_models,
+                "ai_model_count": len(reg_models),
             }
         )
 
@@ -1012,6 +1180,7 @@ def harvest_all(
             prev_svc_map = {s["name"]: set(s["regions"]) for s in prev_data.get("services", [])}
             prev_regions = set(prev_data.get("regions", []))
             prev_apis = set(prev_data.get("apis", []))
+            prev_models = {m["name"]: set(m.get("regions", [])) for m in prev_data.get("models", [])}
 
             # Detect brand-new regions
             for r in serialized_regions:
@@ -1019,11 +1188,11 @@ def harvest_all(
                     whats_new.append(
                         {
                             "date": today_str,
-                            "type": "New GCP Region",
+                            "type": "New Google Cloud Region",
                             "service": f"{r['service_count']} Regional Services",
                             "region_id": r["region_id"],
                             "region_name": r["region_name"],
-                            "details": f"New GCP Region {r['display_name']} launched in {r['full_location']}",
+                            "details": f"New Google Cloud Region {r['display_name']} launched in {r['full_location']}",
                         }
                     )
 
@@ -1033,11 +1202,11 @@ def harvest_all(
                     whats_new.append(
                         {
                             "date": today_str,
-                            "type": "New GCP Service",
+                            "type": "New Google Cloud Service",
                             "service": s["name"],
                             "region_id": f"{s['region_count']} regions" if s["region_count"] else s["scope"],
                             "region_name": s["category"],
-                            "details": f"New GCP service '{s['name']}' launched ({s['scope']}, {s['region_count']} regions)",
+                            "details": f"New Google Cloud service '{s['name']}' launched ({s['scope']}, {s['region_count']} regions)",
                         }
                     )
                 else:
@@ -1053,6 +1222,21 @@ def harvest_all(
                                 "region_id": rid,
                                 "region_name": r_obj.get("region_name", rid),
                                 "details": f"{s['name']} added to {r_obj.get('display_name', rid)}",
+                            }
+                        )
+
+            # Detect brand-new AI models & regional expansions
+            if prev_models:
+                for m in ai_models_list:
+                    if m["name"] not in prev_models:
+                        whats_new.append(
+                            {
+                                "date": today_str,
+                                "type": "New AI Model",
+                                "service": m["name"],
+                                "region_id": m["model_id"],
+                                "region_name": m["family"],
+                                "details": f"New AI Model '{m['name']}' ({m['model_id']}) launched in {m['endpoint_scope']}",
                             }
                         )
 
@@ -1087,7 +1271,7 @@ def harvest_all(
                     "service": f"{r['service_count']} Regional Services",
                     "region_id": r["region_id"],
                     "region_name": r["region_name"],
-                    "details": f"GCP Region {r['display_name']} launched in {r['full_location']} ({r['zone_count']} zones)",
+                    "details": f"Google Cloud Region {r['display_name']} launched in {r['full_location']} ({r['zone_count']} zones)",
                 }
             )
 
@@ -1096,10 +1280,10 @@ def harvest_all(
             {
                 "date": "Upcoming",
                 "type": "Announced Future Region",
-                "service": "Core GCP Launch Bundle",
+                "service": "Core Google Cloud Launch Bundle",
                 "region_id": fr["region_id"],
                 "region_name": fr["region_name"],
-                "details": f"Announced upcoming GCP region in {fr['region_name']} ({fr['sub_region']})",
+                "details": f"Announced upcoming Google Cloud region in {fr['region_name']} ({fr['sub_region']})",
             }
         )
 
@@ -1123,6 +1307,8 @@ def harvest_all(
                 "total_zones": sum(r["zone_count"] for r in serialized_regions),
                 "gpu_zones": len(gpu_by_zone),
                 "low_co2_regions": sum(1 for r in serialized_regions if r["is_low_co2"]),
+                "ai_models": len(ai_models_list),
+                "ai_model_families": len({m["family"] for m in ai_models_list}),
                 "discovery_apis": len(serialized_apis),
                 "total_api_methods": total_harvested_methods,
                 "edge_pops": len(edge_pops),
@@ -1133,6 +1319,7 @@ def harvest_all(
         "regions": serialized_regions,
         "future_regions": future_regions_list,
         "services": serialized_services,
+        "models": ai_models_list,
         "apis": serialized_apis,
         "pops": {
             "edge_pops": edge_pops,
@@ -1160,6 +1347,10 @@ def harvest_all(
                         {"name": s["name"], "regions": s["regions"]}
                         for s in serialized_services
                     ],
+                    "models": [
+                        {"name": m["name"], "regions": m["regions"]}
+                        for m in ai_models_list
+                    ],
                 },
                 indent=2,
             ),
@@ -1169,8 +1360,8 @@ def harvest_all(
     print(
         f"[Harvester] Completed in {elapsed}s! "
         f"Services={len(serialized_services)}, Regions={len(serialized_regions)} (+{len(future_regions_list)} future), "
-        f"Zones={catalog['meta']['counts']['total_zones']}, Discovery APIs={len(serialized_apis)}, "
-        f"REST Methods={total_harvested_methods}."
+        f"Zones={catalog['meta']['counts']['total_zones']}, AI Models={len(ai_models_list)}, "
+        f"Discovery APIs={len(serialized_apis)}, REST Methods={total_harvested_methods}."
     )
     return catalog
 
