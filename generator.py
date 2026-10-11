@@ -53,7 +53,7 @@ def write_shared_assets() -> None:
   --gcp-purple-light: #f3e8fd;
   --bg-page: #f4f6f9;
   --bg-card: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.88);
+  --bg-header: rgba(255, 255, 255, 0.94);
   --bg-subtle: #f8fafd;
   --bg-row-even: #fafbfd;
   --bg-row-hover: #eef5ff;
@@ -80,7 +80,7 @@ html[data-theme="dark"] {
   --gcp-purple-light: rgba(168, 85, 247, 0.18);
   --bg-page: #0b0f19;
   --bg-card: #111827;
-  --bg-header: rgba(17, 24, 39, 0.88);
+  --bg-header: rgba(17, 24, 39, 0.94);
   --bg-subtle: #1e293b;
   --bg-row-even: #131c2e;
   --bg-row-hover: #1e293b;
@@ -97,13 +97,13 @@ html[data-theme="dark"] {
 
 body {
   margin: 0;
-  font-family: "Inter", "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--bg-page);
   color: var(--text-main);
-  line-height: 1.55;
+  line-height: 1.5;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 a {
@@ -115,39 +115,11 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Unofficial Top Disclaimer Ribbon */
-.unofficial-ribbon {
-  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 50%, #eff6ff 100%);
-  border-bottom: 1px solid #fde68a;
-  color: #92400e;
-  font-size: 12.5px;
-  padding: 7px 24px;
-}
-html[data-theme="dark"] .unofficial-ribbon {
-  background: linear-gradient(90deg, rgba(146, 64, 14, 0.28) 0%, rgba(30, 58, 138, 0.28) 100%);
-  border-bottom: 1px solid rgba(251, 191, 36, 0.3);
-  color: #fde68a;
-}
-.unofficial-ribbon-inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.unofficial-ribbon a {
-  color: inherit;
-  font-weight: 700;
-  text-decoration: underline;
-}
-
-/* Header & Glassmorphic Navigation */
+/* Header & Navigation */
 .site-header {
   background: var(--bg-header);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
@@ -157,88 +129,87 @@ html[data-theme="dark"] .unofficial-ribbon {
 .header-inner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 12px 24px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 16px;
 }
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.2px;
+  gap: 11px;
+  font-size: 14px;
+  font-weight: 400;
   color: var(--text-main);
   text-decoration: none !important;
+  flex-shrink: 0;
 }
 .brand-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #4285f4 0%, #34a853 45%, #fbbc05 75%, #ea4335 100%);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--gcp-blue-light);
+  border: 1px solid rgba(26, 115, 232, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 800;
-  font-size: 18px;
-  box-shadow: 0 3px 10px rgba(66, 133, 244, 0.3);
   flex-shrink: 0;
 }
-.brand-title-row {
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
-.unofficial-pill {
+.unofficial-tag {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding: 2px 7px;
-  border-radius: 6px;
-  background: var(--gcp-yellow-light);
-  color: var(--gcp-yellow);
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  letter-spacing: 0.4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-chip);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
 }
 .brand-subtitle {
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--text-muted);
-  display: block;
-}
-.brand-unofficial-line {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--gcp-yellow);
-  display: block;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .nav-pills {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   list-style: none;
   margin: 0;
-  padding: 4px;
+  padding: 3px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-subtle);
-  border-radius: 24px;
-  flex-wrap: wrap;
+  border-radius: 10px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 .nav-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 20px;
+  padding: 6px 11px;
+  border-radius: 7px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-muted);
+  white-space: nowrap;
   transition: all 0.15s ease;
   text-decoration: none !important;
 }
@@ -249,7 +220,7 @@ html[data-theme="dark"] .unofficial-ribbon {
 .nav-link.active {
   background: var(--gcp-blue);
   color: #ffffff;
-  box-shadow: 0 2px 6px rgba(26, 115, 232, 0.35);
+  box-shadow: 0 1px 4px rgba(26, 115, 232, 0.3);
 }
 
 .header-actions {
@@ -257,37 +228,39 @@ html[data-theme="dark"] .unofficial-ribbon {
   align-items: center;
   gap: 8px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 .cache-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
   background: var(--gcp-green-light);
   color: var(--gcp-green);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11.5px;
+  white-space: nowrap;
 }
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 13px;
-  border-radius: 8px;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 7px;
   font-weight: 600;
-  font-size: 12.5px;
+  font-size: 12px;
   cursor: pointer;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-main);
+  white-space: nowrap;
   transition: all 0.15s ease;
   text-decoration: none !important;
-  box-shadow: var(--shadow-sm);
 }
 .btn:hover {
   border-color: var(--gcp-blue);
-  transform: translateY(-1px);
+  background: var(--bg-subtle);
 }
 .btn-primary {
   background: var(--gcp-blue);
@@ -299,45 +272,57 @@ html[data-theme="dark"] .unofficial-ribbon {
   color: #ffffff;
 }
 
+@media (max-width: 1180px) {
+  .header-inner {
+    flex-wrap: wrap;
+  }
+  .nav-pills {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 /* Main Container */
 .container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 22px 24px 56px;
+  padding: 20px 24px 56px;
 }
 
 /* Status & Summary Banner */
 .status-bar {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-left: 5px solid var(--gcp-blue);
-  border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 20px;
+  border-left: 4px solid var(--gcp-blue);
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
   box-shadow: var(--shadow-sm);
+  font-size: 13px;
 }
 
 /* Interactive KPI Grid */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 .kpi-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 18px 20px;
+  border-radius: 10px;
+  padding: 16px 18px;
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .kpi-card::before {
   content: "";
@@ -358,12 +343,12 @@ html[data-theme="dark"] .unofficial-ribbon {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   color: var(--text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .kpi-value {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--gcp-blue);
@@ -371,16 +356,16 @@ html[data-theme="dark"] .unofficial-ribbon {
 .kpi-sub {
   font-size: 12px;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 /* Filter & Search Bar */
 .toolbar {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 14px 18px;
-  margin-bottom: 18px;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -396,13 +381,13 @@ html[data-theme="dark"] .unofficial-ribbon {
   flex: 1;
 }
 .search-input {
-  min-width: 260px;
+  min-width: 240px;
   flex: 1;
-  max-width: 440px;
-  padding: 10px 14px;
+  max-width: 420px;
+  padding: 8px 12px;
   border: 1px solid var(--border-color);
-  border-radius: 9px;
-  font-size: 13.5px;
+  border-radius: 7px;
+  font-size: 13px;
   background: var(--bg-subtle);
   color: var(--text-main);
   outline: none;
@@ -414,9 +399,9 @@ html[data-theme="dark"] .unofficial-ribbon {
   box-shadow: 0 0 0 3px var(--gcp-blue-light);
 }
 .select-input {
-  padding: 9px 13px;
+  padding: 8px 11px;
   border: 1px solid var(--border-color);
-  border-radius: 9px;
+  border-radius: 7px;
   font-size: 13px;
   font-weight: 500;
   background: var(--bg-subtle);
@@ -428,20 +413,21 @@ html[data-theme="dark"] .unofficial-ribbon {
   border-color: var(--gcp-blue);
 }
 .count-label {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
   background: var(--bg-subtle);
   padding: 5px 12px;
   border-radius: 16px;
   border: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
 /* Data Tables */
 .table-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
@@ -452,14 +438,14 @@ table.data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13.5px;
+  font-size: 13px;
 }
 table.data-table thead tr {
   background: var(--bg-subtle);
   border-bottom: 2px solid var(--border-color);
 }
 table.data-table th {
-  padding: 13px 16px;
+  padding: 11px 14px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -475,7 +461,7 @@ table.data-table th:hover {
   background: var(--bg-row-hover);
 }
 table.data-table td {
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border-subtle);
   vertical-align: middle;
 }
@@ -491,7 +477,7 @@ table.data-table tbody tr:hover {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  padding: 2px 9px;
   border-radius: 999px;
   font-size: 11.5px;
   font-weight: 600;
@@ -506,25 +492,31 @@ table.data-table tbody tr:hover {
 
 .code-chip {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 12px;
+  font-size: 11.5px;
   background: var(--bg-chip);
   color: var(--text-main);
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 2px 7px;
+  border-radius: 5px;
   border: 1px solid var(--border-color);
   display: inline-block;
   margin: 1px 2px;
+}
+.code-chip-match {
+  background: var(--gcp-green-light) !important;
+  color: var(--gcp-green) !important;
+  border-color: var(--gcp-green) !important;
+  font-weight: 700 !important;
 }
 
 /* Progress bar */
 .cov-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 .cov-bar {
-  width: 92px;
-  height: 7px;
+  width: 84px;
+  height: 6px;
   background: var(--border-subtle);
   border-radius: 4px;
   overflow: hidden;
@@ -540,10 +532,10 @@ table.data-table tbody tr:hover {
   font-family: ui-monospace, monospace;
   font-size: 11px;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
   display: inline-block;
-  min-width: 56px;
+  min-width: 52px;
   text-align: center;
 }
 .verb-GET { background: var(--gcp-blue-light); color: var(--gcp-blue); }
@@ -555,29 +547,29 @@ table.data-table tbody tr:hover {
 .section-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 22px;
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
 }
 .section-title {
-  margin: 0 0 12px 0;
-  font-size: 18px;
+  margin: 0 0 10px 0;
+  font-size: 16.5px;
   font-weight: 700;
   letter-spacing: -0.2px;
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* Footer */
 .site-footer {
-  margin-top: 48px;
-  padding: 24px;
+  margin-top: 40px;
+  padding: 20px 24px;
   border-top: 1px solid var(--border-color);
   color: var(--text-muted);
-  font-size: 12.5px;
+  font-size: 12px;
   text-align: center;
   background: var(--bg-card);
 }
@@ -592,13 +584,22 @@ table.data-table tbody tr:hover {
     js = """
 // Theme initialization & toggle (Light / Dark mode)
 (function initTheme() {
-  const saved = localStorage.getItem('gcp_explorer_theme');
-  if (saved === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
+  try {
+    const saved = localStorage.getItem('gcp_explorer_theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
 })();
 
-function toggleTheme() {
+function updateThemeButtonLabel() {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (!btn) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  btn.innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+}
+
+window.toggleTheme = function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   if (next === 'dark') {
@@ -606,17 +607,14 @@ function toggleTheme() {
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
-  localStorage.setItem('gcp_explorer_theme', next);
-  const btn = document.getElementById('theme-toggle-btn');
-  if (btn) btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
-}
+  try {
+    localStorage.setItem('gcp_explorer_theme', next);
+  } catch (e) {}
+  updateThemeButtonLabel();
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('theme-toggle-btn');
-  if (btn) {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-  }
+  updateThemeButtonLabel();
   // Press '/' to quickly focus the primary search box on any page
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
@@ -630,12 +628,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Shared table sorting, filtering, and local refresh trigger
-function setupTableFilter(config) {
+window.setupTableFilter = function setupTableFilter(config) {
   const searchInput = document.getElementById(config.searchId);
   const select1 = config.select1Id ? document.getElementById(config.select1Id) : null;
   const select2 = config.select2Id ? document.getElementById(config.select2Id) : null;
   const select3 = config.select3Id ? document.getElementById(config.select3Id) : null;
   const checkbox = config.checkboxId ? document.getElementById(config.checkboxId) : null;
+  const resetBtn = config.resetId ? document.getElementById(config.resetId) : null;
   const table = document.getElementById(config.tableId);
   const countEl = document.getElementById(config.countId);
   if (!table) return;
@@ -659,15 +658,36 @@ function setupTableFilter(config) {
       const attr3 = row.getAttribute('data-filter3') || '';
       const attrCb = row.getAttribute('data-flag') === 'true';
 
+      const tokens1 = attr1.split('|');
+      const tokens2 = attr2.split('|');
+      const tokens3 = attr3.split('|');
+
       const matchQ = !q || text.includes(q);
-      const match1 = !v1 || attr1 === v1 || attr1.split('|').includes(v1);
-      const match2 = !v2 || attr2 === v2 || attr2.split('|').includes(v2);
-      const match3 = !v3 || attr3 === v3 || attr3.split('|').includes(v3);
+      const match1 = !v1 || attr1 === v1 || tokens1.includes(v1);
+      const match2 = !v2 || attr2 === v2 || tokens2.includes(v2);
+      const match3 = !v3 || attr3 === v3 || tokens3.includes(v3);
       const matchCb = !cb || attrCb;
 
       if (matchQ && match1 && match2 && match3 && matchCb) {
         row.style.display = '';
         visible++;
+        if (config.highlightRegionAttr && v3) {
+          row.querySelectorAll('[data-rid]').forEach(chip => {
+            if (chip.getAttribute('data-rid') === v3) {
+              chip.classList.add('code-chip-match');
+              const extraWrap = chip.closest('.extra-rids');
+              if (extraWrap) {
+                extraWrap.style.display = 'inline';
+                const toggleBtn = row.querySelector('.more-rids-toggle');
+                if (toggleBtn) toggleBtn.style.display = 'none';
+              }
+            } else {
+              chip.classList.remove('code-chip-match');
+            }
+          });
+        } else if (config.highlightRegionAttr) {
+          row.querySelectorAll('.code-chip-match').forEach(chip => chip.classList.remove('code-chip-match'));
+        }
       } else {
         row.style.display = 'none';
       }
@@ -683,6 +703,16 @@ function setupTableFilter(config) {
   if (select2) select2.addEventListener('change', applyFilter);
   if (select3) select3.addEventListener('change', applyFilter);
   if (checkbox) checkbox.addEventListener('change', applyFilter);
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (select1) select1.value = '';
+      if (select2) select2.value = '';
+      if (select3) select3.value = '';
+      if (checkbox) checkbox.checked = false;
+      applyFilter();
+    });
+  }
 
   // Column sorting
   const headers = table.querySelectorAll('th[data-sort]');
@@ -708,12 +738,12 @@ function setupTableFilter(config) {
   });
 
   applyFilter();
-}
+};
 
-async function triggerHarvestRefresh(btn) {
+window.triggerHarvestRefresh = async function triggerHarvestRefresh(btn) {
   const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '⏳ Refreshing Google Cloud APIs...';
+  btn.innerHTML = '⏳ Refreshing...';
   try {
     const resp = await fetch('/api/refresh', { method: 'POST' });
     if (resp.ok) {
@@ -727,7 +757,7 @@ async function triggerHarvestRefresh(btn) {
     btn.disabled = false;
     btn.innerHTML = orig;
   }
-}
+};
 """
     (assets_dir / "app.js").write_text(js.strip() + "\n", encoding="utf-8")
 
@@ -742,12 +772,14 @@ def render_layout(
     """Wrap page content in the standard navigation layout."""
     counts = meta.get("counts", {})
     gen_at = meta.get("generated_at", "")
+    gen_date = gen_at.split(" ")[0] if gen_at else "Daily"
+    asset_v = f"{meta.get('generated_epoch', 1)}-v2"
     tabs = [
         ("services", "Services", f"{root_prefix}index.html"),
         ("regions", "Regions", f"{root_prefix}regions.html"),
         ("models", "AI Models", f"{root_prefix}models.html"),
-        ("capabilities", "Capabilities & Matrix", f"{root_prefix}capabilities.html"),
-        ("pops", "Zones & Edge PoPs", f"{root_prefix}pops.html"),
+        ("capabilities", "Compare Matrix", f"{root_prefix}capabilities.html"),
+        ("pops", "Zones & PoPs", f"{root_prefix}pops.html"),
         ("whatsnew", "What's New", f"{root_prefix}whatsnew.html"),
         ("arch", "Architecture", f"{root_prefix}arch.html"),
         ("faqs", "FAQs & CLI", f"{root_prefix}faqs.html"),
@@ -763,43 +795,33 @@ def render_layout(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(title)} | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="{root_prefix}assets/style.css">
+  <link rel="stylesheet" href="{root_prefix}assets/style.css?v={asset_v}">
+  <script src="{root_prefix}assets/app.js?v={asset_v}"></script>
 </head>
 <body>
-  <div class="unofficial-ribbon">
-    <div class="unofficial-ribbon-inner">
-      <div>
-        <strong>⚠️ Unofficial Tool:</strong> This is an unofficial tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
-      </div>
-      <div>
-        Official References:
-        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs ↗</a>
-      </div>
-    </div>
-  </div>
-
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="{root_prefix}index.html">
-        <div class="brand-logo" title="Google Cloud">☁️</div>
-        <div>
-          <div class="brand-title-row">
+        <div class="brand-logo" title="Google Cloud Services &amp; Regions Explorer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gcp-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
             <span>Google Cloud Services &amp; Regions</span>
-            <span class="unofficial-pill">Unofficial Tool</span>
+            <span class="unofficial-tag">Unofficial</span>
           </div>
           <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
-          <span class="brand-unofficial-line">This is an unofficial tool — refer to official Google Cloud docs for the latest information.</span>
         </div>
       </a>
       <ul class="nav-pills">
         {nav_items}
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • {esc(gen_at)}</span>
-        <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
+        <span class="cache-pill" title="Snapshot generated at {esc(gen_at)}">⚡ Snapshot: {esc(gen_date)}</span>
+        <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
+        <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -808,22 +830,20 @@ def render_layout(
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot Updated:</strong> {esc(gen_at)} —
-          <strong>{counts.get('total_services', 0)}</strong> <a href="{root_prefix}index.html">Google Cloud Services</a>,
-          <strong>{counts.get('available_regions', 0)}</strong> <a href="{root_prefix}regions.html">Regions</a>
-          (+<strong>{counts.get('future_regions', 0)}</strong> upcoming),
-          <strong>{counts.get('ai_models', 0)}</strong> <a href="{root_prefix}models.html">AI &amp; Foundation Models</a>,
-          <strong>{counts.get('total_zones', 0)}</strong> <a href="{root_prefix}pops.html">Availability Zones</a>,
-          <strong>{counts.get('discovery_apis', 0)}</strong> <a href="{root_prefix}capabilities.html">Discovery APIs</a>, and
-          <strong>{counts.get('total_api_methods', 0):,}</strong> REST API Operations.
+          <strong>Snapshot ({esc(gen_at)}):</strong>
+          <strong>{counts.get('total_services', 0)}</strong> <a href="{root_prefix}index.html">Google Cloud Services</a> •
+          <strong>{counts.get('available_regions', 0)}</strong> <a href="{root_prefix}regions.html">Regions</a> (+<strong>{counts.get('future_regions', 0)}</strong> upcoming) •
+          <strong>{counts.get('ai_models', 0)}</strong> <a href="{root_prefix}models.html">AI &amp; Foundation Models</a> •
+          <strong>{counts.get('total_zones', 0)}</strong> <a href="{root_prefix}pops.html">Zones</a> •
+          <strong>{counts.get('discovery_apis', 0)}</strong> <a href="{root_prefix}capabilities.html">Discovery APIs</a> (<strong>{counts.get('total_api_methods', 0):,}</strong> REST operations)
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
-          ℹ️ <strong>Note:</strong> This is an unofficial tool. Please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
-        <span class="badge badge-blue">24h Local Cache + Exponential Backoff</span>
+        <span class="badge badge-blue">24h Cache</span>
       </div>
     </div>
     {body_html}
@@ -832,20 +852,19 @@ def render_layout(
   <footer class="site-footer">
     <div class="footer-inner">
       <div>
-        <strong>⚠️ Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
+        <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
         Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
       </div>
       <div style="margin-top:6px;">
-        For authoritative service and model availability, SLAs, and compliance information, always refer to the official documentation:
+        Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
         <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
         <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
         <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
-        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>
   </footer>
-  <script src="{root_prefix}assets/app.js"></script>
 </body>
 </html>
 """
@@ -1186,13 +1205,25 @@ def generate_models_page(catalog: dict[str, Any]) -> None:
         if not ep_badges:
             ep_badges.append('<span class="badge badge-gray">Regional Only</span>')
 
-        reg_chips = " ".join(
-            f'<a href="regions/{esc(rid)}.html#region-ai-models" class="code-chip" title="{esc(regions_by_id.get(rid, {}).get("region_name", rid))}">{esc(rid)}</a>'
+        primary_chips = " ".join(
+            f'<a href="regions/{esc(rid)}.html#region-ai-models" data-rid="{esc(rid)}" class="code-chip" title="{esc(regions_by_id.get(rid, {}).get("region_name", rid))}">{esc(rid)}</a>'
             for rid in m_regions[:8]
         )
         if len(m_regions) > 8:
+            extra_chips = " ".join(
+                f'<a href="regions/{esc(rid)}.html#region-ai-models" data-rid="{esc(rid)}" class="code-chip" title="{esc(regions_by_id.get(rid, {}).get("region_name", rid))}">{esc(rid)}</a>'
+                for rid in m_regions[8:]
+            )
             extra_rids = ", ".join(m_regions[8:])
-            reg_chips += f' <span class="badge badge-blue" title="{esc(extra_rids)}">+{len(m_regions) - 8} more</span>'
+            reg_chips = (
+                f'{primary_chips} '
+                f'<span class="extra-rids" style="display:none;">{extra_chips}</span> '
+                f'<span class="badge badge-blue more-rids-toggle" style="cursor:pointer;" '
+                f'onclick="this.previousElementSibling.style.display=\'inline\';this.style.display=\'none\';" '
+                f'title="Click to expand: {esc(extra_rids)}">+{len(m_regions) - 8} more</span>'
+            )
+        else:
+            reg_chips = primary_chips
         if not reg_chips:
             reg_chips = '<span style="color:var(--text-muted);font-size:12px;">Global / Multi-Region Endpoint Only</span>'
 
@@ -1219,7 +1250,7 @@ def generate_models_page(catalog: dict[str, Any]) -> None:
             f'<div class="cov-bar"><div class="cov-fill" style="width:{min(100, cov_pct)}%"></div></div>'
             f'<span style="font-size:12px;color:var(--text-muted);">{cov_pct}%</span></div>'
             f'</td>'
-            f'<td><div style="max-width:440px;">{reg_chips}</div></td>'
+            f'<td><div style="max-width:460px;">{reg_chips}</div></td>'
             f'</tr>'
         )
 
@@ -1301,6 +1332,7 @@ def generate_models_page(catalog: dict[str, Any]) -> None:
           <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;">
             <input id="mod-global" type="checkbox"> 🌐 Global Endpoint Only
           </label>
+          <button id="mod-reset" type="button" class="btn">Reset</button>
         </div>
         <div id="mod-count" class="count-label">Showing {len(models)} of {len(models)}</div>
       </div>
@@ -1353,6 +1385,8 @@ def generate_models_page(catalog: dict[str, Any]) -> None:
           select2Id: 'mod-type',
           select3Id: 'mod-region',
           checkboxId: 'mod-global',
+          resetId: 'mod-reset',
+          highlightRegionAttr: true,
           tableId: 'mod-table',
           countId: 'mod-count'
         }});
@@ -1903,7 +1937,7 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
       </div>
     </div>
 
-    <script src="data/matrix_data.js"></script>
+    <script src="data/matrix_data.js?v={meta.get('generated_epoch', 1)}-v2"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {{
         setupTableFilter({{ searchId: 'disc-search', tableId: 'disc-table', countId: 'disc-count' }});
