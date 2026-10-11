@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Storage Transfer Service - GCP Regional Availability | GCP Services &amp; Regional Capabilities (Unofficial)</title>
+  <title>Storage Transfer Service - Google Cloud Regional Availability | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
   <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
   <div class="unofficial-ribbon">
     <div class="unofficial-ribbon-inner">
       <div>
-        <strong>⚠️ Unofficial Resource:</strong> This is an independent community reference and is <strong>not affiliated with or endorsed by Google Cloud</strong>.
+        <strong>⚠️ Unofficial Tool:</strong> This is an unofficial tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
       </div>
       <div>
-        Always verify production availability in the
-        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official GCP Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs</a> •
-        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation ↗</a>
+        Official References:
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs ↗</a>
       </div>
     </div>
   </div>
@@ -24,18 +24,20 @@
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="../index.html">
-        <div class="brand-logo">GCP</div>
+        <div class="brand-logo" title="Google Cloud">☁️</div>
         <div>
           <div class="brand-title-row">
-            <span>GCP Services &amp; Regions</span>
-            <span class="unofficial-pill">Unofficial</span>
+            <span>Google Cloud Services &amp; Regions</span>
+            <span class="unofficial-pill">Unofficial Tool</span>
           </div>
-          <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-unofficial-line">This is an unofficial tool — refer to official Google Cloud docs for the latest information.</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="../index.html" class="nav-link active">Services</a></li>
 <li><a href="../regions.html" class="nav-link ">Regions</a></li>
+<li><a href="../models.html" class="nav-link ">AI Models</a></li>
 <li><a href="../capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
 <li><a href="../pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
 <li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
@@ -43,9 +45,9 @@
 <li><a href="../faqs.html" class="nav-link ">FAQs & CLI</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 16:27:53 UTC</span>
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-11 16:05:41 UTC</span>
         <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh</button>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -53,13 +55,19 @@
   <main class="container">
     <div class="status-bar">
       <div>
-        <strong>Snapshot Updated:</strong> 2026-10-09 16:27:53 UTC —
-        <strong>153</strong> <a href="../index.html">GCP Services</a>,
-        <strong>43</strong> <a href="../regions.html">Regions</a>
-        (+<strong>4</strong> upcoming),
-        <strong>130</strong> <a href="../pops.html">Availability Zones</a>,
-        <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a>, and
-        <strong>10,501</strong> REST API Operations.
+        <div>
+          <strong>Snapshot Updated:</strong> 2026-10-11 16:05:41 UTC —
+          <strong>153</strong> <a href="../index.html">Google Cloud Services</a>,
+          <strong>43</strong> <a href="../regions.html">Regions</a>
+          (+<strong>4</strong> upcoming),
+          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a>,
+          <strong>130</strong> <a href="../pops.html">Availability Zones</a>,
+          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a>, and
+          <strong>10,501</strong> REST API Operations.
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+          ℹ️ <strong>Note:</strong> This is an unofficial tool. Please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
@@ -70,10 +78,10 @@
         <div class="section-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
             <div>
-              <div style="font-size:12px;color:#5f6368;margin-bottom:4px;">
-                <a href="../index.html">← Back to All GCP Services</a> • Category: <strong>Storage &amp; Databases</strong>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">
+                <a href="../index.html">← Back to All Google Cloud Services</a> • Category: <strong>Storage &amp; Databases</strong>
               </div>
-              <h1 style="margin:0 0 8px 0;font-size:24px;color:#1a73e8;">Storage Transfer Service</h1>
+              <h1 style="margin:0 0 8px 0;font-size:24px;color:var(--gcp-blue);">Storage Transfer Service</h1>
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                 <span class="badge badge-blue">Regional + Multi-Region</span>
                 <span class="badge badge-green">43 / 43 Regions (100.0%)</span>
@@ -111,12 +119,12 @@
 
         <div class="section-card">
           <h2 class="section-title">⚠️ Regions Where "Storage Transfer Service" Is Not Listed (0 Regions)</h2>
-          <div><span class="badge badge-green">Available in 100% of active GCP regions (43/43)!</span></div>
+          <div><span class="badge badge-green">Available in 100% of active Google Cloud regions!</span></div>
         </div>
 
         <div class="section-card" id="api-methods">
           <h2 class="section-title">⚙️ Google Cloud Discovery APIs &amp; Capabilities (17 Operations)</h2>
-          <div style="padding:14px;border:1px solid #e8eaed;border-radius:8px;margin-bottom:10px;background:#fafbfc;"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><strong>Storage Transfer API</strong> <span class="code-chip" style="color:#1a73e8;font-weight:700;">storagetransfer.googleapis.com</span></div><div><span class="badge badge-blue">Preferred: v1</span> <span class="badge badge-gray">Versions: v1</span> <span class="badge badge-green">17 REST Methods (0 regional)</span></div></div><div style="margin-top:8px;font-size:12.5px;color:#5f6368;">Top-Level Resources: <span class="code-chip">googleServiceAccounts</span> <span class="code-chip">projects</span> <span class="code-chip">transferJobs</span> <span class="code-chip">transferOperations</span></div></div>
+          <div style="padding:14px;border:1px solid var(--border-subtle);border-radius:8px;margin-bottom:10px;background:var(--bg-subtle);"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><strong>Storage Transfer API</strong> <span class="code-chip" style="color:var(--gcp-blue);font-weight:700;">storagetransfer.googleapis.com</span></div><div><span class="badge badge-blue">Preferred: v1</span> <span class="badge badge-gray">Versions: v1</span> <span class="badge badge-green">17 REST Methods (0 regional)</span></div></div><div style="margin-top:8px;font-size:12.5px;color:var(--text-muted);">Top-Level Resources: <span class="code-chip">googleServiceAccounts</span> <span class="code-chip">projects</span> <span class="code-chip">transferJobs</span> <span class="code-chip">transferOperations</span></div></div>
           
           <div class="toolbar" style="margin-top:14px;margin-bottom:12px;">
             <input id="api-m-search" type="search" class="search-input" placeholder="Search REST API method ID, HTTP verb (POST, GET, DELETE), path, or description...">
@@ -134,7 +142,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.googleServiceAccounts.get</span></td><td><span class="code-chip">v1/googleServiceAccounts/{projectId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Cloud pr...</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.create</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Creates an agent pool resource.</td></tr><tr><td><span class="verb verb-DELETE">DELETE</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.delete</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Deletes an agent pool.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.get</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Gets an agent pool.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.list</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Lists agent pools.</td></tr><tr><td><span class="verb verb-PATCH">PATCH</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.patch</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Updates an existing agent pool resource.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.create</span></td><td><span class="code-chip">v1/transferJobs</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Creates a transfer job that runs periodically.</td></tr><tr><td><span class="verb verb-DELETE">DELETE</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.delete</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Deletes a transfer job. Deleting a transfer job sets its status to DELETED.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.get</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Gets a transfer job.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.list</span></td><td><span class="code-chip">v1/transferJobs</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Lists transfer jobs.</td></tr><tr><td><span class="verb verb-PATCH">PATCH</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.patch</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Updates a transfer job. Updating a job&#x27;s transfer spec does not affect transfer operations that are running already. **Note:** The job&#x27;s status field can be modified using this RPC (for example, to set a job&#x27;s status ...</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.run</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}:run</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Starts a new operation for the specified transfer job. A `TransferJob` has a maximum of one active `TransferOperation`. If this method is called while a `TransferOperation` is active, an error is returned.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.cancel</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:cancel</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Cancels a transfer. Use the transferOperations.get method to check if the cancellation succeeded or if the operation completed despite the `cancel` request. When you cancel an operation, the currently running transfer...</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.get</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.list</span></td><td><span class="code-chip">v1/transferOperations</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Lists transfer operations. Operations are ordered by their creation time in reverse chronological order.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.pause</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:pause</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Pauses a transfer operation.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.resume</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:resume</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:#5f6368;">Resumes a transfer operation that is paused.</td></tr>
+                <tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.googleServiceAccounts.get</span></td><td><span class="code-chip">v1/googleServiceAccounts/{projectId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Returns the Google service account that is used by Storage Transfer Service to access buckets in the project where transfers run or in other projects. Each Google service account is associated with one Google Cloud pr...</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.create</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Creates an agent pool resource.</td></tr><tr><td><span class="verb verb-DELETE">DELETE</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.delete</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Deletes an agent pool.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.get</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Gets an agent pool.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.list</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Lists agent pools.</td></tr><tr><td><span class="verb verb-PATCH">PATCH</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.projects.agentPools.patch</span></td><td><span class="code-chip">v1/projects/{projectsId}/agentPools/{agentPoolsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Updates an existing agent pool resource.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.create</span></td><td><span class="code-chip">v1/transferJobs</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Creates a transfer job that runs periodically.</td></tr><tr><td><span class="verb verb-DELETE">DELETE</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.delete</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Deletes a transfer job. Deleting a transfer job sets its status to DELETED.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.get</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Gets a transfer job.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.list</span></td><td><span class="code-chip">v1/transferJobs</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Lists transfer jobs.</td></tr><tr><td><span class="verb verb-PATCH">PATCH</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.patch</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Updates a transfer job. Updating a job&#x27;s transfer spec does not affect transfer operations that are running already. **Note:** The job&#x27;s status field can be modified using this RPC (for example, to set a job&#x27;s status ...</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferJobs.run</span></td><td><span class="code-chip">v1/transferJobs/{transferJobsId}:run</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Starts a new operation for the specified transfer job. A `TransferJob` has a maximum of one active `TransferOperation`. If this method is called while a `TransferOperation` is active, an error is returned.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.cancel</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:cancel</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Cancels a transfer. Use the transferOperations.get method to check if the cancellation succeeded or if the operation completed despite the `cancel` request. When you cancel an operation, the currently running transfer...</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.get</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.</td></tr><tr><td><span class="verb verb-GET">GET</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.list</span></td><td><span class="code-chip">v1/transferOperations</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Lists transfer operations. Operations are ordered by their creation time in reverse chronological order.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.pause</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:pause</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Pauses a transfer operation.</td></tr><tr><td><span class="verb verb-POST">POST</span></td><td><span class="code-chip" style="font-weight:600;">storagetransfer.transferOperations.resume</span></td><td><span class="code-chip">v1/transferOperations/{transferOperationsId}:resume</span></td><td><span class="badge badge-gray">Global/Project</span></td><td style="font-size:12.5px;color:var(--text-muted);">Resumes a transfer operation that is paused.</td></tr>
               </tbody>
             </table>
           </div>
@@ -153,16 +161,16 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div>
-        <strong>⚠️ Unofficial Resource Disclaimer:</strong> This application is an independent, unofficial utility and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud.
-        Data is harvested once daily from public Google Cloud Location feeds, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        <strong>⚠️ Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
       </div>
       <div style="margin-top:6px;">
-        For authoritative service availability, SLAs, and compliance information, always refer to the official documentation:
+        For authoritative service and model availability, SLAs, and compliance information, always refer to the official documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
         <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
         <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
-        Google Cloud and all GCP service names are trademarks of Google LLC.
       </div>
     </div>
   </footer>

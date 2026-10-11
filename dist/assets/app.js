@@ -42,6 +42,7 @@ function setupTableFilter(config) {
   const searchInput = document.getElementById(config.searchId);
   const select1 = config.select1Id ? document.getElementById(config.select1Id) : null;
   const select2 = config.select2Id ? document.getElementById(config.select2Id) : null;
+  const select3 = config.select3Id ? document.getElementById(config.select3Id) : null;
   const checkbox = config.checkboxId ? document.getElementById(config.checkboxId) : null;
   const table = document.getElementById(config.tableId);
   const countEl = document.getElementById(config.countId);
@@ -55,6 +56,7 @@ function setupTableFilter(config) {
     const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
     const v1 = select1 ? select1.value : '';
     const v2 = select2 ? select2.value : '';
+    const v3 = select3 ? select3.value : '';
     const cb = checkbox ? checkbox.checked : false;
     let visible = 0;
 
@@ -62,14 +64,16 @@ function setupTableFilter(config) {
       const text = row.textContent.toLowerCase();
       const attr1 = row.getAttribute('data-filter1') || '';
       const attr2 = row.getAttribute('data-filter2') || '';
+      const attr3 = row.getAttribute('data-filter3') || '';
       const attrCb = row.getAttribute('data-flag') === 'true';
 
       const matchQ = !q || text.includes(q);
       const match1 = !v1 || attr1 === v1 || attr1.split('|').includes(v1);
       const match2 = !v2 || attr2 === v2 || attr2.split('|').includes(v2);
+      const match3 = !v3 || attr3 === v3 || attr3.split('|').includes(v3);
       const matchCb = !cb || attrCb;
 
-      if (matchQ && match1 && match2 && matchCb) {
+      if (matchQ && match1 && match2 && match3 && matchCb) {
         row.style.display = '';
         visible++;
       } else {
@@ -85,6 +89,7 @@ function setupTableFilter(config) {
   if (searchInput) searchInput.addEventListener('input', applyFilter);
   if (select1) select1.addEventListener('change', applyFilter);
   if (select2) select2.addEventListener('change', applyFilter);
+  if (select3) select3.addEventListener('change', applyFilter);
   if (checkbox) checkbox.addEventListener('change', applyFilter);
 
   // Column sorting
@@ -116,7 +121,7 @@ function setupTableFilter(config) {
 async function triggerHarvestRefresh(btn) {
   const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '⏳ Refreshing GCP APIs...';
+  btn.innerHTML = '⏳ Refreshing Google Cloud APIs...';
   try {
     const resp = await fetch('/api/refresh', { method: 'POST' });
     if (resp.ok) {

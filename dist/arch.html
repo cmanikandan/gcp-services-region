@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Architecture &amp; Cost | GCP Services &amp; Regional Capabilities (Unofficial)</title>
+  <title>Architecture &amp; Cost | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
   <div class="unofficial-ribbon">
     <div class="unofficial-ribbon-inner">
       <div>
-        <strong>⚠️ Unofficial Resource:</strong> This is an independent community reference and is <strong>not affiliated with or endorsed by Google Cloud</strong>.
+        <strong>⚠️ Unofficial Tool:</strong> This is an unofficial tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
       </div>
       <div>
-        Always verify production availability in the
-        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official GCP Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs</a> •
-        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation ↗</a>
+        Official References:
+        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
+        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs ↗</a>
       </div>
     </div>
   </div>
@@ -24,18 +24,20 @@
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="index.html">
-        <div class="brand-logo">GCP</div>
+        <div class="brand-logo" title="Google Cloud">☁️</div>
         <div>
           <div class="brand-title-row">
-            <span>GCP Services &amp; Regions</span>
-            <span class="unofficial-pill">Unofficial</span>
+            <span>Google Cloud Services &amp; Regions</span>
+            <span class="unofficial-pill">Unofficial Tool</span>
           </div>
-          <span class="brand-subtitle">Regional Availability &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-unofficial-line">This is an unofficial tool — refer to official Google Cloud docs for the latest information.</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="index.html" class="nav-link ">Services</a></li>
 <li><a href="regions.html" class="nav-link ">Regions</a></li>
+<li><a href="models.html" class="nav-link ">AI Models</a></li>
 <li><a href="capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
 <li><a href="pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
 <li><a href="whatsnew.html" class="nav-link ">What's New</a></li>
@@ -43,9 +45,9 @@
 <li><a href="faqs.html" class="nav-link ">FAQs & CLI</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-09 16:27:53 UTC</span>
+        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-11 16:05:41 UTC</span>
         <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live GCP APIs">↻ Refresh</button>
+        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -53,13 +55,19 @@
   <main class="container">
     <div class="status-bar">
       <div>
-        <strong>Snapshot Updated:</strong> 2026-10-09 16:27:53 UTC —
-        <strong>153</strong> <a href="index.html">GCP Services</a>,
-        <strong>43</strong> <a href="regions.html">Regions</a>
-        (+<strong>4</strong> upcoming),
-        <strong>130</strong> <a href="pops.html">Availability Zones</a>,
-        <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
-        <strong>10,501</strong> REST API Operations.
+        <div>
+          <strong>Snapshot Updated:</strong> 2026-10-11 16:05:41 UTC —
+          <strong>153</strong> <a href="index.html">Google Cloud Services</a>,
+          <strong>43</strong> <a href="regions.html">Regions</a>
+          (+<strong>4</strong> upcoming),
+          <strong>94</strong> <a href="models.html">AI &amp; Foundation Models</a>,
+          <strong>130</strong> <a href="pops.html">Availability Zones</a>,
+          <strong>204</strong> <a href="capabilities.html">Discovery APIs</a>, and
+          <strong>10,501</strong> REST API Operations.
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+          ℹ️ <strong>Note:</strong> This is an unofficial tool. Please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
@@ -68,9 +76,9 @@
     </div>
     
     <div class="section-card">
-      <h2 class="section-title">🏗️ Solution Architecture (Local Cache Mode &amp; Serverless GCP Mode)</h2>
+      <h2 class="section-title">🏗️ Solution Architecture (Local Cache Mode &amp; Serverless Google Cloud Mode)</h2>
       <p>
-        This unofficial explorer is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
+        This unofficial tool is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
         and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.30/month).
       </p>
 
@@ -78,7 +86,7 @@
         <svg viewBox="0 0 1050 320" width="100%" height="auto" style="min-width:780px;font-family:sans-serif;">
           <!-- Background Groups -->
           <rect x="15" y="15" width="250" height="290" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
-          <text x="30" y="42" font-size="13" font-weight="bold" fill="#1a73e8">1. GCP Upstream Data Sources</text>
+          <text x="30" y="42" font-size="13" font-weight="bold" fill="#1a73e8">1. Google Cloud Upstream Sources</text>
 
           <rect x="305" y="15" width="380" height="290" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.5"/>
           <text x="320" y="42" font-size="13" font-weight="bold" fill="#137333">2. Quota-Resilient Harvester (Daily 24h Refresh)</text>
@@ -88,8 +96,8 @@
 
           <!-- Upstream Boxes -->
           <rect x="30" y="60" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
-          <text x="42" y="82" font-size="12" font-weight="bold" fill="#202124">GCP Locations &amp; Global Feeds</text>
-          <text x="42" y="98" font-size="10.5" fill="#5f6368">data.json, locations_map.json, multi-region</text>
+          <text x="42" y="82" font-size="12" font-weight="bold" fill="#202124">Locations &amp; Vertex AI Models</text>
+          <text x="42" y="98" font-size="10.5" fill="#5f6368">data.json, locations_map.json, AI models</text>
 
           <rect x="30" y="122" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="144" font-size="12" font-weight="bold" fill="#202124">Compute Zones &amp; GPU Matrices</text>
@@ -115,8 +123,8 @@
 
           <rect x="325" y="206" width="340" height="80" rx="6" fill="#fff" stroke="#137333"/>
           <text x="340" y="228" font-size="12" font-weight="bold" fill="#202124">Static Site Generator (generator.py)</text>
-          <text x="340" y="246" font-size="10.5" fill="#5f6368">• Compiles 200+ static HTML pages into dist/</text>
-          <text x="340" y="262" font-size="10.5" fill="#5f6368">• Pre-computes Multi-Region Comparison Matrix JS</text>
+          <text x="340" y="246" font-size="10.5" fill="#5f6368">• Compiles 210+ static HTML pages into dist/</text>
+          <text x="340" y="262" font-size="10.5" fill="#5f6368">• Pre-computes Services &amp; AI Models Matrix JS</text>
           <text x="340" y="276" font-size="10.5" fill="#5f6368">• Triggered once/day via server.py or Cloud Scheduler</text>
 
           <!-- Delivery Boxes -->
@@ -127,7 +135,7 @@
 
           <rect x="745" y="145" width="270" height="65" rx="6" fill="#fff" stroke="#b06000"/>
           <text x="760" y="168" font-size="12" font-weight="bold" fill="#202124">Local Terminal CLI (cli.py)</text>
-          <text x="760" y="185" font-size="10.5" fill="#5f6368">• Instant queries by service, region, or diff</text>
+          <text x="760" y="185" font-size="10.5" fill="#5f6368">• Instant queries by service, region, model, or diff</text>
           <text x="760" y="200" font-size="10.5" fill="#5f6368">• Reads directly from local JSON cache</text>
 
           <rect x="745" y="225" width="270" height="65" rx="6" fill="#fff" stroke="#b06000"/>
@@ -147,7 +155,7 @@
     <div class="section-card">
       <h2 class="section-title">🛡️ Quota &amp; Rate-Limit Protection Architecture</h2>
       <ul>
-        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream GCP endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
+        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, AI model lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream Google Cloud endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
         <li><strong>Token-Bucket Rate Limiting:</strong> Outbound requests during the daily harvest are paced through a thread-safe token-bucket rate limiter (default 15 requests/sec across 8 bounded worker threads) to prevent burst quota exhaustion on <code>discovery.googleapis.com</code>.</li>
         <li><strong>Exponential Backoff with Full Jitter &amp; <code>Retry-After</code> Parsing:</strong> Any HTTP <code>429 Too Many Requests</code>, <code>403 Rate Limit Exceeded</code>, or <code>5xx</code> response automatically honors the server's <code>Retry-After</code> header or backs off using <code>random.uniform(0.5 * base * 2^attempt, base * 2^attempt)</code> up to 5 attempts.</li>
         <li><strong>Per-API Disk Checkpointing &amp; Graceful Stale-Cache Fallback:</strong> Every Discovery REST spec (<code>data/cache/discovery/{api}_{version}.json</code>) is atomically written to disk as soon as it arrives. If network connectivity drops mid-run, re-running resumes instantly without re-fetching completed specs, and falls back to the last known good cached spec if an upstream endpoint is temporarily unreachable.</li>
@@ -164,7 +172,7 @@
               <th>Component Role</th>
               <th>Google Cloud Native Service</th>
               <th>Configuration &amp; Sizing</th>
-              <th>Monthly GCP Cost Estimate (Excl. Free Tier)</th>
+              <th>Monthly Google Cloud Cost Estimate (Excl. Free Tier)</th>
             </tr>
           </thead>
           <tbody>
@@ -200,7 +208,7 @@
             </tr>
             <tr style="background:var(--gcp-blue-light);font-weight:700;">
               <td colspan="3">Total Monthly Cost (Local Workstation Mode / Cloud Serverless Mode without optional WAF)</td>
-              <td>$0.00 Locally / ~$0.30/month on GCP</td>
+              <td>$0.00 Locally / ~$0.30/month on Google Cloud</td>
             </tr>
           </tbody>
         </table>
@@ -212,16 +220,16 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div>
-        <strong>⚠️ Unofficial Resource Disclaimer:</strong> This application is an independent, unofficial utility and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud.
-        Data is harvested once daily from public Google Cloud Location feeds, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        <strong>⚠️ Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
       </div>
       <div style="margin-top:6px;">
-        For authoritative service availability, SLAs, and compliance information, always refer to the official documentation:
+        For authoritative service and model availability, SLAs, and compliance information, always refer to the official documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
+        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
         <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
         <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
-        Google Cloud and all GCP service names are trademarks of Google LLC.
       </div>
     </div>
   </footer>
