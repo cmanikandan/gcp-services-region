@@ -142,6 +142,26 @@ python3 cli.py refresh --force
 
 ---
 
+## 🗺️ Product Backlog & Future Features Roadmap
+
+Below is the prioritized feature backlog of capabilities that can be added in future iterations to further assist Cloud Architects, Platform Engineers, and FinOps/Security teams:
+
+| Priority | Feature / Capability | Target Persona | Data Source / Technical Approach |
+| :--- | :--- | :--- | :--- |
+| **P0** | **☁️ Cloud TPU (`v6e Trillium`, `v5p`, `v5e`) & AI Hypercomputer Pod Matrix** | AI/ML Architects | Expand zone-level accelerator harvesting in `harvester.py` to include Cloud TPU topologies, Dynamic Workload Scheduler (DWS) support, and GKE AI Hypercomputer cluster zones alongside NVIDIA GPUs. |
+| **P0** | **🛡️ Compliance, Data Residency & Assured Workloads Overlay** | Security & Compliance Architects | Map every Google Cloud region and service against regulatory compliance regimes (`FedRAMP High/Moderate`, `IL4/IL5`, `HIPAA`, `PCI-DSS`, `GDPR / EU Sovereign Cloud`, `DORA`, `RBI / MeitY India`, `IRAP Australia`) so users can filter compliant regions in one click. |
+| **P1** | **🌐 Inter-Region Network RTT Latency & Subsea Cable Matrix** | Network Architects | Add an interactive `43 × 43` inter-region round-trip latency (p50/p95 ms) matrix, Cloud Interconnect colocation facility lookup, and Premium vs. Standard Network Tier throughput comparison. |
+| **P1** | **💰 Regional FinOps & SKU Pricing Comparator** | FinOps & Cloud Economists | Harvest public SKU pricing via the Google Cloud Billing Catalog API (`cloudbilling.googleapis.com`) to display relative regional cost multipliers (e.g., `us-central1` vs. `europe-west3` vs. `asia-south1`) across Compute (`N4`/`C4`/`G2`/`A3`), Storage, BigQuery, AlloyDB, and Vertex AI token pricing (On-Demand, 1Y/3Y CUD, Spot). |
+| **P1** | **🧭 Multi-Region HA / DR Pair Recommendation Engine** | Enterprise Architects | Interactive "Workload Bill of Materials" wizard: select required Google Cloud services, AI models, GPUs/TPUs, maximum RTT latency budget, and sovereignty boundary to automatically score and rank optimal **Primary + Secondary (DR) Region Pairs** with zero service/model gaps. |
+| **P2** | **🗺️ Interactive Global Map & Edge Latency Ring Visualizer** | Solution Architects | Add a zero-dependency interactive SVG/Canvas world map plotting all 43 active regions, 4 future regions, 101 Edge PoPs, 137 CDN PoPs, and Low CO₂ 🌱 grids with distance/latency radius rings. |
+| **P2** | **🔍 Terraform / OpenTofu & `gcloud` Regional Readiness Linter** | DevOps / Platform Engineers | Allow uploading or pasting a `.tf` file (or running `python3 cli.py lint main.tf --region asia-south1`) to statically verify whether all referenced Google Cloud resources, machine series, GPUs, and Vertex AI model IDs are available in the target region/zone before running `terraform apply`. |
+| **P2** | **🔐 Live GCP Project Quota & Org Policy Overlay (Optional Authenticated Mode)** | Enterprise Operators | Optional local `gcloud` / ADC integration (`cloudquotas.googleapis.com`, `serviceusage.googleapis.com`, `orgpolicy.googleapis.com`) to overlay a project's actual enabled APIs, active regional GPU/TPU quota limits, and `constraints/gcp.resourceLocations` policies directly on the UI. |
+| **P3** | **📅 Vertex AI Model Lifecycle, Deprecation & Release Notes Tracker** | AI Application Teams | Enrich the AI Models catalog with model launch dates, `Preview` vs. `GA` stability stages, context window / max output token limits, and automated sunset/deprecation countdown alerts from Google Cloud Release Notes. |
+| **P3** | **🔔 RSS / Atom Feed, JSON Diff API & Webhook Notifications** | Engineering Teams | Generate a static RSS/Atom feed (`dist/whatsnew.xml`) and optional Slack/Google Chat/Webhook notifications whenever the daily 24h snapshot diff detects newly launched Google Cloud services, AI models, or regional expansions. |
+
+---
+
 ## 📌 Disclaimer
 
 This is an **unofficial tool** and is not affiliated with, maintained, authorized, endorsed, or sponsored by Google LLC. Please refer to the official Google Cloud documentation ([https://cloud.google.com/about/locations](https://cloud.google.com/about/locations) and [https://cloud.google.com/docs](https://cloud.google.com/docs)) for the latest information.
+
