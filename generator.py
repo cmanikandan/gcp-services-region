@@ -204,10 +204,10 @@ a:hover {
 .nav-link {
   display: inline-flex;
   align-items: center;
-  padding: 6px 11px;
+  padding: 5px 9px;
   border-radius: 7px;
   font-weight: 600;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
   transition: all 0.15s ease;
@@ -585,9 +585,13 @@ table.data-table tbody tr:hover {
 // Theme initialization & toggle (Light / Dark mode)
 (function initTheme() {
   try {
-    const saved = localStorage.getItem('gcp_explorer_theme');
+    const params = new URLSearchParams(window.location.search);
+    const urlTheme = params.get('theme');
+    const saved = urlTheme || localStorage.getItem('gcp_explorer_theme');
     if (saved === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (urlTheme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
     }
   } catch (e) {}
 })();
@@ -642,6 +646,15 @@ window.setupTableFilter = function setupTableFilter(config) {
   const tbody = table.querySelector('tbody');
   const rows = Array.from(tbody.querySelectorAll('tr'));
   const total = rows.length;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (searchInput && params.get('q')) searchInput.value = params.get('q');
+    if (select1 && params.get('f1')) select1.value = params.get('f1');
+    if (select2 && params.get('f2')) select2.value = params.get('f2');
+    if (select3 && (params.get('region') || params.get('f3'))) select3.value = params.get('region') || params.get('f3');
+    if (checkbox && params.get('flag') === '1') checkbox.checked = true;
+  } catch (e) {}
 
   function applyFilter() {
     const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
@@ -782,7 +795,7 @@ def render_layout(
         ("pops", "Zones & PoPs", f"{root_prefix}pops.html"),
         ("whatsnew", "What's New", f"{root_prefix}whatsnew.html"),
         ("arch", "Architecture", f"{root_prefix}arch.html"),
-        ("faqs", "FAQs & CLI", f"{root_prefix}faqs.html"),
+        ("faqs", "FAQs", f"{root_prefix}faqs.html"),
     ]
     nav_items = "\n".join(
         f'<li><a href="{href}" class="nav-link {"active" if key == active_tab else ""}">{label}</a></li>'
@@ -1977,6 +1990,17 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
         catEl.addEventListener('change', renderMatrix);
         document.getElementById('cmp-search').addEventListener('input', renderMatrix);
         document.getElementById('cmp-diff-only').addEventListener('change', renderMatrix);
+
+        try {{
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('mode') === 'models') {{
+            modeEl.value = 'models';
+            populateCategoryDropdown();
+          }}
+          if (params.get('diff') === '1') {{
+            document.getElementById('cmp-diff-only').checked = true;
+          }}
+        }} catch (e) {{}}
 
         function renderMatrix() {{
           const mode = modeEl.value;

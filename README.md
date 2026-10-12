@@ -20,6 +20,55 @@ A fast, locally runnable web application, static HTML generator, and terminal CL
 
 ---
 
+## 📸 Visual Tour & Key Pages
+
+### 1. Google Cloud Services Explorer (`index.html`)
+Search and filter **153 Google Cloud Services** by category, deployment scope (`Regional`, `Multi-Region`, `Global`), underlying `*.googleapis.com` Discovery APIs, REST API operation counts, and regional coverage percentage.
+
+![Google Cloud Services Explorer](docs/screenshots/01-services-explorer.png)
+
+### 2. Google Cloud Regions Explorer (`regions.html`)
+Explore all **43 active Google Cloud Regions** (+ **4 announced upcoming regions**), including unique service coverage, available AI & Foundation models, availability zones, Compute machine series, GPU accelerators, Low CO₂ 🌱 sustainability indicators, and launch years.
+
+![Google Cloud Regions Explorer](docs/screenshots/02-regions-explorer.png)
+
+### 3. AI & Foundation Models Regional Availability Explorer (`models.html`)
+Check regional, multi-region (`us`, `eu`), and `global` endpoint availability across **94 First-Party and Partner AI Models** spanning **16 Model Families** (Gemini, Veo Video, Embeddings, Chirp/TTS, Anthropic Claude, Meta Llama, Mistral/Codestral, DeepSeek, xAI Grok, OpenAI `gpt-oss`, Qwen, Gemma, etc.).
+
+![Google Cloud AI & Foundation Models Explorer](docs/screenshots/03-ai-models-explorer.png)
+
+### 4. AI Models Filtered by Region + Dark Mode (`models.html?region=asia-south1&theme=dark`)
+Filter AI & Foundation Models by any specific Google Cloud region (e.g., `asia-south1 — Mumbai`) or endpoint (`global`, `us`, `eu`) with automatic region chip highlighting and built-in **Dark / Light Mode**.
+
+![AI Models Filtered by Region in Dark Mode](docs/screenshots/04-ai-models-filtered-mumbai-dark.png)
+
+### 5. Multi-Region Capabilities & AI Model Comparison Matrix (`capabilities.html`)
+Compare up to **4 Google Cloud Regions** side-by-side across both **Google Cloud Services** and **AI & Foundation Models**, with hardware/GPU summaries, a **Show Differences / Gaps Only** toggle, and one-click CSV export.
+
+![Multi-Region Capabilities & AI Model Comparison Matrix](docs/screenshots/05-capabilities-compare-matrix.png)
+
+### 6. 130 Availability Zones — Hardware, CPU Microarchitectures, GPUs & Edge PoPs (`pops.html`)
+Inspect exact Compute machine series (`A4X`, `A3 Mega`, `C4`, `C4A`, `N4`, `Z3`, `M4`), CPU microarchitectures (`Google Axion`, `AMD EPYC Turin`, `Intel Granite Rapids`, `NVIDIA Grace`), GPU accelerators, Confidential Computing support across all **130 Availability Zones**, and **238 Global Edge / CDN PoPs**.
+
+![Availability Zones Hardware, GPUs & Edge PoPs](docs/screenshots/06-zones-gpu-edge-pops.png)
+
+### 7. Dedicated Google Cloud Region Detail Page (`regions/us-central1.html`)
+Every Google Cloud region has its own dedicated page detailing zone-level CPU/GPU hardware, available AI & Foundation Models in that region, available regional services, and a gap list of regional services not currently offered in that region.
+
+![Google Cloud Region Detail Page — us-central1](docs/screenshots/07-region-detail-us-central1.png)
+
+### 8. Dedicated Google Cloud Service Detail Page & REST API Operations (`services/alloydb.html`)
+Every Google Cloud service has its own dedicated page showing all supported regions, missing regions, regional service endpoints, and every harvested REST API operation (`GET`, `POST`, `PATCH`, `DELETE`) from the Google APIs Discovery specification.
+
+![Google Cloud Service Detail Page — AlloyDB](docs/screenshots/08-service-detail-alloydb.png)
+
+### 9. Solution Architecture & Quota Resilience (`arch.html`)
+Overview of the daily 24-hour caching pipeline, token-bucket rate limiter, exponential backoff with jitter, per-API disk checkpointing, and optional serverless Google Cloud hosting cost breakdown (~`$0.30/month`).
+
+![Solution Architecture & Quota Resilience](docs/screenshots/09-architecture-quota-resilience.png)
+
+---
+
 ## ✨ Key Features
 
 1. **Daily Refresh & Local Static/JSON Cache (24h TTL)**:
@@ -96,4 +145,3 @@ python3 cli.py refresh --force
 ## 📌 Disclaimer
 
 This is an **unofficial tool** and is not affiliated with, maintained, authorized, endorsed, or sponsored by Google LLC. Please refer to the official Google Cloud documentation ([https://cloud.google.com/about/locations](https://cloud.google.com/about/locations) and [https://cloud.google.com/docs](https://cloud.google.com/docs)) for the latest information.
-
