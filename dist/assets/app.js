@@ -1,12 +1,25 @@
 // Theme initialization & toggle (Light / Dark mode)
 (function initTheme() {
-  const saved = localStorage.getItem('gcp_explorer_theme');
-  if (saved === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const urlTheme = params.get('theme');
+    const saved = urlTheme || localStorage.getItem('gcp_explorer_theme');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else if (urlTheme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  } catch (e) {}
 })();
 
-function toggleTheme() {
+function updateThemeButtonLabel() {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (!btn) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  btn.innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
+}
+
+window.toggleTheme = function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'dark' ? 'light' : 'dark';
   if (next === 'dark') {
@@ -14,17 +27,14 @@ function toggleTheme() {
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
-  localStorage.setItem('gcp_explorer_theme', next);
-  const btn = document.getElementById('theme-toggle-btn');
-  if (btn) btn.textContent = next === 'dark' ? '☀️ Light' : '🌙 Dark';
-}
+  try {
+    localStorage.setItem('gcp_explorer_theme', next);
+  } catch (e) {}
+  updateThemeButtonLabel();
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('theme-toggle-btn');
-  if (btn) {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-  }
+  updateThemeButtonLabel();
   // Press '/' to quickly focus the primary search box on any page
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
@@ -38,12 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Shared table sorting, filtering, and local refresh trigger
-function setupTableFilter(config) {
+window.setupTableFilter = function setupTableFilter(config) {
   const searchInput = document.getElementById(config.searchId);
   const select1 = config.select1Id ? document.getElementById(config.select1Id) : null;
   const select2 = config.select2Id ? document.getElementById(config.select2Id) : null;
   const select3 = config.select3Id ? document.getElementById(config.select3Id) : null;
   const checkbox = config.checkboxId ? document.getElementById(config.checkboxId) : null;
+  const resetBtn = config.resetId ? document.getElementById(config.resetId) : null;
   const table = document.getElementById(config.tableId);
   const countEl = document.getElementById(config.countId);
   if (!table) return;
@@ -51,6 +62,15 @@ function setupTableFilter(config) {
   const tbody = table.querySelector('tbody');
   const rows = Array.from(tbody.querySelectorAll('tr'));
   const total = rows.length;
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (searchInput && params.get('q')) searchInput.value = params.get('q');
+    if (select1 && params.get('f1')) select1.value = params.get('f1');
+    if (select2 && params.get('f2')) select2.value = params.get('f2');
+    if (select3 && (params.get('region') || params.get('f3'))) select3.value = params.get('region') || params.get('f3');
+    if (checkbox && params.get('flag') === '1') checkbox.checked = true;
+  } catch (e) {}
 
   function applyFilter() {
     const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
@@ -67,15 +87,36 @@ function setupTableFilter(config) {
       const attr3 = row.getAttribute('data-filter3') || '';
       const attrCb = row.getAttribute('data-flag') === 'true';
 
+      const tokens1 = attr1.split('|');
+      const tokens2 = attr2.split('|');
+      const tokens3 = attr3.split('|');
+
       const matchQ = !q || text.includes(q);
-      const match1 = !v1 || attr1 === v1 || attr1.split('|').includes(v1);
-      const match2 = !v2 || attr2 === v2 || attr2.split('|').includes(v2);
-      const match3 = !v3 || attr3 === v3 || attr3.split('|').includes(v3);
+      const match1 = !v1 || attr1 === v1 || tokens1.includes(v1);
+      const match2 = !v2 || attr2 === v2 || tokens2.includes(v2);
+      const match3 = !v3 || attr3 === v3 || tokens3.includes(v3);
       const matchCb = !cb || attrCb;
 
       if (matchQ && match1 && match2 && match3 && matchCb) {
         row.style.display = '';
         visible++;
+        if (config.highlightRegionAttr && v3) {
+          row.querySelectorAll('[data-rid]').forEach(chip => {
+            if (chip.getAttribute('data-rid') === v3) {
+              chip.classList.add('code-chip-match');
+              const extraWrap = chip.closest('.extra-rids');
+              if (extraWrap) {
+                extraWrap.style.display = 'inline';
+                const toggleBtn = row.querySelector('.more-rids-toggle');
+                if (toggleBtn) toggleBtn.style.display = 'none';
+              }
+            } else {
+              chip.classList.remove('code-chip-match');
+            }
+          });
+        } else if (config.highlightRegionAttr) {
+          row.querySelectorAll('.code-chip-match').forEach(chip => chip.classList.remove('code-chip-match'));
+        }
       } else {
         row.style.display = 'none';
       }
@@ -91,6 +132,16 @@ function setupTableFilter(config) {
   if (select2) select2.addEventListener('change', applyFilter);
   if (select3) select3.addEventListener('change', applyFilter);
   if (checkbox) checkbox.addEventListener('change', applyFilter);
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      if (select1) select1.value = '';
+      if (select2) select2.value = '';
+      if (select3) select3.value = '';
+      if (checkbox) checkbox.checked = false;
+      applyFilter();
+    });
+  }
 
   // Column sorting
   const headers = table.querySelectorAll('th[data-sort]');
@@ -116,12 +167,12 @@ function setupTableFilter(config) {
   });
 
   applyFilter();
-}
+};
 
-async function triggerHarvestRefresh(btn) {
+window.triggerHarvestRefresh = async function triggerHarvestRefresh(btn) {
   const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '⏳ Refreshing Google Cloud APIs...';
+  btn.innerHTML = '⏳ Refreshing...';
   try {
     const resp = await fetch('/api/refresh', { method: 'POST' });
     if (resp.ok) {
@@ -135,4 +186,4 @@ async function triggerHarvestRefresh(btn) {
     btn.disabled = false;
     btn.innerHTML = orig;
   }
-}
+};

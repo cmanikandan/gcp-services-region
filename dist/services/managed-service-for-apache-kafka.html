@@ -4,50 +4,40 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Managed Service for Apache Kafka - Google Cloud Regional Availability | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../assets/style.css?v=1791740133-v2">
+  <script src="../assets/app.js?v=1791740133-v2"></script>
 </head>
 <body>
-  <div class="unofficial-ribbon">
-    <div class="unofficial-ribbon-inner">
-      <div>
-        <strong>⚠️ Unofficial Tool:</strong> This is an unofficial tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
-      </div>
-      <div>
-        Official References:
-        <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Regions &amp; Zones Docs ↗</a>
-      </div>
-    </div>
-  </div>
-
   <header class="site-header">
     <div class="header-inner">
       <a class="brand" href="../index.html">
-        <div class="brand-logo" title="Google Cloud">☁️</div>
-        <div>
-          <div class="brand-title-row">
+        <div class="brand-logo" title="Google Cloud Services &amp; Regions Explorer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gcp-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
             <span>Google Cloud Services &amp; Regions</span>
-            <span class="unofficial-pill">Unofficial Tool</span>
+            <span class="unofficial-tag">Unofficial</span>
           </div>
           <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
-          <span class="brand-unofficial-line">This is an unofficial tool — refer to official Google Cloud docs for the latest information.</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="../index.html" class="nav-link active">Services</a></li>
 <li><a href="../regions.html" class="nav-link ">Regions</a></li>
 <li><a href="../models.html" class="nav-link ">AI Models</a></li>
-<li><a href="../capabilities.html" class="nav-link ">Capabilities & Matrix</a></li>
-<li><a href="../pops.html" class="nav-link ">Zones & Edge PoPs</a></li>
+<li><a href="../capabilities.html" class="nav-link ">Compare Matrix</a></li>
+<li><a href="../pops.html" class="nav-link ">Zones & PoPs</a></li>
 <li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
 <li><a href="../arch.html" class="nav-link ">Architecture</a></li>
-<li><a href="../faqs.html" class="nav-link ">FAQs & CLI</a></li>
+<li><a href="../faqs.html" class="nav-link ">FAQs</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Daily static cache TTL (24h)">⚡ Cached Daily • 2026-10-11 16:05:41 UTC</span>
-        <button id="theme-toggle-btn" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
-        <button class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
+        <span class="cache-pill" title="Snapshot generated at 2026-10-11 17:35:33 UTC">⚡ Snapshot: 2026-10-11</span>
+        <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
+        <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
     </div>
   </header>
@@ -56,22 +46,20 @@
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot Updated:</strong> 2026-10-11 16:05:41 UTC —
-          <strong>153</strong> <a href="../index.html">Google Cloud Services</a>,
-          <strong>43</strong> <a href="../regions.html">Regions</a>
-          (+<strong>4</strong> upcoming),
-          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a>,
-          <strong>130</strong> <a href="../pops.html">Availability Zones</a>,
-          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a>, and
-          <strong>10,501</strong> REST API Operations.
+          <strong>Snapshot (2026-10-11 17:35:33 UTC):</strong>
+          <strong>153</strong> <a href="../index.html">Google Cloud Services</a> •
+          <strong>43</strong> <a href="../regions.html">Regions</a> (+<strong>4</strong> upcoming) •
+          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a> •
+          <strong>130</strong> <a href="../pops.html">Zones</a> •
+          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a> (<strong>10,501</strong> REST operations)
         </div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
-          ℹ️ <strong>Note:</strong> This is an unofficial tool. Please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> for the latest information.
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
-        <span class="badge badge-blue">24h Local Cache + Exponential Backoff</span>
+        <span class="badge badge-blue">24h Cache</span>
       </div>
     </div>
     
@@ -161,19 +149,18 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div>
-        <strong>⚠️ Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is <strong>not</strong> affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
+        <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
         Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
       </div>
       <div style="margin-top:6px;">
-        For authoritative service and model availability, SLAs, and compliance information, always refer to the official documentation:
+        Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
         <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
         <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
         <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
-        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>.
+        <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>
   </footer>
-  <script src="../assets/app.js"></script>
 </body>
 </html>
