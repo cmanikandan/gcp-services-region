@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:GoogleCloudExplorer/GoogleCloudExplorer.xctestplan"
+            reference = "container:GoogleCloudExplorer.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>

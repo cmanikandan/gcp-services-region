@@ -196,7 +196,32 @@ Below is the prioritized feature backlog of capabilities that can be added in fu
 
 ---
 
-## 📌 Disclaimer
+## 🍎 iOS / iPadOS App Icons & Publishing to the Apple App Store
 
-This is an **unofficial tool** and is not affiliated with, maintained, authorized, endorsed, or sponsored by Google LLC. Please refer to the official Google Cloud documentation ([https://cloud.google.com/about/locations](https://cloud.google.com/about/locations) and [https://cloud.google.com/docs](https://cloud.google.com/docs)) for the latest information.
+The native Xcode project ([`ios/GoogleCloudExplorer/`](ios/GoogleCloudExplorer/)) ships **App Store Connect–ready** out of the box:
+
+<p align="left">
+  <img src="ios/GoogleCloudExplorer/GoogleCloudExplorer/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="120" alt="Light App Icon" />
+  &nbsp;&nbsp;
+  <img src="ios/GoogleCloudExplorer/GoogleCloudExplorer/Assets.xcassets/AppIcon.appiconset/AppIcon-Dark.png" width="120" alt="Dark App Icon" />
+  &nbsp;&nbsp;
+  <img src="ios/GoogleCloudExplorer/GoogleCloudExplorer/Assets.xcassets/AppIcon.appiconset/AppIcon-Tinted.png" width="120" alt="Tinted App Icon" />
+</p>
+
+- **3 Native `1024×1024` App Store Icons (`Light`, `iOS 18+ Dark`, `iOS 18+ Tinted`)**: Pre-generated in strict 24-bit opaque RGB (`hasAlpha: no`) inside [`AppIcon.appiconset`](ios/GoogleCloudExplorer/GoogleCloudExplorer/Assets.xcassets/AppIcon.appiconset/) via [`ios/scripts/generate_app_icon.py`](ios/scripts/generate_app_icon.py).
+- **Mandatory Apple Privacy Manifest (`PrivacyInfo.xcprivacy`)**: Pre-bundled for `ITMS-91053` compliance declaring **Data Not Collected** (`NSPrivacyTracking = false`, `NSPrivacyCollectedDataTypes = []`) and Required Reason API codes (`CA92.1`, `C617.1`).
+- **Automated Export Compliance & Universal Launch Screen**: Pre-configured with `ITSAppUsesNonExemptEncryption = false`, `UILaunchScreen` generation, and `public.app-category.developer-tools`.
+- **Publishing Quick Steps** (full walkthrough in [`ios/GoogleCloudExplorer/README.md`](ios/GoogleCloudExplorer/README.md#-publishing-to-the-apple-app-store-step-by-step-guide)):
+  1. Set your own `PRODUCT_BUNDLE_IDENTIFIER` in [`ios/GoogleCloudExplorer/Config/Shared.xcconfig`](ios/GoogleCloudExplorer/Config/Shared.xcconfig) using an active [Apple Developer Program](https://developer.apple.com/programs/) account.
+  2. Follow Apple Guideline 4.1 / 5.2 trademark naming in App Store Connect (e.g., **Name**: `Cloud Region & SLA Explorer`, **Subtitle**: `Unofficial Reference for Google Cloud`).
+  3. Run `python3 harvester.py --force && python3 generator.py && python3 ios/scripts/sync_bundled_catalog.py` to bundle the freshest offline catalog.
+  4. In Xcode, select **Any iOS Device (arm64)** -> **Product -> Archive -> Distribute App -> App Store Connect**, upload `6.9"` iPhone + `13"` iPad screenshots, mark App Privacy as **Data Not Collected**, test via **TestFlight**, and submit to App Review.
+
+---
+
+## 📌 Disclaimer & License
+
+- **Disclaimer**: This is an **unofficial tool** and is not affiliated with, maintained, authorized, endorsed, or sponsored by Google LLC. Please refer to the official Google Cloud documentation ([https://cloud.google.com/about/locations](https://cloud.google.com/about/locations) and [https://cloud.google.com/docs](https://cloud.google.com/docs)) for the latest information.
+- **License**: Released under the [MIT License](LICENSE).
+
 
