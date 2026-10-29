@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root-prefix="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
   <title>Knowledge Catalog (Dataplex) - Google Cloud Regional Availability | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="../assets/style.css?v=1791740133-v2">
-  <script src="../assets/app.js?v=1791740133-v2"></script>
+  <link rel="icon" type="image/svg+xml" href="../assets/icon.svg">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../assets/style.css?v=1793251273-v3">
+  <script src="../assets/app.js?v=1793251273-v3"></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,13 +24,14 @@
             <span>Google Cloud Services &amp; Regions</span>
             <span class="unofficial-tag">Unofficial</span>
           </div>
-          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Availability, AI Models, Pricing, SLAs &amp; Updates Explorer</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="../index.html" class="nav-link active">Services</a></li>
 <li><a href="../regions.html" class="nav-link ">Regions</a></li>
 <li><a href="../models.html" class="nav-link ">AI Models</a></li>
+<li><a href="../pricing-sla.html" class="nav-link ">Pricing & SLA</a></li>
 <li><a href="../capabilities.html" class="nav-link ">Compare Matrix</a></li>
 <li><a href="../pops.html" class="nav-link ">Zones & PoPs</a></li>
 <li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
@@ -35,7 +39,7 @@
 <li><a href="../faqs.html" class="nav-link ">FAQs</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Snapshot generated at 2026-10-11 17:35:33 UTC">⚡ Snapshot: 2026-10-11</span>
+        <span class="cache-pill" title="Snapshot generated at 2026-10-29 05:21:13 UTC">⚡ Snapshot: 2026-10-29</span>
         <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
         <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
@@ -46,18 +50,19 @@
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot (2026-10-11 17:35:33 UTC):</strong>
+          <strong>Snapshot (2026-10-29 05:21:13 UTC):</strong>
           <strong>153</strong> <a href="../index.html">Google Cloud Services</a> •
           <strong>43</strong> <a href="../regions.html">Regions</a> (+<strong>4</strong> upcoming) •
-          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a> •
-          <strong>130</strong> <a href="../pops.html">Zones</a> •
-          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a> (<strong>10,501</strong> REST operations)
+          <strong>91</strong> <a href="../models.html">AI Models</a> •
+          <strong>149</strong> <a href="../pricing-sla.html">SLAs &amp; Pricing</a> •
+          <strong>30</strong> <a href="../whatsnew.html">Release Updates</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">SLAs</a> • <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Pricing</a>) for the latest authoritative information.
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="offline-status-pill" class="badge badge-green">✓ Offline PWA Ready</span>
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
         <span class="badge badge-blue">24h Cache</span>
       </div>
@@ -73,9 +78,41 @@
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                 <span class="badge badge-blue">Regional</span>
                 <span class="badge badge-green">41 / 43 Regions (95.3%)</span>
-                <span class="badge badge-purple">204 API Operations</span>
+                <span class="badge badge-yellow">SLA: 99.95%</span>
+                <span class="badge badge-purple">206 API Operations</span>
                 <a href="https://cloud.google.com/products/knowledge-catalog" target="_blank" rel="noopener" class="btn">Official Documentation ↗</a>
+                <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener" class="btn">Official SLA ↗</a>
+                <a href="https://cloud.google.com/products/knowledge-catalog/pricing" target="_blank" rel="noopener" class="btn">Official Pricing ↗</a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">🛡️ Service Level Agreement (SLA) &amp; HA Architecture</h2>
+            
+            <div class="table-scroll" style="margin-bottom:10px;">
+              <table class="data-table">
+                <thead><tr><th>Deployment Tier</th><th>Target SLA</th><th>Max Downtime</th><th>Topology</th></tr></thead>
+                <tbody><tr><td><strong>Regional High Availability (Multi-Zone)</strong></td><td><span class="badge badge-green">99.95%</span></td><td><code>21m 55s / mo</code> • <code>4h 23m / yr</code></td><td style="color:var(--text-muted);font-size:12.5px;">Managed multi-zone regional deployment</td></tr><tr><td><strong>Zonal / Standard Deployment</strong></td><td><span class="badge badge-green">99.9%</span></td><td><code>43m 50s / mo</code> • <code>8h 46m / yr</code></td><td style="color:var(--text-muted);font-size:12.5px;">Single-zone or standard regional resource</td></tr></tbody>
+              </table>
+            </div>
+            
+            <div style="font-size:12.5px;">
+              <strong>HA Qualification Prerequisites:</strong>
+              <ul style="margin:6px 0 0 18px;padding:0;"><li>Enable multi-zone High Availability (HA) within the region and avoid single-zone resource pinning.</li><li>Pair with a secondary DR region if business continuity requires survival of a full regional outage.</li></ul>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">💰 FinOps Pricing Model, Free Tier &amp; CUDs</h2>
+            <div style="display:grid;gap:8px;font-size:13px;">
+              <div><strong>Billing Model:</strong> Usage-Metered API Calls / Tokens / Compute Node-Hours</div>
+              <div><strong>Metered Units:</strong> <code>per-1k units / 1M tokens / accelerator-hour</code></div>
+              <div><strong>Free Tier:</strong> <span class="badge badge-green">Eligible</span> Monthly free usage units on select Vision, Speech, Translation &amp; NLP APIs</div>
+              <div><strong>Committed Use Discounts:</strong> Provisioned Throughput / Compute CUDs on dedicated nodes</div>
+              <div><strong>Key Cost Watchouts:</strong><ul style="margin:4px 0 0 18px;padding:0;"><li>Synchronous real-time vs batch inference volume</li><li>Media duration (audio minutes / video seconds / document pages)</li><li>Dedicated endpoint minimum replica count</li></ul></div>
             </div>
           </div>
         </div>
@@ -107,12 +144,12 @@
 
         <div class="section-card">
           <h2 class="section-title">⚠️ Regions Where "Knowledge Catalog (Dataplex)" Is Not Listed (2 Regions)</h2>
-          <div><a href="../regions/asia-southeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast3 (Bangkok)</a> <a href="../regions/northamerica-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-south1 (Mexico*)</a></div>
+          <div><a href="../regions/asia-southeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast3 (Bangkok)</a> <a href="../regions/northamerica-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-south1 (Mexico)</a></div>
         </div>
 
         <div class="section-card" id="api-methods">
-          <h2 class="section-title">⚙️ Google Cloud Discovery APIs &amp; Capabilities (204 Operations)</h2>
-          <div style="padding:14px;border:1px solid var(--border-subtle);border-radius:8px;margin-bottom:10px;background:var(--bg-subtle);"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><strong>Cloud Dataplex API</strong> <span class="code-chip" style="color:var(--gcp-blue);font-weight:700;">dataplex.googleapis.com</span></div><div><span class="badge badge-blue">Preferred: v1</span> <span class="badge badge-gray">Versions: v1</span> <span class="badge badge-green">204 REST Methods (203 regional)</span></div></div><div style="margin-top:8px;font-size:12.5px;color:var(--text-muted);">Top-Level Resources: <span class="code-chip">organizations</span> <span class="code-chip">projects</span></div></div>
+          <h2 class="section-title">⚙️ Google Cloud Discovery APIs &amp; Capabilities (206 Operations)</h2>
+          <div style="padding:14px;border:1px solid var(--border-subtle);border-radius:8px;margin-bottom:10px;background:var(--bg-subtle);"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;"><div><strong>Cloud Dataplex API</strong> <span class="code-chip" style="color:var(--gcp-blue);font-weight:700;">dataplex.googleapis.com</span></div><div><span class="badge badge-blue">Preferred: v1</span> <span class="badge badge-gray">Versions: v1</span> <span class="badge badge-green">206 REST Methods (205 regional)</span></div></div><div style="margin-top:8px;font-size:12.5px;color:var(--text-muted);">Top-Level Resources: <span class="code-chip">organizations</span> <span class="code-chip">projects</span></div></div>
           
           <div class="toolbar" style="margin-top:14px;margin-bottom:12px;">
             <input id="api-m-search" type="search" class="search-input" placeholder="Search REST API method ID, HTTP verb (POST, GET, DELETE), path, or description...">
@@ -150,14 +187,14 @@
     <div class="footer-inner">
       <div>
         <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
-        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model matrices, SLA &amp; Pricing documentation, Release Notes XML feeds, and Google APIs Discovery REST specifications and served locally via static HTML &amp; offline PWA cache.
       </div>
       <div style="margin-top:6px;">
         Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
-        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Service Level Agreements</a> •
+        <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Cloud Pricing</a> •
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener">Release Notes</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>

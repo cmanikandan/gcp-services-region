@@ -1,0 +1,7 @@
+// Release.xcconfig
+// Release build configuration for GoogleCloudExplorer
+
+#include "Shared.xcconfig"
+
+// No additional release-specific overrides needed
+// All release settings use Xcode project defaults

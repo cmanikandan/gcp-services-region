@@ -33,8 +33,30 @@ window.toggleTheme = function toggleTheme() {
   updateThemeButtonLabel();
 };
 
+function updateConnectivityPill() {
+  const pill = document.getElementById('offline-status-pill');
+  if (!pill) return;
+  if (navigator.onLine === false) {
+    pill.textContent = '✈️ Offline Mode (Cached)';
+    pill.className = 'badge badge-yellow';
+  } else {
+    pill.textContent = '✓ Offline PWA Ready';
+    pill.className = 'badge badge-green';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateThemeButtonLabel();
+  updateConnectivityPill();
+  window.addEventListener('online', updateConnectivityPill);
+  window.addEventListener('offline', updateConnectivityPill);
+
+  // Register Offline Service Worker when served over HTTP(S)
+  if ('serviceWorker' in navigator && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+    const swPrefix = document.documentElement.getAttribute('data-root-prefix') || '';
+    navigator.serviceWorker.register(swPrefix + 'sw.js').catch(() => {});
+  }
+
   // Press '/' to quickly focus the primary search box on any page
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {

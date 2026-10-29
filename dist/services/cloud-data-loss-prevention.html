@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root-prefix="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
   <title>Cloud Data Loss Prevention - Google Cloud Regional Availability | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="../assets/style.css?v=1791740133-v2">
-  <script src="../assets/app.js?v=1791740133-v2"></script>
+  <link rel="icon" type="image/svg+xml" href="../assets/icon.svg">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../assets/style.css?v=1793251273-v3">
+  <script src="../assets/app.js?v=1793251273-v3"></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,13 +24,14 @@
             <span>Google Cloud Services &amp; Regions</span>
             <span class="unofficial-tag">Unofficial</span>
           </div>
-          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Availability, AI Models, Pricing, SLAs &amp; Updates Explorer</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="../index.html" class="nav-link active">Services</a></li>
 <li><a href="../regions.html" class="nav-link ">Regions</a></li>
 <li><a href="../models.html" class="nav-link ">AI Models</a></li>
+<li><a href="../pricing-sla.html" class="nav-link ">Pricing & SLA</a></li>
 <li><a href="../capabilities.html" class="nav-link ">Compare Matrix</a></li>
 <li><a href="../pops.html" class="nav-link ">Zones & PoPs</a></li>
 <li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
@@ -35,7 +39,7 @@
 <li><a href="../faqs.html" class="nav-link ">FAQs</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Snapshot generated at 2026-10-11 17:35:33 UTC">⚡ Snapshot: 2026-10-11</span>
+        <span class="cache-pill" title="Snapshot generated at 2026-10-29 05:21:13 UTC">⚡ Snapshot: 2026-10-29</span>
         <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
         <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
@@ -46,18 +50,19 @@
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot (2026-10-11 17:35:33 UTC):</strong>
+          <strong>Snapshot (2026-10-29 05:21:13 UTC):</strong>
           <strong>153</strong> <a href="../index.html">Google Cloud Services</a> •
           <strong>43</strong> <a href="../regions.html">Regions</a> (+<strong>4</strong> upcoming) •
-          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a> •
-          <strong>130</strong> <a href="../pops.html">Zones</a> •
-          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a> (<strong>10,501</strong> REST operations)
+          <strong>91</strong> <a href="../models.html">AI Models</a> •
+          <strong>149</strong> <a href="../pricing-sla.html">SLAs &amp; Pricing</a> •
+          <strong>30</strong> <a href="../whatsnew.html">Release Updates</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">SLAs</a> • <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Pricing</a>) for the latest authoritative information.
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="offline-status-pill" class="badge badge-green">✓ Offline PWA Ready</span>
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
         <span class="badge badge-blue">24h Cache</span>
       </div>
@@ -73,9 +78,41 @@
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                 <span class="badge badge-blue">Global</span>
                 <span class="badge badge-green">0 / 43 Regions (0.0%)</span>
+                <span class="badge badge-yellow">SLA: 99.99%</span>
                 <span class="badge badge-purple">150 API Operations</span>
                 <a href="https://cloud.google.com/security/products/dlp/" target="_blank" rel="noopener" class="btn">Official Documentation ↗</a>
+                <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener" class="btn">Official SLA ↗</a>
+                <a href="https://cloud.google.com/security/products/dlp/pricing" target="_blank" rel="noopener" class="btn">Official Pricing ↗</a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">🛡️ Service Level Agreement (SLA) &amp; HA Architecture</h2>
+            
+            <div class="table-scroll" style="margin-bottom:10px;">
+              <table class="data-table">
+                <thead><tr><th>Deployment Tier</th><th>Target SLA</th><th>Max Downtime</th><th>Topology</th></tr></thead>
+                <tbody><tr><td><strong>Multi-Region / Global Redundant</strong></td><td><span class="badge badge-green">99.99%</span></td><td><code>4m 23s / mo</code> • <code>52m 36s / yr</code></td><td style="color:var(--text-muted);font-size:12.5px;">Geo-redundant or Anycast multi-region deployment</td></tr><tr><td><strong>Single-Region Multi-Zone</strong></td><td><span class="badge badge-green">99.95%</span></td><td><code>21m 55s / mo</code> • <code>4h 23m / yr</code></td><td style="color:var(--text-muted);font-size:12.5px;">Regional multi-zone deployment</td></tr></tbody>
+              </table>
+            </div>
+            
+            <div style="font-size:12.5px;">
+              <strong>HA Qualification Prerequisites:</strong>
+              <ul style="margin:6px 0 0 18px;padding:0;"><li>Deploy using multi-region or dual-region endpoints where supported by data residency rules.</li><li>Implement client-side retries with exponential backoff and jitter.</li></ul>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">💰 FinOps Pricing Model, Free Tier &amp; CUDs</h2>
+            <div style="display:grid;gap:8px;font-size:13px;">
+              <div><strong>Billing Model:</strong> Hourly Gateway / Policy / Rule Base + Processed Data or Queries</div>
+              <div><strong>Metered Units:</strong> <code>Resource-hour • GiB processed • per-1M requests/queries</code></div>
+              <div><strong>Free Tier:</strong> <span class="badge badge-gray">Standard Metering</span> Core IAM &amp; VPC firewall rules included; advanced tiers metered</div>
+              <div><strong>Committed Use Discounts:</strong> Enterprise subscription tiers available (e.g., Cloud Armor Enterprise, SCC Enterprise)</div>
+              <div><strong>Key Cost Watchouts:</strong><ul style="margin:4px 0 0 18px;padding:0;"><li>Cross-region / internet data processing &amp; egress volume (GiB)</li><li>Number of active forwarding rules, tunnels, or WAF policies</li><li>Packet mirroring &amp; VPC Flow Logs sampling ingestion volume</li></ul></div>
             </div>
           </div>
         </div>
@@ -107,7 +144,7 @@
 
         <div class="section-card">
           <h2 class="section-title">⚠️ Regions Where "Cloud Data Loss Prevention" Is Not Listed (43 Regions)</h2>
-          <div><a href="../regions/africa-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">africa-south1 (Johannesburg)</a> <a href="../regions/asia-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east1 (Taiwan)</a> <a href="../regions/asia-east2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east2 (Hong Kong)</a> <a href="../regions/asia-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast1 (Tokyo)</a> <a href="../regions/asia-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast2 (Osaka*)</a> <a href="../regions/asia-northeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast3 (Seoul)</a> <a href="../regions/asia-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south1 (Mumbai)</a> <a href="../regions/asia-south2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south2 (Delhi)</a> <a href="../regions/asia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast1 (Singapore)</a> <a href="../regions/asia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast2 (Jakarta)</a> <a href="../regions/asia-southeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast3 (Bangkok)</a> <a href="../regions/australia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast1 (Sydney)</a> <a href="../regions/australia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast2 (Melbourne)</a> <a href="../regions/europe-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-central2 (Warsaw)</a> <a href="../regions/europe-north1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north1 (Finland)</a> <a href="../regions/europe-north2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north2 (Stockholm*)</a> <a href="../regions/europe-southwest1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-southwest1 (Madrid)</a> <a href="../regions/europe-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west1 (Belgium)</a> <a href="../regions/europe-west10.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west10 (Berlin)</a> <a href="../regions/europe-west12.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west12 (Turin)</a> <a href="../regions/europe-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west2 (London)</a> <a href="../regions/europe-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west3 (Frankfurt)</a> <a href="../regions/europe-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west4 (Netherlands)</a> <a href="../regions/europe-west6.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west6 (Zurich)</a> <a href="../regions/europe-west8.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west8 (Milan)</a> <a href="../regions/europe-west9.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west9 (Paris)</a> <a href="../regions/me-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central1 (Doha)</a> <a href="../regions/me-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central2 (Dammam)</a> <a href="../regions/me-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-west1 (Tel Aviv)</a> <a href="../regions/northamerica-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast1 (Montréal*)</a> <a href="../regions/northamerica-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast2 (Toronto)</a> <a href="../regions/northamerica-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-south1 (Mexico*)</a> <a href="../regions/southamerica-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-east1 (São Paulo)</a> <a href="../regions/southamerica-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-west1 (Santiago)</a> <a href="../regions/us-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-central1 (Iowa)</a> <a href="../regions/us-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east1 (South Carolina)</a> <a href="../regions/us-east4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east4 (North Virginia)</a> <a href="../regions/us-east5.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east5 (Columbus)</a> <a href="../regions/us-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-south1 (Dallas)</a> <a href="../regions/us-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west1 (Oregon)</a> <a href="../regions/us-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west2 (Los Angeles)</a> <a href="../regions/us-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west3 (Salt Lake City)</a> <a href="../regions/us-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west4 (Las Vegas)</a></div>
+          <div><a href="../regions/africa-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">africa-south1 (Johannesburg)</a> <a href="../regions/asia-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east1 (Taiwan)</a> <a href="../regions/asia-east2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-east2 (Hong Kong)</a> <a href="../regions/asia-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast1 (Tokyo)</a> <a href="../regions/asia-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast2 (Osaka*)</a> <a href="../regions/asia-northeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-northeast3 (Seoul)</a> <a href="../regions/asia-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south1 (Mumbai)</a> <a href="../regions/asia-south2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-south2 (Delhi)</a> <a href="../regions/asia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast1 (Singapore)</a> <a href="../regions/asia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast2 (Jakarta)</a> <a href="../regions/asia-southeast3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">asia-southeast3 (Bangkok)</a> <a href="../regions/australia-southeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast1 (Sydney)</a> <a href="../regions/australia-southeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">australia-southeast2 (Melbourne)</a> <a href="../regions/europe-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-central2 (Warsaw)</a> <a href="../regions/europe-north1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north1 (Finland)</a> <a href="../regions/europe-north2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-north2 (Stockholm*)</a> <a href="../regions/europe-southwest1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-southwest1 (Madrid)</a> <a href="../regions/europe-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west1 (Belgium)</a> <a href="../regions/europe-west10.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west10 (Berlin)</a> <a href="../regions/europe-west12.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west12 (Turin)</a> <a href="../regions/europe-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west2 (London)</a> <a href="../regions/europe-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west3 (Frankfurt)</a> <a href="../regions/europe-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west4 (Netherlands)</a> <a href="../regions/europe-west6.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west6 (Zurich)</a> <a href="../regions/europe-west8.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west8 (Milan)</a> <a href="../regions/europe-west9.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">europe-west9 (Paris)</a> <a href="../regions/me-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central1 (Doha)</a> <a href="../regions/me-central2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-central2 (Dammam)</a> <a href="../regions/me-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">me-west1 (Tel Aviv)</a> <a href="../regions/northamerica-northeast1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast1 (Montréal*)</a> <a href="../regions/northamerica-northeast2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-northeast2 (Toronto)</a> <a href="../regions/northamerica-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">northamerica-south1 (Mexico)</a> <a href="../regions/southamerica-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-east1 (São Paulo)</a> <a href="../regions/southamerica-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">southamerica-west1 (Santiago)</a> <a href="../regions/us-central1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-central1 (Iowa)</a> <a href="../regions/us-east1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east1 (South Carolina)</a> <a href="../regions/us-east4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east4 (North Virginia)</a> <a href="../regions/us-east5.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-east5 (Columbus)</a> <a href="../regions/us-south1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-south1 (Dallas)</a> <a href="../regions/us-west1.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west1 (Oregon)</a> <a href="../regions/us-west2.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west2 (Los Angeles)</a> <a href="../regions/us-west3.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west3 (Salt Lake City)</a> <a href="../regions/us-west4.html" class="code-chip" style="color:#c5221f;background:#fce8e6;border-color:#f5c2c0;">us-west4 (Las Vegas)</a></div>
         </div>
 
         <div class="section-card" id="api-methods">
@@ -150,14 +187,14 @@
     <div class="footer-inner">
       <div>
         <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
-        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model matrices, SLA &amp; Pricing documentation, Release Notes XML feeds, and Google APIs Discovery REST specifications and served locally via static HTML &amp; offline PWA cache.
       </div>
       <div style="margin-top:6px;">
         Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
-        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Service Level Agreements</a> •
+        <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Cloud Pricing</a> •
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener">Release Notes</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>

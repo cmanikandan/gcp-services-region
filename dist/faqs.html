@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root-prefix="">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
   <title>FAQs &amp; CLI Usage | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="assets/style.css?v=1791740133-v2">
-  <script src="assets/app.js?v=1791740133-v2"></script>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/style.css?v=1793251273-v3">
+  <script src="assets/app.js?v=1793251273-v3"></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,13 +24,14 @@
             <span>Google Cloud Services &amp; Regions</span>
             <span class="unofficial-tag">Unofficial</span>
           </div>
-          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Availability, AI Models, Pricing, SLAs &amp; Updates Explorer</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="index.html" class="nav-link ">Services</a></li>
 <li><a href="regions.html" class="nav-link ">Regions</a></li>
 <li><a href="models.html" class="nav-link ">AI Models</a></li>
+<li><a href="pricing-sla.html" class="nav-link ">Pricing & SLA</a></li>
 <li><a href="capabilities.html" class="nav-link ">Compare Matrix</a></li>
 <li><a href="pops.html" class="nav-link ">Zones & PoPs</a></li>
 <li><a href="whatsnew.html" class="nav-link ">What's New</a></li>
@@ -35,7 +39,7 @@
 <li><a href="faqs.html" class="nav-link active">FAQs</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Snapshot generated at 2026-10-11 17:35:33 UTC">⚡ Snapshot: 2026-10-11</span>
+        <span class="cache-pill" title="Snapshot generated at 2026-10-29 05:21:13 UTC">⚡ Snapshot: 2026-10-29</span>
         <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
         <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
@@ -46,62 +50,53 @@
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot (2026-10-11 17:35:33 UTC):</strong>
+          <strong>Snapshot (2026-10-29 05:21:13 UTC):</strong>
           <strong>153</strong> <a href="index.html">Google Cloud Services</a> •
           <strong>43</strong> <a href="regions.html">Regions</a> (+<strong>4</strong> upcoming) •
-          <strong>94</strong> <a href="models.html">AI &amp; Foundation Models</a> •
-          <strong>130</strong> <a href="pops.html">Zones</a> •
-          <strong>204</strong> <a href="capabilities.html">Discovery APIs</a> (<strong>10,501</strong> REST operations)
+          <strong>91</strong> <a href="models.html">AI Models</a> •
+          <strong>149</strong> <a href="pricing-sla.html">SLAs &amp; Pricing</a> •
+          <strong>30</strong> <a href="whatsnew.html">Release Updates</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">SLAs</a> • <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Pricing</a>) for the latest authoritative information.
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="offline-status-pill" class="badge badge-green">✓ Offline PWA Ready</span>
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
         <span class="badge badge-blue">24h Cache</span>
       </div>
     </div>
     
     <div class="section-card">
-      <h2 class="section-title">❓ Frequently Asked Questions (FAQs) &amp; Local CLI Guide</h2>
+      <h2 class="section-title">❓ Frequently Asked Questions (FAQs), Offline Mode &amp; CLI Guide</h2>
 
-      <p><strong>Q: Is this an official Google Cloud website or product?</strong></p>
+      <p><strong>Q: Is this an official Google Cloud website or mobile app?</strong></p>
       <ul>
-        <li><strong>No.</strong> This is an <strong>unofficial tool</strong> and is not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
-        <li>While data is automatically harvested from public Google Cloud feeds and Discovery APIs, it is provided "as-is" without warranty. Always refer to the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations Documentation</a>, <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones Documentation</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> for the latest information.</li>
+        <li><strong>No.</strong> Both the Web PWA and the Native SwiftUI iOS/iPadOS App are <strong>unofficial tools</strong> and are not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
+        <li>While data is automatically harvested from public Google Cloud feeds, SLA indexes, release notes, and Discovery APIs, it is provided "as-is" without warranty. Always refer to the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Official Google Cloud SLAs</a>, <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Official Google Cloud Pricing</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> for authoritative information.</li>
       </ul>
 
-      <p><strong>Q: What happens when Google Cloud launches a brand-new service, AI model, region, zone, or API?</strong></p>
+      <p><strong>Q: How do Offline Mode and the Native SwiftUI iOS/iPadOS App work?</strong></p>
       <ul>
-        <li><strong>Zero-Touch Dynamic Discovery:</strong> Every daily harvest dynamically pulls the live product/region feeds (<code>data.json</code>, <code>locations_map.json</code>, <code>multi-region-data.json</code>, <code>global-data.json</code>), live Vertex AI model availability tables, live Compute Engine zone/GPU tables, and the live Google APIs Discovery directory (<code>discovery.googleapis.com/discovery/v1/apis</code>).</li>
-        <li>Any newly launched service, AI model, region, zone, machine series, GPU, or REST API is automatically ingested, matched via documentation URL slug and title similarity, given its own detail view, and highlighted in the <a href="whatsnew.html">What's New</a> tab without requiring any code changes.</li>
+        <li><strong>Offline-Ready Web PWA:</strong> Opening the web app over <code>http://localhost:8080</code> (or HTTPS) registers <code>sw.js</code>, pre-caching all core views, stylesheets, scripts, and <code>data/mobile_catalog.json</code> so you can browse offline in Airplane Mode.</li>
+        <li><strong>Modern Native SwiftUI App (<code>ios/GoogleCloudExplorer</code>):</strong> Built natively for iOS 17+ (iPhone &amp; iPad) with Bento dashboards, a 3D interactive Apple MapKit Globe, Swift Charts SLA/FinOps scrubbers, Customer Stack blueprints, and CoreSpotlight. It embeds <code>mobile_catalog.json</code> directly inside the app bundle for instant 0ms offline launch and delta-syncs via ETag/Gzip against <code>/api/mobile-catalog</code> when online.</li>
       </ul>
 
-      <p><strong>Q: How often is the data refreshed, and how are API quota issues prevented?</strong></p>
-      <ul>
-        <li>By default, the dataset is refreshed <strong>once per day (24-hour TTL = 86,400 seconds)</strong>.</li>
-        <li>All UI interactions, searches, AI model checks, region comparisons, and CLI queries read from the local cache (<code>data/cache/gcp_catalog.json</code>) and pre-rendered static HTML files in <code>dist/</code>—making <strong>zero external API calls</strong> during normal usage.</li>
-        <li>When the daily harvest runs, <code>ResilientFetcher</code> enforces a token-bucket rate limit, checkpoints every individual API specification to disk, and automatically retries any <code>429</code> / <code>403</code> / <code>5xx</code> responses using exponential backoff with full jitter.</li>
-      </ul>
-
-      <p><strong>Q: How do I run the application locally?</strong></p>
-      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
+      <p><strong>Q: How do I run the Web App and CLI locally?</strong></p>
+      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + ETag/Gzip REST API + daily auto-refresh thread)
 python3 server.py --port 8080
 
-# 2. Or open the static HTML files directly in any browser:
-open dist/index.html
-
-# 3. Query Services, Regions, or AI Models from the terminal using cli.py:
+# 2. Query Services, Regions, AI Models, SLAs, Pricing &amp; Release Notes via cli.py:
 python3 cli.py service "Vertex AI"
-python3 cli.py service alloydb
-python3 cli.py models gemini
+python3 cli.py sla "Cloud Spanner"
+python3 cli.py pricing asia-south1
+python3 cli.py pricing "BigQuery"
+python3 cli.py updates --type FEATURE
 python3 cli.py models claude --region us-east5
-python3 cli.py region us-central1
-python3 cli.py region asia-south1
 python3 cli.py compare us-central1 europe-west1 asia-south1 --diff
 
-# 4. Force an immediate live re-harvest &amp; static site rebuild:
+# 3. Force an immediate live re-harvest &amp; static site rebuild:
 python3 cli.py refresh --force</pre>
     </div>
     
@@ -111,14 +106,14 @@ python3 cli.py refresh --force</pre>
     <div class="footer-inner">
       <div>
         <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
-        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model matrices, SLA &amp; Pricing documentation, Release Notes XML feeds, and Google APIs Discovery REST specifications and served locally via static HTML &amp; offline PWA cache.
       </div>
       <div style="margin-top:6px;">
         Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
-        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Service Level Agreements</a> •
+        <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Cloud Pricing</a> •
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener">Release Notes</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>

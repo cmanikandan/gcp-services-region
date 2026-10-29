@@ -537,3 +537,46 @@ table.data-table tbody tr:hover {
   margin: 0 auto;
   line-height: 1.6;
 }
+
+/* Interactive Studio Grids & Responsive Mobile Form Factor */
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.calc-metric-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.calc-big-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gcp-blue);
+  letter-spacing: -0.02em;
+}
+@media (max-width: 960px) {
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .nav-pills {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .nav-pills::-webkit-scrollbar { display: none; }
+  .container { padding: 14px 12px 32px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-group { flex-direction: column; align-items: stretch; }
+  .search-input, .select-input { width: 100% !important; min-width: 0 !important; }
+  .status-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

@@ -1,0 +1,27 @@
+// Shared.xcconfig
+// Shared Xcode build configuration for GoogleCloudExplorer
+
+// ==========================================
+// Project Identity
+// ==========================================
+PRODUCT_NAME = GoogleCloudExplorer
+PRODUCT_DISPLAY_NAME = Cloud Explorer
+PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.googlecloudexplorer
+MARKETING_VERSION = 2.0.0
+CURRENT_PROJECT_VERSION = 1
+
+// ==========================================
+// Platform Configuration
+// ==========================================
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+
+// (1 == iPhone, 2 == iPad)
+TARGETED_DEVICE_FAMILY = 1,2
+
+// ==========================================
+// Info PLIST
+// ==========================================
+GENERATE_INFOPLIST_FILE = YES
+INFOPLIST_FILE = Config/Info.plist
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationPortrait
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown

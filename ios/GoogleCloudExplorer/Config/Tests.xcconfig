@@ -1,0 +1,13 @@
+// Tests.xcconfig
+// Test configuration for iOS projects - minimal overrides only
+
+#include "Shared.xcconfig"
+
+// ==========================================
+// Test Target Settings
+// ==========================================
+PRODUCT_NAME = $(TARGET_NAME)
+PRODUCT_MODULE_NAME = $(TARGET_NAME)
+PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.googlecloudexplorer.uitests
+INFOPLIST_FILE =
+TEST_TARGET_NAME = GoogleCloudExplorer

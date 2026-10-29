@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root-prefix="../">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
   <title>Cloud Router - Google Cloud Regional Availability | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
-  <link rel="stylesheet" href="../assets/style.css?v=1791740133-v2">
-  <script src="../assets/app.js?v=1791740133-v2"></script>
+  <link rel="icon" type="image/svg+xml" href="../assets/icon.svg">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../assets/style.css?v=1793251273-v3">
+  <script src="../assets/app.js?v=1793251273-v3"></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,13 +24,14 @@
             <span>Google Cloud Services &amp; Regions</span>
             <span class="unofficial-tag">Unofficial</span>
           </div>
-          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Availability, AI Models, Pricing, SLAs &amp; Updates Explorer</span>
         </div>
       </a>
       <ul class="nav-pills">
         <li><a href="../index.html" class="nav-link active">Services</a></li>
 <li><a href="../regions.html" class="nav-link ">Regions</a></li>
 <li><a href="../models.html" class="nav-link ">AI Models</a></li>
+<li><a href="../pricing-sla.html" class="nav-link ">Pricing & SLA</a></li>
 <li><a href="../capabilities.html" class="nav-link ">Compare Matrix</a></li>
 <li><a href="../pops.html" class="nav-link ">Zones & PoPs</a></li>
 <li><a href="../whatsnew.html" class="nav-link ">What's New</a></li>
@@ -35,7 +39,7 @@
 <li><a href="../faqs.html" class="nav-link ">FAQs</a></li>
       </ul>
       <div class="header-actions">
-        <span class="cache-pill" title="Snapshot generated at 2026-10-11 17:35:33 UTC">⚡ Snapshot: 2026-10-11</span>
+        <span class="cache-pill" title="Snapshot generated at 2026-10-29 05:21:13 UTC">⚡ Snapshot: 2026-10-29</span>
         <button id="theme-toggle-btn" type="button" class="btn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">🌙 Dark</button>
         <button type="button" class="btn" onclick="triggerHarvestRefresh(this)" title="Refresh from live Google Cloud APIs">↻ Refresh</button>
       </div>
@@ -46,18 +50,19 @@
     <div class="status-bar">
       <div>
         <div>
-          <strong>Snapshot (2026-10-11 17:35:33 UTC):</strong>
+          <strong>Snapshot (2026-10-29 05:21:13 UTC):</strong>
           <strong>153</strong> <a href="../index.html">Google Cloud Services</a> •
           <strong>43</strong> <a href="../regions.html">Regions</a> (+<strong>4</strong> upcoming) •
-          <strong>94</strong> <a href="../models.html">AI &amp; Foundation Models</a> •
-          <strong>130</strong> <a href="../pops.html">Zones</a> •
-          <strong>204</strong> <a href="../capabilities.html">Discovery APIs</a> (<strong>10,501</strong> REST operations)
+          <strong>91</strong> <a href="../models.html">AI Models</a> •
+          <strong>149</strong> <a href="../pricing-sla.html">SLAs &amp; Pricing</a> •
+          <strong>30</strong> <a href="../whatsnew.html">Release Updates</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">SLAs</a> • <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Pricing</a>) for the latest authoritative information.
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="offline-status-pill" class="badge badge-green">✓ Offline PWA Ready</span>
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
         <span class="badge badge-blue">24h Cache</span>
       </div>
@@ -73,9 +78,41 @@
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                 <span class="badge badge-blue">Regional</span>
                 <span class="badge badge-green">16 / 43 Regions (37.2%)</span>
+                <span class="badge badge-yellow">SLA: 99.9%</span>
                 <span class="badge badge-purple">1018 API Operations</span>
                 <a href="https://cloud.google.com/network-connectivity/docs/router/" target="_blank" rel="noopener" class="btn">Official Documentation ↗</a>
+                <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener" class="btn">Official SLA ↗</a>
+                <a href="https://cloud.google.com/network-connectivity/docs/router/pricing" target="_blank" rel="noopener" class="btn">Official Pricing ↗</a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">🛡️ Service Level Agreement (SLA) &amp; HA Architecture</h2>
+            
+            <div class="table-scroll" style="margin-bottom:10px;">
+              <table class="data-table">
+                <thead><tr><th>Deployment Tier</th><th>Target SLA</th><th>Max Downtime</th><th>Topology</th></tr></thead>
+                <tbody><tr><td><strong>Managed Regional Service</strong></td><td><span class="badge badge-green">99.9%</span></td><td><code>43m 50s / mo</code> • <code>8h 46m / yr</code></td><td style="color:var(--text-muted);font-size:12.5px;">Standard managed regional endpoint</td></tr></tbody>
+              </table>
+            </div>
+            
+            <div style="font-size:12.5px;">
+              <strong>HA Qualification Prerequisites:</strong>
+              <ul style="margin:6px 0 0 18px;padding:0;"><li>Use regional endpoints closest to workloads and implement idempotent retry logic for transient 5xx responses.</li></ul>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">💰 FinOps Pricing Model, Free Tier &amp; CUDs</h2>
+            <div style="display:grid;gap:8px;font-size:13px;">
+              <div><strong>Billing Model:</strong> Hourly Gateway / Policy / Rule Base + Processed Data or Queries</div>
+              <div><strong>Metered Units:</strong> <code>Resource-hour • GiB processed • per-1M requests/queries</code></div>
+              <div><strong>Free Tier:</strong> <span class="badge badge-gray">Standard Metering</span> Core IAM &amp; VPC firewall rules included; advanced tiers metered</div>
+              <div><strong>Committed Use Discounts:</strong> Enterprise subscription tiers available (e.g., Cloud Armor Enterprise, SCC Enterprise)</div>
+              <div><strong>Key Cost Watchouts:</strong><ul style="margin:4px 0 0 18px;padding:0;"><li>Cross-region / internet data processing &amp; egress volume (GiB)</li><li>Number of active forwarding rules, tunnels, or WAF policies</li><li>Packet mirroring &amp; VPC Flow Logs sampling ingestion volume</li></ul></div>
             </div>
           </div>
         </div>
@@ -99,7 +136,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td><a href="../regions/africa-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">africa-south1</span></a></td><td><a href="../regions/africa-south1.html" style="font-weight:600;">Africa (Johannesburg)</a></td><td>Johannesburg, South Africa </td><td>3 zones (africa-south1-a, africa-south1-b, africa-south1-c)</td><td><span class="code-chip">africa-south1-compute.googleapis.com</span></td><td>2024</td></tr><tr><td><a href="../regions/asia-southeast3.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">asia-southeast3</span></a></td><td><a href="../regions/asia-southeast3.html" style="font-weight:600;">Asia Pacific (Bangkok)</a></td><td>Bangkok, Thailand, APAC </td><td>3 zones (asia-southeast3-a, asia-southeast3-b, asia-southeast3-c)</td><td><span class="code-chip">asia-southeast3-compute.googleapis.com</span></td><td>2026</td></tr><tr><td><a href="../regions/northamerica-northeast1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-northeast1</span></a></td><td><a href="../regions/northamerica-northeast1.html" style="font-weight:600;">North America (Montréal*)</a></td><td>Montréal, Québec, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (northamerica-northeast1-a, northamerica-northeast1-b, northamerica-northeast1-c)</td><td><span class="code-chip">northamerica-northeast1-compute.googleapis.com</span></td><td>2018</td></tr><tr><td><a href="../regions/northamerica-northeast2.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-northeast2</span></a></td><td><a href="../regions/northamerica-northeast2.html" style="font-weight:600;">North America (Toronto)</a></td><td>Toronto, Ontario, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (northamerica-northeast2-a, northamerica-northeast2-b, northamerica-northeast2-c)</td><td><span class="code-chip">northamerica-northeast2-compute.googleapis.com</span></td><td>2021</td></tr><tr><td><a href="../regions/northamerica-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-south1</span></a></td><td><a href="../regions/northamerica-south1.html" style="font-weight:600;">North America (Mexico*)</a></td><td>Queretaro, Mexico, North America </td><td>3 zones (northamerica-south1-a, northamerica-south1-b, northamerica-south1-c)</td><td><span class="code-chip">northamerica-south1-compute.googleapis.com</span></td><td>2025</td></tr><tr><td><a href="../regions/southamerica-east1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">southamerica-east1</span></a></td><td><a href="../regions/southamerica-east1.html" style="font-weight:600;">South America (São Paulo)</a></td><td>Osasco, São Paulo, Brazil, South America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (southamerica-east1-a, southamerica-east1-b, southamerica-east1-c)</td><td><span class="code-chip">southamerica-east1-compute.googleapis.com</span></td><td>2017</td></tr><tr><td><a href="../regions/southamerica-west1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">southamerica-west1</span></a></td><td><a href="../regions/southamerica-west1.html" style="font-weight:600;">South America (Santiago)</a></td><td>Santiago, Chile, South America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (southamerica-west1-a, southamerica-west1-b, southamerica-west1-c)</td><td><span class="code-chip">southamerica-west1-compute.googleapis.com</span></td><td>2021</td></tr><tr><td><a href="../regions/us-central1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-central1</span></a></td><td><a href="../regions/us-central1.html" style="font-weight:600;">North America (Iowa)</a></td><td>Council Bluffs, Iowa, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>4 zones (us-central1-a, us-central1-b, us-central1-c, us-central1-f)</td><td><span class="code-chip">us-central1-compute.googleapis.com</span></td><td>2008</td></tr><tr><td><a href="../regions/us-east1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east1</span></a></td><td><a href="../regions/us-east1.html" style="font-weight:600;">North America (South Carolina)</a></td><td>Moncks Corner, South Carolina, North America </td><td>3 zones (us-east1-b, us-east1-c, us-east1-d)</td><td><span class="code-chip">us-east1-compute.googleapis.com</span></td><td>2015</td></tr><tr><td><a href="../regions/us-east4.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east4</span></a></td><td><a href="../regions/us-east4.html" style="font-weight:600;">North America (North Virginia)</a></td><td>Ashburn, Virginia, North America </td><td>3 zones (us-east4-a, us-east4-b, us-east4-c)</td><td><span class="code-chip">us-east4-compute.googleapis.com</span></td><td>2017</td></tr><tr><td><a href="../regions/us-east5.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east5</span></a></td><td><a href="../regions/us-east5.html" style="font-weight:600;">North America (Columbus)</a></td><td>Columbus, Ohio, North America </td><td>3 zones (us-east5-a, us-east5-b, us-east5-c)</td><td><span class="code-chip">us-east5-compute.googleapis.com</span></td><td>2022</td></tr><tr><td><a href="../regions/us-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-south1</span></a></td><td><a href="../regions/us-south1.html" style="font-weight:600;">North America (Dallas)</a></td><td>Dallas, Texas, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (us-south1-a, us-south1-b, us-south1-c)</td><td><span class="code-chip">us-south1-compute.googleapis.com</span></td><td>2022</td></tr><tr><td><a href="../regions/us-west1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west1</span></a></td><td><a href="../regions/us-west1.html" style="font-weight:600;">North America (Oregon)</a></td><td>The Dalles, Oregon, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (us-west1-a, us-west1-b, us-west1-c)</td><td><span class="code-chip">us-west1-compute.googleapis.com</span></td><td>2016</td></tr><tr><td><a href="../regions/us-west2.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west2</span></a></td><td><a href="../regions/us-west2.html" style="font-weight:600;">North America (Los Angeles)</a></td><td>Los Angeles, California, North America </td><td>3 zones (us-west2-a, us-west2-b, us-west2-c)</td><td><span class="code-chip">us-west2-compute.googleapis.com</span></td><td>2018</td></tr><tr><td><a href="../regions/us-west3.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west3</span></a></td><td><a href="../regions/us-west3.html" style="font-weight:600;">North America (Salt Lake City)</a></td><td>Salt Lake City, Utah, North America </td><td>3 zones (us-west3-a, us-west3-b, us-west3-c)</td><td><span class="code-chip">us-west3-compute.googleapis.com</span></td><td>2020</td></tr><tr><td><a href="../regions/us-west4.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west4</span></a></td><td><a href="../regions/us-west4.html" style="font-weight:600;">North America (Las Vegas)</a></td><td>Las Vegas, Nevada, North America </td><td>3 zones (us-west4-a, us-west4-b, us-west4-c)</td><td><span class="code-chip">us-west4-compute.googleapis.com</span></td><td>2020</td></tr>
+                <tr><td><a href="../regions/africa-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">africa-south1</span></a></td><td><a href="../regions/africa-south1.html" style="font-weight:600;">Africa (Johannesburg)</a></td><td>Johannesburg, South Africa </td><td>3 zones (africa-south1-a, africa-south1-b, africa-south1-c)</td><td><span class="code-chip">africa-south1-compute.googleapis.com</span></td><td>2024</td></tr><tr><td><a href="../regions/asia-southeast3.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">asia-southeast3</span></a></td><td><a href="../regions/asia-southeast3.html" style="font-weight:600;">Asia Pacific (Bangkok)</a></td><td>Bangkok, Thailand, APAC </td><td>3 zones (asia-southeast3-a, asia-southeast3-b, asia-southeast3-c)</td><td><span class="code-chip">asia-southeast3-compute.googleapis.com</span></td><td>2026</td></tr><tr><td><a href="../regions/northamerica-northeast1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-northeast1</span></a></td><td><a href="../regions/northamerica-northeast1.html" style="font-weight:600;">North America (Montréal*)</a></td><td>Montréal, Québec, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (northamerica-northeast1-a, northamerica-northeast1-b, northamerica-northeast1-c)</td><td><span class="code-chip">northamerica-northeast1-compute.googleapis.com</span></td><td>2018</td></tr><tr><td><a href="../regions/northamerica-northeast2.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-northeast2</span></a></td><td><a href="../regions/northamerica-northeast2.html" style="font-weight:600;">North America (Toronto)</a></td><td>Toronto, Ontario, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (northamerica-northeast2-a, northamerica-northeast2-b, northamerica-northeast2-c)</td><td><span class="code-chip">northamerica-northeast2-compute.googleapis.com</span></td><td>2021</td></tr><tr><td><a href="../regions/northamerica-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">northamerica-south1</span></a></td><td><a href="../regions/northamerica-south1.html" style="font-weight:600;">North America (Mexico)</a></td><td>Queretaro, Mexico, North America </td><td>3 zones (northamerica-south1-a, northamerica-south1-b, northamerica-south1-c)</td><td><span class="code-chip">northamerica-south1-compute.googleapis.com</span></td><td>2025</td></tr><tr><td><a href="../regions/southamerica-east1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">southamerica-east1</span></a></td><td><a href="../regions/southamerica-east1.html" style="font-weight:600;">South America (São Paulo)</a></td><td>Osasco, São Paulo, Brazil, South America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (southamerica-east1-a, southamerica-east1-b, southamerica-east1-c)</td><td><span class="code-chip">southamerica-east1-compute.googleapis.com</span></td><td>2017</td></tr><tr><td><a href="../regions/southamerica-west1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">southamerica-west1</span></a></td><td><a href="../regions/southamerica-west1.html" style="font-weight:600;">South America (Santiago)</a></td><td>Santiago, Chile, South America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (southamerica-west1-a, southamerica-west1-b, southamerica-west1-c)</td><td><span class="code-chip">southamerica-west1-compute.googleapis.com</span></td><td>2021</td></tr><tr><td><a href="../regions/us-central1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-central1</span></a></td><td><a href="../regions/us-central1.html" style="font-weight:600;">North America (Iowa)</a></td><td>Council Bluffs, Iowa, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>4 zones (us-central1-a, us-central1-b, us-central1-c, us-central1-f)</td><td><span class="code-chip">us-central1-compute.googleapis.com</span></td><td>2008</td></tr><tr><td><a href="../regions/us-east1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east1</span></a></td><td><a href="../regions/us-east1.html" style="font-weight:600;">North America (South Carolina)</a></td><td>Moncks Corner, South Carolina, North America </td><td>3 zones (us-east1-b, us-east1-c, us-east1-d)</td><td><span class="code-chip">us-east1-compute.googleapis.com</span></td><td>2015</td></tr><tr><td><a href="../regions/us-east4.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east4</span></a></td><td><a href="../regions/us-east4.html" style="font-weight:600;">North America (North Virginia)</a></td><td>Ashburn, Virginia, North America </td><td>3 zones (us-east4-a, us-east4-b, us-east4-c)</td><td><span class="code-chip">us-east4-compute.googleapis.com</span></td><td>2017</td></tr><tr><td><a href="../regions/us-east5.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-east5</span></a></td><td><a href="../regions/us-east5.html" style="font-weight:600;">North America (Columbus)</a></td><td>Columbus, Ohio, North America </td><td>3 zones (us-east5-a, us-east5-b, us-east5-c)</td><td><span class="code-chip">us-east5-compute.googleapis.com</span></td><td>2022</td></tr><tr><td><a href="../regions/us-south1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-south1</span></a></td><td><a href="../regions/us-south1.html" style="font-weight:600;">North America (Dallas)</a></td><td>Dallas, Texas, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (us-south1-a, us-south1-b, us-south1-c)</td><td><span class="code-chip">us-south1-compute.googleapis.com</span></td><td>2022</td></tr><tr><td><a href="../regions/us-west1.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west1</span></a></td><td><a href="../regions/us-west1.html" style="font-weight:600;">North America (Oregon)</a></td><td>The Dalles, Oregon, North America <span class="badge badge-green">🌱 Low CO₂</span></td><td>3 zones (us-west1-a, us-west1-b, us-west1-c)</td><td><span class="code-chip">us-west1-compute.googleapis.com</span></td><td>2016</td></tr><tr><td><a href="../regions/us-west2.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west2</span></a></td><td><a href="../regions/us-west2.html" style="font-weight:600;">North America (Los Angeles)</a></td><td>Los Angeles, California, North America </td><td>3 zones (us-west2-a, us-west2-b, us-west2-c)</td><td><span class="code-chip">us-west2-compute.googleapis.com</span></td><td>2018</td></tr><tr><td><a href="../regions/us-west3.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west3</span></a></td><td><a href="../regions/us-west3.html" style="font-weight:600;">North America (Salt Lake City)</a></td><td>Salt Lake City, Utah, North America </td><td>3 zones (us-west3-a, us-west3-b, us-west3-c)</td><td><span class="code-chip">us-west3-compute.googleapis.com</span></td><td>2020</td></tr><tr><td><a href="../regions/us-west4.html"><span class="code-chip" style="font-weight:700;color:#1a73e8;">us-west4</span></a></td><td><a href="../regions/us-west4.html" style="font-weight:600;">North America (Las Vegas)</a></td><td>Las Vegas, Nevada, North America </td><td>3 zones (us-west4-a, us-west4-b, us-west4-c)</td><td><span class="code-chip">us-west4-compute.googleapis.com</span></td><td>2020</td></tr>
               </tbody>
             </table>
           </div>
@@ -224,14 +261,14 @@ To prevent failure, it is recommended that you set the
     <div class="footer-inner">
       <div>
         <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
-        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model matrices, SLA &amp; Pricing documentation, Release Notes XML feeds, and Google APIs Discovery REST specifications and served locally via static HTML &amp; offline PWA cache.
       </div>
       <div style="margin-top:6px;">
         Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
-        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Service Level Agreements</a> •
+        <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Cloud Pricing</a> •
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener">Release Notes</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>

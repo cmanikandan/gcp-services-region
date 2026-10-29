@@ -39,6 +39,14 @@ import urllib.error
 import urllib.request
 from typing import Any
 
+from enrichment import (
+    build_region_pricing,
+    build_service_pricing,
+    build_service_sla,
+    harvest_release_notes,
+    harvest_sla_links,
+)
+
 BASE_DIR = Path(__file__).resolve().parent
 CACHE_DIR = BASE_DIR / "data" / "cache"
 RAW_CACHE_DIR = CACHE_DIR / "raw"
@@ -706,11 +714,19 @@ def harvest_all(
     if not force_refresh and CATALOG_FILE.exists():
         age_sec = time.time() - CATALOG_FILE.stat().st_mtime
         if age_sec < ttl_seconds:
-            print(f"[Cache Hit] Loading cached GCP catalog ({int(age_sec)}s old, TTL={ttl_seconds}s): {CATALOG_FILE}")
             catalog = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
-            catalog.setdefault("meta", {})["served_from_cache"] = True
-            catalog["meta"]["cache_age_seconds"] = int(age_sec)
-            return catalog
+            has_enrichment = (
+                "release_notes" in catalog
+                and bool(catalog.get("services"))
+                and "sla" in catalog["services"][0]
+                and "pricing" in catalog["services"][0]
+            )
+            if has_enrichment:
+                print(f"[Cache Hit] Loading cached GCP catalog ({int(age_sec)}s old, TTL={ttl_seconds}s): {CATALOG_FILE}")
+                catalog.setdefault("meta", {})["served_from_cache"] = True
+                catalog["meta"]["cache_age_seconds"] = int(age_sec)
+                return catalog
+            print("[Harvester] Upgrading local catalog with SLA, FinOps Pricing & Official Release Notes...")
 
     start_ts = time.time()
     fetcher = ResilientFetcher(
@@ -1085,6 +1101,9 @@ def harvest_all(
                     }
                 )
 
+    # Harvest official Google Cloud SLA links dynamically (cached 24h via ResilientFetcher)
+    discovered_sla_links = harvest_sla_links(fetcher, RAW_CACHE_DIR)
+
     # Finalize serializable lists for regions and services
     total_available_regions = len(regions_dict)
     serialized_regions: list[dict[str, Any]] = []
@@ -1115,6 +1134,7 @@ def harvest_all(
                 "service_count": len(svc_list),
                 "ai_models": reg_models,
                 "ai_model_count": len(reg_models),
+                "pricing": build_region_pricing(rinfo),
             }
         )
 
@@ -1123,25 +1143,26 @@ def harvest_all(
         svc = services_dict[pname]
         reg_list = sorted(svc["regions"])
         coverage_pct = round((len(reg_list) / total_available_regions) * 100, 1) if total_available_regions else 0.0
-        serialized_services.append(
-            {
-                "name": svc["name"],
-                "slug": svc["slug"],
-                "category": svc["category"],
-                "url": svc["url"],
-                "scope": svc["scope"],
-                "is_global": svc["is_global"],
-                "regions": reg_list,
-                "region_count": len(reg_list),
-                "coverage_pct": coverage_pct,
-                "multi_regions": svc["multi_regions"],
-                "apis": svc["apis"],
-                "api_names": svc["api_names"],
-                "total_api_methods": svc["total_api_methods"],
-                "resources": svc["resources"],
-                "methods": svc["methods"],
-            }
-        )
+        svc_entry = {
+            "name": svc["name"],
+            "slug": svc["slug"],
+            "category": svc["category"],
+            "url": svc["url"],
+            "scope": svc["scope"],
+            "is_global": svc["is_global"],
+            "regions": reg_list,
+            "region_count": len(reg_list),
+            "coverage_pct": coverage_pct,
+            "multi_regions": svc["multi_regions"],
+            "apis": svc["apis"],
+            "api_names": svc["api_names"],
+            "total_api_methods": svc["total_api_methods"],
+            "resources": svc["resources"],
+            "methods": svc["methods"],
+        }
+        svc_entry["sla"] = build_service_sla(svc_entry, discovered_sla_links)
+        svc_entry["pricing"] = build_service_pricing(svc_entry)
+        serialized_services.append(svc_entry)
 
     # Also serialize full Discovery API catalog for the Capabilities Explorer
     serialized_apis: list[dict[str, Any]] = []
@@ -1287,6 +1308,8 @@ def harvest_all(
             }
         )
 
+    release_notes = harvest_release_notes(fetcher, RAW_CACHE_DIR, serialized_services, limit=120)
+
     elapsed = round(time.time() - start_ts, 2)
     catalog = {
         "meta": {
@@ -1302,6 +1325,11 @@ def harvest_all(
                 "regional_services": sum(1 for s in serialized_services if s["region_count"] > 0),
                 "multi_region_services": sum(1 for s in serialized_services if s["multi_regions"]),
                 "global_services": sum(1 for s in serialized_services if s["is_global"]),
+                "formal_sla_services": sum(1 for s in serialized_services if s.get("sla", {}).get("has_formal_sla")),
+                "high_sla_9999_services": sum(
+                    1 for s in serialized_services if s.get("sla", {}).get("headline_uptime_pct", 0) >= 99.99
+                ),
+                "free_tier_services": sum(1 for s in serialized_services if s.get("pricing", {}).get("has_free_tier")),
                 "available_regions": len(serialized_regions),
                 "future_regions": len(future_regions_list),
                 "total_zones": sum(r["zone_count"] for r in serialized_regions),
@@ -1314,6 +1342,7 @@ def harvest_all(
                 "edge_pops": len(edge_pops),
                 "cloud_cdn_pops": len(cdn_pops),
                 "media_cdn_pops": len(media_cdn_pops),
+                "release_notes": len(release_notes),
             },
         },
         "regions": serialized_regions,
@@ -1327,6 +1356,7 @@ def harvest_all(
             "media_cdn_pops": media_cdn_pops,
         },
         "whats_new": whats_new,
+        "release_notes": release_notes,
     }
 
     # Save master catalog and daily snapshot atomically

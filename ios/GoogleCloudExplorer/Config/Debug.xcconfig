@@ -1,0 +1,7 @@
+// Debug.xcconfig
+// Debug build configuration for GoogleCloudExplorer
+
+#include "Shared.xcconfig"
+
+// No additional debug-specific overrides needed
+// All debug settings use Xcode project defaults

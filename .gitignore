@@ -3,6 +3,14 @@ data/cache/raw/
 data/cache/discovery/
 __pycache__/
 *.py[cod]
+*$py.class
 .venv/
 .DS_Store
 *.tmp
+
+# Xcode per-user state & derived build artifacts
+DerivedData/
+**/xcuserdata/
+**/*.xcuserstate
+*.xcresult
+build/

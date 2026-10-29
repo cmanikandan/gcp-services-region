@@ -23,6 +23,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from enrichment import build_mobile_catalog
 from harvester import CATALOG_FILE, harvest_all
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -578,6 +579,49 @@ table.data-table tbody tr:hover {
   margin: 0 auto;
   line-height: 1.6;
 }
+
+/* Interactive Studio Grids & Responsive Mobile Form Factor */
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.calc-metric-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.calc-big-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gcp-blue);
+  letter-spacing: -0.02em;
+}
+@media (max-width: 960px) {
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .nav-pills {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .nav-pills::-webkit-scrollbar { display: none; }
+  .container { padding: 14px 12px 32px; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-group { flex-direction: column; align-items: stretch; }
+  .search-input, .select-input { width: 100% !important; min-width: 0 !important; }
+  .status-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
 """
     (assets_dir / "style.css").write_text(css.strip() + "\n", encoding="utf-8")
 
@@ -617,8 +661,30 @@ window.toggleTheme = function toggleTheme() {
   updateThemeButtonLabel();
 };
 
+function updateConnectivityPill() {
+  const pill = document.getElementById('offline-status-pill');
+  if (!pill) return;
+  if (navigator.onLine === false) {
+    pill.textContent = '✈️ Offline Mode (Cached)';
+    pill.className = 'badge badge-yellow';
+  } else {
+    pill.textContent = '✓ Offline PWA Ready';
+    pill.className = 'badge badge-green';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   updateThemeButtonLabel();
+  updateConnectivityPill();
+  window.addEventListener('online', updateConnectivityPill);
+  window.addEventListener('offline', updateConnectivityPill);
+
+  // Register Offline Service Worker when served over HTTP(S)
+  if ('serviceWorker' in navigator && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+    const swPrefix = document.documentElement.getAttribute('data-root-prefix') || '';
+    navigator.serviceWorker.register(swPrefix + 'sw.js').catch(() => {});
+  }
+
   // Press '/' to quickly focus the primary search box on any page
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && document.activeElement && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
@@ -775,6 +841,100 @@ window.triggerHarvestRefresh = async function triggerHarvestRefresh(btn) {
     (assets_dir / "app.js").write_text(js.strip() + "\n", encoding="utf-8")
 
 
+def write_pwa_offline_assets(catalog: dict[str, Any]) -> None:
+    """Write mobile_catalog.json, manifest.webmanifest, icon.svg, and Service Worker sw.js for 100% offline PWA support."""
+    assets_dir = DIST_DIR / "assets"
+    data_dir = DIST_DIR / "data"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    mobile_payload = build_mobile_catalog(catalog)
+    (data_dir / "mobile_catalog.json").write_text(
+        json.dumps(mobile_payload, separators=(",", ":")),
+        encoding="utf-8",
+    )
+
+    icon_svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#0b0f19"/>
+  <path d="M88 86H44a24 24 0 1 1 23-31h6a16 16 0 1 1 15 31Z" fill="none" stroke="#60a5fa" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="88" cy="44" r="9" fill="#4ade80"/>
+</svg>"""
+    (assets_dir / "icon.svg").write_text(icon_svg, encoding="utf-8")
+
+    manifest = {
+        "name": "Google Cloud Services & Regions Explorer (Unofficial)",
+        "short_name": "Cloud Explorer",
+        "description": "Offline-capable explorer for Google Cloud service availability, AI models, regional pricing, SLAs, and release updates (Unofficial).",
+        "start_url": "./index.html",
+        "display": "standalone",
+        "background_color": "#0b0f19",
+        "theme_color": "#1a73e8",
+        "icons": [
+            {
+                "src": "assets/icon.svg",
+                "sizes": "any",
+                "type": "image/svg+xml",
+                "purpose": "any maskable",
+            }
+        ],
+    }
+    (DIST_DIR / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    cache_ver = f"gcp-explorer-pwa-{catalog.get('meta', {}).get('generated_epoch', 1)}"
+    sw_js = f"""
+const CACHE_NAME = '{cache_ver}';
+const PRECACHE_URLS = [
+  './',
+  './index.html',
+  './regions.html',
+  './models.html',
+  './pricing-sla.html',
+  './capabilities.html',
+  './pops.html',
+  './whatsnew.html',
+  './arch.html',
+  './faqs.html',
+  './manifest.webmanifest',
+  './assets/icon.svg',
+  './assets/style.css',
+  './assets/app.js',
+  './data/matrix_data.js',
+  './data/mobile_catalog.json'
+];
+
+self.addEventListener('install', (event) => {{
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {{}}))
+  );
+}});
+
+self.addEventListener('activate', (event) => {{
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+}});
+
+self.addEventListener('fetch', (event) => {{
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResp) => {{
+        if (networkResp && networkResp.status === 200) {{
+          const copy = networkResp.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }}
+        return networkResp;
+      }})
+      .catch(() => caches.match(event.request, {{ ignoreSearch: true }}).then((cached) => cached || caches.match('./index.html')))
+  );
+}});
+"""
+    (DIST_DIR / "sw.js").write_text(sw_js.strip() + "\n", encoding="utf-8")
+
+
 def render_layout(
     title: str,
     active_tab: str,
@@ -786,11 +946,12 @@ def render_layout(
     counts = meta.get("counts", {})
     gen_at = meta.get("generated_at", "")
     gen_date = gen_at.split(" ")[0] if gen_at else "Daily"
-    asset_v = f"{meta.get('generated_epoch', 1)}-v2"
+    asset_v = f"{meta.get('generated_epoch', 1)}-v3"
     tabs = [
         ("services", "Services", f"{root_prefix}index.html"),
         ("regions", "Regions", f"{root_prefix}regions.html"),
         ("models", "AI Models", f"{root_prefix}models.html"),
+        ("pricing-sla", "Pricing & SLA", f"{root_prefix}pricing-sla.html"),
         ("capabilities", "Compare Matrix", f"{root_prefix}capabilities.html"),
         ("pops", "Zones & PoPs", f"{root_prefix}pops.html"),
         ("whatsnew", "What's New", f"{root_prefix}whatsnew.html"),
@@ -803,11 +964,14 @@ def render_layout(
     )
 
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-root-prefix="{root_prefix}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a73e8">
   <title>{esc(title)} | Google Cloud Services &amp; Regional Capabilities (Unofficial)</title>
+  <link rel="icon" type="image/svg+xml" href="{root_prefix}assets/icon.svg">
+  <link rel="manifest" href="{root_prefix}manifest.webmanifest">
   <link rel="stylesheet" href="{root_prefix}assets/style.css?v={asset_v}">
   <script src="{root_prefix}assets/app.js?v={asset_v}"></script>
 </head>
@@ -825,7 +989,7 @@ def render_layout(
             <span>Google Cloud Services &amp; Regions</span>
             <span class="unofficial-tag">Unofficial</span>
           </div>
-          <span class="brand-subtitle">Regional Services, AI Models &amp; API Capabilities Explorer</span>
+          <span class="brand-subtitle">Availability, AI Models, Pricing, SLAs &amp; Updates Explorer</span>
         </div>
       </a>
       <ul class="nav-pills">
@@ -846,15 +1010,16 @@ def render_layout(
           <strong>Snapshot ({esc(gen_at)}):</strong>
           <strong>{counts.get('total_services', 0)}</strong> <a href="{root_prefix}index.html">Google Cloud Services</a> •
           <strong>{counts.get('available_regions', 0)}</strong> <a href="{root_prefix}regions.html">Regions</a> (+<strong>{counts.get('future_regions', 0)}</strong> upcoming) •
-          <strong>{counts.get('ai_models', 0)}</strong> <a href="{root_prefix}models.html">AI &amp; Foundation Models</a> •
-          <strong>{counts.get('total_zones', 0)}</strong> <a href="{root_prefix}pops.html">Zones</a> •
-          <strong>{counts.get('discovery_apis', 0)}</strong> <a href="{root_prefix}capabilities.html">Discovery APIs</a> (<strong>{counts.get('total_api_methods', 0):,}</strong> REST operations)
+          <strong>{counts.get('ai_models', 0)}</strong> <a href="{root_prefix}models.html">AI Models</a> •
+          <strong>{counts.get('formal_sla_services', counts.get('total_services', 0))}</strong> <a href="{root_prefix}pricing-sla.html">SLAs &amp; Pricing</a> •
+          <strong>{counts.get('release_notes', 0)}</strong> <a href="{root_prefix}whatsnew.html">Release Updates</a>
         </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Models</a>) for the latest authoritative information.
+          Unofficial community tool — please refer to the <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">official Google Cloud documentation</a> (<a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Locations</a> • <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">SLAs</a> • <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Pricing</a>) for the latest authoritative information.
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span id="offline-status-pill" class="badge badge-green">✓ Offline PWA Ready</span>
         <span class="badge badge-gray" title="Press / on your keyboard to jump to search">Press <code>/</code> to search</span>
         <span class="badge badge-blue">24h Cache</span>
       </div>
@@ -866,14 +1031,14 @@ def render_layout(
     <div class="footer-inner">
       <div>
         <strong>Unofficial Tool Disclaimer:</strong> This is an unofficial tool and is not affiliated with, sponsored by, or endorsed by Google LLC or Google Cloud. Please refer to the official Google Cloud documentation for the latest information.
-        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model location matrices, Compute Engine Zone/GPU matrices, and Google APIs Discovery REST specifications (<code>discovery.googleapis.com</code>) and served locally via static HTML &amp; JSON cache.
+        Data is harvested once daily from public Google Cloud Location feeds, Vertex AI Model matrices, SLA &amp; Pricing documentation, Release Notes XML feeds, and Google APIs Discovery REST specifications and served locally via static HTML &amp; offline PWA cache.
       </div>
       <div style="margin-top:6px;">
         Official Google Cloud Documentation:
         <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Google Cloud Locations</a> •
-        <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations</a> •
-        <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones</a> •
-        <a href="https://cloud.google.com/compute/docs/gpus/gpu-regions-zones" target="_blank" rel="noopener">GPU Availability</a> •
+        <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Service Level Agreements</a> •
+        <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Cloud Pricing</a> •
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener">Release Notes</a> •
         <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Google Cloud Docs</a>
       </div>
     </div>
@@ -1481,6 +1646,18 @@ def generate_service_detail_pages(catalog: dict[str, Any]) -> None:
                 f'</tr>'
             )
 
+        sla = s.get("sla", {})
+        prc = s.get("pricing", {})
+        sla_tiers_html = "".join(
+            f'<tr><td><strong>{esc(t["tier_name"])}</strong></td>'
+            f'<td><span class="badge badge-green">{esc(t["uptime_display"])}</span></td>'
+            f'<td><code>{esc(t["max_monthly_downtime"])}</code> • <code>{esc(t["max_annual_downtime"])}</code></td>'
+            f'<td style="color:var(--text-muted);font-size:12.5px;">{esc(t["topology"])}</td></tr>'
+            for t in sla.get("tiers", [])
+        )
+        sla_reqs_html = "".join(f"<li>{esc(req)}</li>" for req in sla.get("ha_requirements", []))
+        cost_drivers_html = "".join(f"<li>{esc(cd)}</li>" for cd in prc.get("cost_drivers", []))
+
         body = f"""
         <div class="section-card">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
@@ -1492,9 +1669,41 @@ def generate_service_detail_pages(catalog: dict[str, Any]) -> None:
               <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
                 <span class="badge badge-blue">{esc(s["scope"])}</span>
                 <span class="badge badge-green">{s["region_count"]} / {len(all_region_ids)} Regions ({s["coverage_pct"]}%)</span>
+                <span class="badge badge-yellow">SLA: {esc(sla.get("headline_display", "N/A"))}</span>
                 <span class="badge badge-purple">{s.get("total_api_methods", 0)} API Operations</span>
                 <a href="{esc(s["url"])}" target="_blank" rel="noopener" class="btn">Official Documentation ↗</a>
+                <a href="{esc(sla.get("sla_url", "https://cloud.google.com/terms/sla"))}" target="_blank" rel="noopener" class="btn">Official SLA ↗</a>
+                <a href="{esc(prc.get("pricing_url", "https://cloud.google.com/pricing"))}" target="_blank" rel="noopener" class="btn">Official Pricing ↗</a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">🛡️ Service Level Agreement (SLA) &amp; HA Architecture</h2>
+            {f'''
+            <div class="table-scroll" style="margin-bottom:10px;">
+              <table class="data-table">
+                <thead><tr><th>Deployment Tier</th><th>Target SLA</th><th>Max Downtime</th><th>Topology</th></tr></thead>
+                <tbody>{sla_tiers_html}</tbody>
+              </table>
+            </div>
+            ''' if sla_tiers_html else '<p style="color:var(--text-muted);">No formal uptime SLA published (developer/management tooling).</p>'}
+            <div style="font-size:12.5px;">
+              <strong>HA Qualification Prerequisites:</strong>
+              <ul style="margin:6px 0 0 18px;padding:0;">{sla_reqs_html}</ul>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-bottom:0;">
+            <h2 class="section-title">💰 FinOps Pricing Model, Free Tier &amp; CUDs</h2>
+            <div style="display:grid;gap:8px;font-size:13px;">
+              <div><strong>Billing Model:</strong> {esc(prc.get("billing_model", ""))}</div>
+              <div><strong>Metered Units:</strong> <code>{esc(prc.get("primary_units", ""))}</code></div>
+              <div><strong>Free Tier:</strong> <span class="badge {'badge-green' if prc.get('has_free_tier') else 'badge-gray'}">{'Eligible' if prc.get('has_free_tier') else 'Standard Metering'}</span> {esc(prc.get("free_tier_note", ""))}</div>
+              <div><strong>Committed Use Discounts:</strong> {esc(prc.get("cud_support", ""))}</div>
+              <div><strong>Key Cost Watchouts:</strong><ul style="margin:4px 0 0 18px;padding:0;">{cost_drivers_html}</ul></div>
             </div>
           </div>
         </div>
@@ -1648,6 +1857,12 @@ def generate_region_detail_pages(catalog: dict[str, Any]) -> None:
         cats_in_reg = sorted({services_by_name.get(sn, {}).get("category", "Cloud") for sn in r["services"]})
         cat_opts = "\n".join(f'<option value="{esc(c)}">{esc(c)}</option>' for c in cats_in_reg)
         co2_badge = '<span class="badge badge-green">🌱 Low CO₂ Region</span>' if r["is_low_co2"] else ""
+        r_pricing = r.get("pricing", {})
+        c_idx = r_pricing.get("relative_compute_index", 1.0)
+        s_idx = r_pricing.get("relative_storage_index", 1.0)
+        p_tier = r_pricing.get("tier", "Tier 1 — Baseline Cost")
+        cost_badge_cls = "badge-green" if c_idx <= 1.05 else ("badge-blue" if c_idx <= 1.15 else "badge-yellow")
+        cost_badge = f'<a href="../pricing-sla.html#regional-cost" class="badge {cost_badge_cls}">💰 {c_idx:.2f}x Compute ({esc(r_pricing.get("delta_vs_baseline", "Baseline"))})</a>'
 
         body = f"""
         <div class="section-card">
@@ -1663,8 +1878,10 @@ def generate_region_detail_pages(catalog: dict[str, Any]) -> None:
             <span class="badge badge-gray">{r["zone_count"]} Availability Zones ({", ".join(r["zones"])})</span>
             <span class="badge badge-blue">{len(r.get("machine_series", []))} Compute Machine Series</span>
             <span class="badge badge-gray">Launched: {esc(r["date_launched"])}</span>
+            {cost_badge}
             {co2_badge}
           </div>
+          {f'<div style="margin-top:12px;padding:10px 14px;background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:8px;font-size:12.5px;color:var(--text-muted);"><strong>FinOps Regional Cost Profile ({esc(p_tier)}):</strong> Relative Compute Multiplier <code>{c_idx:.2f}x</code> • Relative Storage Multiplier <code>{s_idx:.2f}x</code> vs. <code>us-central1 (1.00x)</code> • Inter-Region Egress Band: <code>{esc(r_pricing.get("inter_region_egress_band", "Standard"))}</code> • CUD 1Y/3Y Savings: up to <code>{r_pricing.get("cud_1yr_discount_pct", 37)}%</code> / <code>{r_pricing.get("cud_3yr_discount_pct", 55)}%</code>.</div>' if r_pricing else ''}
         </div>
 
         <div class="section-card">
@@ -1802,6 +2019,8 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
                 "ai_model_count": r.get("ai_model_count", len(r.get("ai_models", []))),
                 "machine_series": r["machine_series"],
                 "gpus": r["gpus"],
+                "cost_index": r.get("pricing", {}).get("relative_compute_index", 1.0),
+                "cost_delta": r.get("pricing", {}).get("delta_vs_baseline", "Baseline (0%)"),
             }
             for r in regions
         ],
@@ -1812,6 +2031,7 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
                 "category": s["category"],
                 "apis": s["api_names"],
                 "ops": s["total_api_methods"],
+                "sla": s.get("sla", {}).get("headline_display", "—"),
                 "regions": s["regions"],
             }
             for s in services
@@ -1865,7 +2085,7 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
         <div>
           <h2 class="section-title" style="margin-bottom:4px;">🔍 Multi-Region Capabilities, AI Models &amp; Gap Comparison Matrix</h2>
           <p style="margin:0;color:var(--text-muted);font-size:13px;">
-            Compare up to 4 Google Cloud Regions side-by-side across Regional Services, AI &amp; Foundation Models, Hardware Machine Series, GPU Accelerators, and Discovery REST API Operations.
+            Compare up to 4 Google Cloud Regions side-by-side across Regional Services, AI &amp; Foundation Models, Relative Cost Multipliers, Hardware Machine Series, GPU Accelerators, and Discovery REST API Operations.
           </p>
         </div>
         <button class="btn btn-primary" onclick="exportComparisonCSV()">⬇ Export Matrix CSV</button>
@@ -2011,12 +2231,16 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
 
           const regMap = Object.fromEntries(data.regions.map(r => [r.id, r]));
 
-          // Render Hardware, GPU & AI Model Comparison Header
+          // Render Hardware, Cost, GPU & AI Model Comparison Header
           const hwHtml = rids.map(rid => {{
             const r = regMap[rid] || {{}};
+            const cIdx = (r.cost_index || 1.0).toFixed(2);
             return `<div style="flex:1;min-width:220px;background:var(--bg-subtle);border:1px solid var(--border-subtle);border-radius:8px;padding:10px 14px;">
-              <div style="font-weight:700;color:var(--gcp-blue);"><a href="regions/${{rid}}.html">${{rid}}</a> ${{r.is_low_co2 ? '🌱' : ''}}</div>
-              <div style="font-size:12px;color:var(--text-muted);"><strong>${{r.service_count || 0}}</strong> Services • <strong>${{r.ai_model_count || 0}}</strong> AI Models • <strong>${{r.zones || 3}}</strong> Zones</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:700;color:var(--gcp-blue);"><a href="regions/${{rid}}.html">${{rid}}</a> ${{r.is_low_co2 ? '🌱' : ''}}</span>
+                <span class="badge badge-blue">💰 ${{cIdx}}x</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;"><strong>${{r.service_count || 0}}</strong> Services • <strong>${{r.ai_model_count || 0}}</strong> AI Models • <strong>${{r.zones || 3}}</strong> Zones</div>
               <div style="font-size:11.5px;margin-top:4px;"><strong>Machine Series (${{(r.machine_series||[]).length}}):</strong> ${{(r.machine_series||[]).slice(0,8).join(', ')}}</div>
               <div style="font-size:11.5px;margin-top:2px;"><strong>GPUs (${{(r.gpus||[]).length}}):</strong> ${{(r.gpus||[]).join(', ') || 'CPU Only'}}</div>
             </div>`;
@@ -2052,7 +2276,7 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
 
           document.getElementById('cmp-thead-row').innerHTML = `
             <th>Service Name</th>
-            <th>Category</th>
+            <th>Category &amp; Target SLA</th>
             <th>API Endpoint &amp; Ops</th>
             ${{rids.map(rid => `<th><a href="regions/${{rid}}.html">${{rid}}</a></th>`).join('')}}
           `;
@@ -2066,7 +2290,7 @@ def generate_capabilities_page(catalog: dict[str, Any]) -> None:
 
             rows.push(`<tr>
               <td><a href="services/${{s.slug}}.html" style="font-weight:600;">${{s.name}}</a></td>
-              <td><span class="badge badge-gray">${{s.category}}</span></td>
+              <td><span class="badge badge-gray">${{s.category}}</span> ${{s.sla && s.sla !== '—' ? `<span class="badge badge-green">🛡️ ${{s.sla}}</span>` : ''}}</td>
               <td><span class="code-chip">${{(s.apis||[])[0] || 'google-cloud'}}</span> <span class="badge badge-blue">${{s.ops}} ops</span></td>
               ${{flags.map(ok => ok
                 ? '<td><span class="badge badge-green">✔ Available</span></td>'
@@ -2239,9 +2463,37 @@ def generate_pops_page(catalog: dict[str, Any]) -> None:
 
 
 def generate_whatsnew_page(catalog: dict[str, Any]) -> None:
-    """Generate dist/whatsnew.html (What's New & Daily Snapshot Diffs)."""
+    """Generate dist/whatsnew.html (Official Release Notes + Regional Launches & Daily Snapshot Diffs)."""
     meta = catalog["meta"]
     items = catalog.get("whats_new", [])
+    rel_notes = catalog.get("release_notes", [])
+    svcs_by_slug = {s["slug"]: s["name"] for s in catalog.get("services", [])}
+
+    rel_types = sorted({n.get("release_type", "Announcement") for n in rel_notes if n.get("release_type")})
+    rel_type_opts = "\n".join(f'<option value="{esc(rt)}">{esc(rt)}</option>' for rt in rel_types)
+    rel_rows = []
+    for n in rel_notes:
+        rt = n.get("release_type", "Announcement")
+        rt_up = rt.upper()
+        rt_cls = (
+            "badge-green" if rt_up in ("FEATURE", "LAUNCH")
+            else ("badge-red" if rt_up in ("DEPRECATED", "SECURITY", "BREAKING")
+            else ("badge-yellow" if rt_up in ("FIXED", "CHANGED") else "badge-blue"))
+        )
+        slug = n.get("service_slug", "")
+        prod = n.get("product_name", "Google Cloud")
+        prod_html = f'<a href="services/{esc(slug)}.html" style="font-weight:600;">{esc(svcs_by_slug.get(slug, prod))}</a>' if slug in svcs_by_slug else f'<strong>{esc(prod)}</strong>'
+        link = n.get("url", n.get("link", "https://cloud.google.com/release-notes"))
+        pub_date = n.get("date", n.get("published_date", ""))
+        rel_rows.append(
+            f'<tr data-filter1="{esc(rt)}">'
+            f'<td data-val="{esc(pub_date)}"><strong>{esc(pub_date)}</strong></td>'
+            f'<td data-val="{esc(rt)}"><span class="badge {rt_cls}">{esc(rt)}</span></td>'
+            f'<td data-val="{esc(prod)}">{prod_html}</td>'
+            f'<td><div style="font-size:12.5px;color:var(--text-primary);">{esc(n.get("summary", ""))}</div></td>'
+            f'<td><a href="{esc(link)}" target="_blank" rel="noopener">Note ↗</a></td>'
+            f'</tr>'
+        )
 
     rows = []
     for item in items:
@@ -2260,8 +2512,44 @@ def generate_whatsnew_page(catalog: dict[str, Any]) -> None:
 
     body = f"""
     <div class="section-card">
-      <h2 class="section-title">🆕 What's New — Regional Launches &amp; Daily Snapshot Diffs</h2>
-      <p style="margin:0 0 14px 0;color:var(--text-muted);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
+        <h2 class="section-title" style="margin:0;">📰 Official Google Cloud Release Notes Feed ({len(rel_rows)} Recent Entries)</h2>
+        <a href="https://cloud.google.com/release-notes" target="_blank" rel="noopener" class="btn">Official Release Notes Portal ↗</a>
+      </div>
+      <p style="margin:0 0 14px 0;color:var(--text-muted);font-size:13px;">
+        Harvested once daily from the official Google Cloud Release Notes Atom XML feed and cached locally for offline inspection.
+      </p>
+      <div class="toolbar" style="margin-bottom:12px;">
+        <div class="toolbar-group">
+          <input id="rn-search" type="search" class="search-input" placeholder="Search release notes by service, feature, CVE, or deprecation...">
+          <select id="rn-type" class="select-input">
+            <option value="">All Release Types ({len(rel_types)})</option>
+            {rel_type_opts}
+          </select>
+        </div>
+        <div id="rn-count" class="count-label">Showing {len(rel_rows)} of {len(rel_rows)}</div>
+      </div>
+      <div class="table-scroll">
+        <table id="rn-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="str" style="width:110px;">Published ⇅</th>
+              <th data-sort="str" style="width:130px;">Release Type ⇅</th>
+              <th data-sort="str" style="width:190px;">Service / Product ⇅</th>
+              <th>Release Summary</th>
+              <th style="width:80px;">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {"".join(rel_rows) if rel_rows else '<tr><td colspan="5">No cached release notes available.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">🆕 Regional Launches &amp; Daily Snapshot Diffs</h2>
+      <p style="margin:0 0 14px 0;color:var(--text-muted);font-size:13px;">
         Every daily run of <code>harvester.py</code> saves a dated snapshot to <code>data/cache/snapshots/YYYY-MM-DD.json</code> and automatically computes newly added services and AI models per region, alongside chronological Google Cloud region launches and announced future regions.
       </p>
       <div class="toolbar" style="margin-bottom:12px;">
@@ -2287,12 +2575,381 @@ def generate_whatsnew_page(catalog: dict[str, Any]) -> None:
     </div>
     <script>
       document.addEventListener('DOMContentLoaded', () => {{
+        setupTableFilter({{ searchId: 'rn-search', select1Id: 'rn-type', tableId: 'rn-table', countId: 'rn-count' }});
         setupTableFilter({{ searchId: 'wn-search', tableId: 'wn-table', countId: 'wn-count' }});
       }});
     </script>
     """
     (DIST_DIR / "whatsnew.html").write_text(
-        render_layout("What's New", "whatsnew", body, meta),
+        render_layout("What's New & Release Notes", "whatsnew", body, meta),
+        encoding="utf-8",
+    )
+
+
+def generate_pricing_sla_page(catalog: dict[str, Any]) -> None:
+    """Generate dist/pricing-sla.html (Interactive SLA Architecture Calculator + FinOps Regional Cost & Service Pricing)."""
+    meta = catalog["meta"]
+    services = catalog.get("services", [])
+    regions = catalog.get("regions", [])
+
+    formal_sla_count = sum(1 for s in services if s.get("sla", {}).get("has_formal_sla"))
+    free_tier_count = sum(1 for s in services if s.get("pricing", {}).get("has_free_tier"))
+    tier1_regions = sum(1 for r in regions if (r.get("pricing", {}).get("relative_compute_index", 1.0) <= 1.02))
+
+    categories = sorted({s.get("category", "Cloud") for s in services})
+    cat_opts = "\n".join(f'<option value="{esc(c)}">{esc(c)}</option>' for c in categories)
+
+    svc_calc_list = []
+    svc_rows = []
+    for s in services:
+        sla = s.get("sla", {})
+        prc = s.get("pricing", {})
+        has_sla = bool(sla.get("has_formal_sla"))
+        uptime_num = sla.get("headline_uptime_pct") or 99.9
+        uptime_disp = sla.get("headline_display", "No formal SLA")
+        downtime = sla.get("max_monthly_downtime", "N/A")
+        tiers_summary = " • ".join(f"{t.get('tier_name', 'Standard')}: {t.get('uptime_display', str(t.get('uptime_pct', '')) + '%')}" for t in sla.get("tiers", [])[:3]) or "Preview / Best-effort"
+        billing_model = prc.get("billing_model", "Pay-as-you-go")
+        raw_units = prc.get("primary_units", "")
+        units_str = raw_units if isinstance(raw_units, str) else ", ".join(raw_units[:2])
+        cud = prc.get("cud_support", "Varies")
+        has_free = bool(prc.get("has_free_tier"))
+        free_badge = '<span class="badge badge-green">✔ Free Tier</span>' if has_free else '<span class="badge badge-gray">Paid Usage</span>'
+        sla_badge_cls = "badge-green" if (sla.get("headline_uptime_pct") or 0) >= 99.99 else ("badge-blue" if has_sla else "badge-gray")
+
+        if has_sla and sla.get("headline_uptime_pct"):
+            svc_calc_list.append({
+                "slug": s["slug"],
+                "name": s["name"],
+                "uptime": float(sla["headline_uptime_pct"]),
+                "tiers": sla.get("tiers", []),
+            })
+
+        svc_rows.append(
+            f'<tr data-filter1="{esc(s["category"])}" data-flag="{str(has_free).lower()}">'
+            f'<td data-val="{esc(s["name"])}"><a href="services/{esc(s["slug"])}.html" style="font-weight:600;">{esc(s["name"])}</a></td>'
+            f'<td data-val="{esc(s["category"])}"><span class="badge badge-gray">{esc(s["category"])}</span></td>'
+            f'<td data-val="{sla.get("headline_uptime_pct") or 0}"><span class="badge {sla_badge_cls}">🛡️ {esc(uptime_disp)}</span><div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Max/mo: {esc(downtime)}</div></td>'
+            f'<td style="font-size:12px;max-width:280px;">{esc(tiers_summary)}</td>'
+            f'<td data-val="{esc(billing_model)}"><strong>{esc(billing_model)}</strong><div style="font-size:11.5px;color:var(--text-muted);">{esc(units_str)}</div></td>'
+            f'<td style="font-size:12px;">{esc(cud)}</td>'
+            f'<td>{free_badge}</td>'
+            f'<td><a href="{esc(sla.get("sla_url", "https://cloud.google.com/terms/sla"))}" target="_blank" rel="noopener">SLA ↗</a> · <a href="{esc(prc.get("pricing_url", "https://cloud.google.com/pricing"))}" target="_blank" rel="noopener">Pricing ↗</a></td>'
+            f'</tr>'
+        )
+
+    reg_calc_list = [
+        {
+            "id": r["region_id"],
+            "name": f"{r['region_id']} — {r['region_name']} ({r['sub_region']})",
+            "compute": float(r.get("pricing", {}).get("relative_compute_index", 1.0)),
+            "storage": float(r.get("pricing", {}).get("relative_storage_index", 1.0)),
+            "tier": r.get("pricing", {}).get("tier", "Tier 1"),
+            "egress": r.get("pricing", {}).get("inter_region_egress_band", "Standard"),
+            "low_co2": bool(r.get("is_low_co2")),
+        }
+        for r in regions
+    ]
+
+    reg_rows = []
+    for r in regions:
+        rp = r.get("pricing", {})
+        c_idx = rp.get("relative_compute_index", 1.0)
+        s_idx = rp.get("relative_storage_index", 1.0)
+        tier = rp.get("tier", "Tier 1")
+        b_cls = "badge-green" if c_idx <= 1.05 else ("badge-blue" if c_idx <= 1.15 else "badge-yellow")
+        co2 = ' <span class="badge badge-green">🌱 Low CO₂</span>' if r.get("is_low_co2") else ""
+        reg_rows.append(
+            f'<tr>'
+            f'<td data-val="{esc(r["region_id"])}"><a href="regions/{esc(r["region_id"])}.html"><span class="code-chip" style="font-weight:700;color:var(--gcp-blue);">{esc(r["region_id"])}</span></a>{co2}</td>'
+            f'<td data-val="{esc(r["region_name"])}"><strong>{esc(r["region_name"])}</strong> <span style="color:var(--text-muted);font-size:12px;">({esc(r["sub_region"])})</span></td>'
+            f'<td data-val="{c_idx}"><span class="badge {b_cls}">{c_idx:.2f}x ({esc(rp.get("delta_vs_baseline", "Baseline"))})</span></td>'
+            f'<td data-val="{s_idx}"><code>{s_idx:.2f}x</code></td>'
+            f'<td data-val="{esc(tier)}">{esc(tier)}</td>'
+            f'<td style="font-size:12px;"><code>{esc(rp.get("inter_region_egress_band", "Standard"))}</code></td>'
+            f'<td><span class="badge badge-green">1Y: ~{rp.get("cud_1y_discount_pct", 37)}%</span> <span class="badge badge-purple">3Y: ~{rp.get("cud_3y_discount_pct", 55)}%</span></td>'
+            f'</tr>'
+        )
+
+    calc_json = json.dumps({"services": svc_calc_list, "regions": reg_calc_list})
+
+    body = f"""
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Services with Formal SLA</div>
+        <div class="kpi-value">{formal_sla_count}</div>
+        <div class="kpi-sub">Out of {len(services)} cataloged Google Cloud services</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Peak Multi-Region Uptime</div>
+        <div class="kpi-value">99.999%</div>
+        <div class="kpi-sub">Spanner, Bigtable &amp; Global LB (≤ 26s/mo)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Baseline Cost Regions (1.00x)</div>
+        <div class="kpi-value">{tier1_regions} / {len(regions)}</div>
+        <div class="kpi-sub">Relative to <code>us-central1</code> baseline</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Free Tier Eligible Services</div>
+        <div class="kpi-value">{free_tier_count}</div>
+        <div class="kpi-sub">+ Up to 55% 3-Year CUD compute savings</div>
+      </div>
+    </div>
+
+    <div class="studio-grid">
+      <div class="section-card" style="margin-bottom:0;">
+        <h2 class="section-title">🛡️ Interactive Composite Workload SLA Calculator</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:var(--text-muted);">
+          Model end-to-end architecture availability across up to 4 dependent Google Cloud services in <strong>Serial</strong> (single-region critical path) vs. <strong>Active-Active Multi-Region</strong> deployment topologies.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">COMPONENT 1 (INGRESS / EDGE)</label>
+            <select id="sla-s1" class="select-input" style="width:100%;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">COMPONENT 2 (COMPUTE / APP)</label>
+            <select id="sla-s2" class="select-input" style="width:100%;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">COMPONENT 3 (DATABASE / STATE)</label>
+            <select id="sla-s3" class="select-input" style="width:100%;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">COMPONENT 4 (OPTIONAL AI / BUS)</label>
+            <select id="sla-s4" class="select-input" style="width:100%;"></select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">TOPOLOGY ARCHITECTURE PATTERN</label>
+          <select id="sla-topo" class="select-input" style="width:100%;font-weight:600;color:var(--gcp-blue);">
+            <option value="serial">🔗 Single-Region Serial Critical Path (A × B × C × D)</option>
+            <option value="dual_active">🌐 Dual-Region Active-Active Redundant Stack (1 − (1 − R_stack)²)</option>
+          </select>
+        </div>
+        <div class="calc-metric-box" id="sla-result-box"></div>
+      </div>
+
+      <div class="section-card" id="regional-cost" style="margin-bottom:0;">
+        <h2 class="section-title">💰 Regional FinOps Cost Multiplier &amp; CUD Estimator</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:var(--text-muted);">
+          Compare relative compute/storage spend across Google Cloud regions against <code>us-central1 (1.00x)</code> and model 1-Year / 3-Year Committed Use Discount (CUD) impact.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">BASELINE MONTHLY SPEND (USD)</label>
+            <input id="cost-base" type="number" min="100" step="500" value="10000" class="select-input" style="width:100%;font-weight:700;">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">COMMITMENT DISCOUNT TIER</label>
+            <select id="cost-cud" class="select-input" style="width:100%;font-weight:600;">
+              <option value="1.0">On-Demand Pay-As-You-Go (0% CUD)</option>
+              <option value="0.63">1-Year Committed Use (~37% Compute Savings)</option>
+              <option value="0.45">3-Year Committed Use (~55% Compute Savings)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">PRIMARY REGION (A)</label>
+            <select id="cost-r1" class="select-input" style="width:100%;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);display:block;">TARGET / DR REGION (B)</label>
+            <select id="cost-r2" class="select-input" style="width:100%;"></select>
+          </div>
+        </div>
+        <div class="calc-metric-box" id="cost-result-box"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">🛡️ Google Cloud Service SLA Targets, Billing Models &amp; FinOps Catalog ({len(services)} Services)</h2>
+      <div class="toolbar" style="margin-bottom:12px;">
+        <div class="toolbar-group">
+          <input id="ps-search" type="search" class="search-input" placeholder="Search service SLA or billing model (e.g. Spanner, 99.999%, Cloud Run, BigQuery, CUD)...">
+          <select id="ps-cat" class="select-input">
+            <option value="">All Categories ({len(categories)})</option>
+            {cat_opts}
+          </select>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;">
+            <input id="ps-free" type="checkbox"> Free Tier Eligible Only ({free_tier_count})
+          </label>
+        </div>
+        <div id="ps-count" class="count-label">Showing {len(svc_rows)} of {len(svc_rows)}</div>
+      </div>
+      <div class="table-scroll">
+        <table id="ps-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="str">Service Name ⇅</th>
+              <th data-sort="str">Category ⇅</th>
+              <th data-sort="num">Headline SLA &amp; Budget ⇅</th>
+              <th>Architecture SLA Tiers</th>
+              <th data-sort="str">Billing Model &amp; Units ⇅</th>
+              <th>CUD / Commitment</th>
+              <th>Free Tier</th>
+              <th>Official Links</th>
+            </tr>
+          </thead>
+          <tbody>
+            {"".join(svc_rows)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2 class="section-title">🌍 All {len(regions)} Google Cloud Regions — Relative Cost Multipliers &amp; Egress Tiers</h2>
+      <p style="margin:0 0 12px 0;font-size:13px;color:var(--text-muted);">
+        Relative compute and storage price indices normalized against <code>us-central1 = 1.00x</code>. Actual SKU pricing varies by machine family and storage class; always verify exact figures in the <a href="https://cloud.google.com/products/calculator" target="_blank" rel="noopener">Official Google Cloud Pricing Calculator</a>.
+      </p>
+      <div class="toolbar" style="margin-bottom:12px;">
+        <input id="rc-search" type="search" class="search-input" placeholder="Search region ID, city, or cost tier (e.g. us-central1, europe-west4, asia-south1, Tier 1)...">
+        <div id="rc-count" class="count-label">Showing {len(reg_rows)} of {len(reg_rows)}</div>
+      </div>
+      <div class="table-scroll">
+        <table id="rc-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="str">Region ID ⇅</th>
+              <th data-sort="str">Location ⇅</th>
+              <th data-sort="num">Compute Cost Index ⇅</th>
+              <th data-sort="num">Storage Index ⇅</th>
+              <th data-sort="str">FinOps Price Tier ⇅</th>
+              <th>Inter-Region Egress Band</th>
+              <th>Standard CUD Discounts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {"".join(reg_rows)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      window.GCP_PRICING_SLA_DATA = {calc_json};
+      document.addEventListener('DOMContentLoaded', () => {{
+        setupTableFilter({{ searchId: 'ps-search', select1Id: 'ps-cat', checkboxId: 'ps-free', tableId: 'ps-table', countId: 'ps-count' }});
+        setupTableFilter({{ searchId: 'rc-search', tableId: 'rc-table', countId: 'rc-count' }});
+
+        const d = window.GCP_PRICING_SLA_DATA;
+        const slaSelects = ['sla-s1', 'sla-s2', 'sla-s3', 'sla-s4'].map(id => document.getElementById(id));
+        const slaDefaults = ['cloud-load-balancing', 'cloud-run', 'spanner', ''];
+
+        slaSelects.forEach((sel, idx) => {{
+          if (idx === 3) {{
+            const noneOpt = document.createElement('option');
+            noneOpt.value = '';
+            noneOpt.textContent = '— None (3-Component Stack) —';
+            sel.appendChild(noneOpt);
+          }}
+          d.services.forEach(s => {{
+            const opt = document.createElement('option');
+            opt.value = s.slug;
+            opt.textContent = `${{s.name}} (${{s.uptime}}%)`;
+            if (s.slug === slaDefaults[idx]) opt.selected = true;
+            sel.appendChild(opt);
+          }});
+          sel.addEventListener('change', computeSLA);
+        }});
+        document.getElementById('sla-topo').addEventListener('change', computeSLA);
+
+        function fmtDuration(sec) {{
+          if (sec < 1) return '< 1s';
+          if (sec < 60) return `${{Math.round(sec)}}s`;
+          if (sec < 3600) {{
+            const m = Math.floor(sec / 60), s = Math.round(sec % 60);
+            return s > 0 ? `${{m}}m ${{s}}s` : `${{m}}m`;
+          }}
+          const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
+          return `${{h}}h ${{m}}m`;
+        }}
+
+        function computeSLA() {{
+          const svcMap = Object.fromEntries(d.services.map(s => [s.slug, s]));
+          const picked = slaSelects.map(el => svcMap[el.value]).filter(Boolean);
+          let serialProb = picked.reduce((acc, s) => acc * (s.uptime / 100.0), 1.0);
+          const topo = document.getElementById('sla-topo').value;
+          let finalProb = topo === 'dual_active' ? (1.0 - Math.pow(1.0 - serialProb, 2)) : serialProb;
+          const pct = Math.min(99.9999, finalProb * 100.0);
+          const monthlySec = (1.0 - finalProb) * 30 * 86400;
+          const annualSec = (1.0 - finalProb) * 365 * 86400;
+          document.getElementById('sla-result-box').innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;">
+              <div>
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);">Composite Workload SLA</div>
+                <div style="font-size:28px;font-weight:800;color:var(--gcp-green);">${{pct.toFixed(pct >= 99.995 ? 4 : 3)}}%</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:12px;"><strong>Max Monthly Downtime:</strong> <code>${{fmtDuration(monthlySec)}}</code></div>
+                <div style="font-size:12px;color:var(--text-muted);"><strong>Max Annual Downtime:</strong> <code>${{fmtDuration(annualSec)}}</code></div>
+              </div>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">
+              Active Stack (${{picked.length}} services): ${{picked.map(s => `<code>${{s.name}} (${{s.uptime}}%)</code>`).join(' → ')}}
+            </div>
+          `;
+        }}
+
+        const r1El = document.getElementById('cost-r1');
+        const r2El = document.getElementById('cost-r2');
+        d.regions.forEach(r => {{
+          [r1El, r2El].forEach((sel, idx) => {{
+            const opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = `${{r.id}} (${{r.compute.toFixed(2)}}x)${{r.low_co2 ? ' 🌱' : ''}}`;
+            if ((idx === 0 && r.id === 'us-central1') || (idx === 1 && r.id === 'asia-south1')) opt.selected = true;
+            sel.appendChild(opt);
+          }});
+        }});
+        [r1El, r2El, document.getElementById('cost-base'), document.getElementById('cost-cud')].forEach(el => {{
+          el.addEventListener('input', computeCost);
+          el.addEventListener('change', computeCost);
+        }});
+
+        function computeCost() {{
+          const regMap = Object.fromEntries(d.regions.map(r => [r.id, r]));
+          const base = Math.max(0, parseFloat(document.getElementById('cost-base').value || '10000'));
+          const cudFactor = parseFloat(document.getElementById('cost-cud').value || '1.0');
+          const ra = regMap[r1El.value] || d.regions[0];
+          const rb = regMap[r2El.value] || d.regions[0];
+          const costA = base * ra.compute * cudFactor;
+          const costB = base * rb.compute * cudFactor;
+          const diffMonthly = costB - costA;
+          const sign = diffMonthly >= 0 ? '+' : '−';
+          const fmt = n => '$' + Math.round(Math.abs(n)).toLocaleString();
+          document.getElementById('cost-result-box').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);">${{ra.id}} / MO</div>
+                <div style="font-size:21px;font-weight:800;color:var(--gcp-blue);">${{fmt(costA)}}</div>
+                <div style="font-size:11px;color:var(--text-muted);">${{ra.compute.toFixed(2)}}x Compute</div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);">${{rb.id}} / MO</div>
+                <div style="font-size:21px;font-weight:800;color:var(--text-primary);">${{fmt(costB)}}</div>
+                <div style="font-size:11px;color:var(--text-muted);">${{rb.compute.toFixed(2)}}x Compute</div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);">ANNUAL DELTA</div>
+                <div style="font-size:21px;font-weight:800;color:${{diffMonthly <= 0 ? 'var(--gcp-green)' : 'var(--gcp-yellow)'}};">${{sign}}${{fmt(diffMonthly * 12)}}/yr</div>
+                <div style="font-size:11px;color:var(--text-muted);">${{sign}}${{fmt(diffMonthly)}}/mo</div>
+              </div>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">
+              Inter-Region Egress Band (<code>${{rb.id}}</code>): <code>${{rb.egress}}</code>
+            </div>
+          `;
+        }}
+
+        computeSLA();
+        computeCost();
+      }});
+    </script>
+    """
+    (DIST_DIR / "pricing-sla.html").write_text(
+        render_layout("Pricing & SLA Intelligence", "pricing-sla", body, meta),
         encoding="utf-8",
     )
 
@@ -2302,10 +2959,9 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
     meta = catalog["meta"]
     body = """
     <div class="section-card">
-      <h2 class="section-title">🏗️ Solution Architecture (Local Cache Mode &amp; Serverless Google Cloud Mode)</h2>
+      <h2 class="section-title">🏗️ Solution Architecture (Offline Web PWA, Native SwiftUI iOS App &amp; Google Cloud Mode)</h2>
       <p>
-        This unofficial tool is engineered to run both <strong>100% locally on your workstation</strong> (with a once-a-day background refresh &amp; static HTML/JSON cache)
-        and as a <strong>serverless Google Cloud architecture</strong> at near-zero cost (~$0.30/month).
+        This unofficial tool is engineered across two dedicated offline-first form factors—an <strong>Analytical Offline Web PWA</strong> (<code>dist/</code>) and a <strong>Modern Native Universal SwiftUI iOS/iPadOS App</strong> (<code>ios/GoogleCloudExplorer</code>)—backed by a once-a-day local cache or serverless Google Cloud backend (~$0.30/month).
       </p>
 
       <div style="background:#f8f9fa;border:1px solid #dadce0;border-radius:10px;padding:20px;margin:18px 0;overflow-x:auto;">
@@ -2318,7 +2974,7 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
           <text x="320" y="42" font-size="13" font-weight="bold" fill="#137333">2. Quota-Resilient Harvester (Daily 24h Refresh)</text>
 
           <rect x="725" y="15" width="310" height="290" rx="10" fill="#fef7e0" stroke="#b06000" stroke-width="1.5"/>
-          <text x="740" y="42" font-size="13" font-weight="bold" fill="#b06000">3. Zero-Latency Static &amp; Cached Delivery</text>
+          <text x="740" y="42" font-size="13" font-weight="bold" fill="#b06000">3. Offline-First Web PWA, CLI &amp; Native iOS</text>
 
           <!-- Upstream Boxes -->
           <rect x="30" y="60" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
@@ -2326,8 +2982,8 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
           <text x="42" y="98" font-size="10.5" fill="#5f6368">data.json, locations_map.json, AI models</text>
 
           <rect x="30" y="122" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
-          <text x="42" y="144" font-size="12" font-weight="bold" fill="#202124">Compute Zones &amp; GPU Matrices</text>
-          <text x="42" y="160" font-size="10.5" fill="#5f6368">130 Zones, Machine Series, CPUs, GPUs</text>
+          <text x="42" y="144" font-size="12" font-weight="bold" fill="#202124">Compute Zones, GPUs &amp; SLAs</text>
+          <text x="42" y="160" font-size="10.5" fill="#5f6368">130 Zones, GPUs, SLA Index, Release XML</text>
 
           <rect x="30" y="184" width="220" height="48" rx="6" fill="#fff" stroke="#1a73e8"/>
           <text x="42" y="206" font-size="12" font-weight="bold" fill="#202124">Google Discovery REST API</text>
@@ -2339,35 +2995,35 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
 
           <!-- Harvester Boxes -->
           <rect x="325" y="62" width="340" height="58" rx="6" fill="#fff" stroke="#137333"/>
-          <text x="340" y="84" font-size="12" font-weight="bold" fill="#202124">ResilientFetcher (harvester.py)</text>
+          <text x="340" y="84" font-size="12" font-weight="bold" fill="#202124">ResilientFetcher + enrichment.py</text>
           <text x="340" y="101" font-size="10.5" fill="#5f6368">• Token-Bucket Rate Limiter (15 req/s cap)</text>
-          <text x="340" y="114" font-size="10.5" fill="#5f6368">• Exponential Backoff + Full Jitter on 429/403/5xx</text>
+          <text x="340" y="114" font-size="10.5" fill="#5f6368">• SLA Tiers, FinOps Indices &amp; Release Notes XML</text>
 
           <rect x="325" y="136" width="340" height="54" rx="6" fill="#fff" stroke="#137333"/>
-          <text x="340" y="158" font-size="12" font-weight="bold" fill="#202124">Per-API Disk Checkpointing &amp; 24h Cache</text>
-          <text x="340" y="175" font-size="10.5" fill="#5f6368">data/cache/gcp_catalog.json + snapshots/YYYY-MM-DD.json</text>
+          <text x="340" y="158" font-size="12" font-weight="bold" fill="#202124">24h Cache &amp; Compact Mobile Bundle</text>
+          <text x="340" y="175" font-size="10.5" fill="#5f6368">gcp_catalog.json + mobile_catalog.json (~130KB gz)</text>
 
           <rect x="325" y="206" width="340" height="80" rx="6" fill="#fff" stroke="#137333"/>
-          <text x="340" y="228" font-size="12" font-weight="bold" fill="#202124">Static Site Generator (generator.py)</text>
-          <text x="340" y="246" font-size="10.5" fill="#5f6368">• Compiles 210+ static HTML pages into dist/</text>
-          <text x="340" y="262" font-size="10.5" fill="#5f6368">• Pre-computes Services &amp; AI Models Matrix JS</text>
-          <text x="340" y="276" font-size="10.5" fill="#5f6368">• Triggered once/day via server.py or Cloud Scheduler</text>
+          <text x="340" y="228" font-size="12" font-weight="bold" fill="#202124">Static Site &amp; PWA Generator (generator.py)</text>
+          <text x="340" y="246" font-size="10.5" fill="#5f6368">• Compiles 205+ static HTML pages + sw.js into dist/</text>
+          <text x="340" y="262" font-size="10.5" fill="#5f6368">• Pre-computes Matrix JS + SLA/Pricing Calculators</text>
+          <text x="340" y="276" font-size="10.5" fill="#5f6368">• ETag / Gzip delta sync for Native iOS clients</text>
 
           <!-- Delivery Boxes -->
           <rect x="745" y="65" width="270" height="65" rx="6" fill="#fff" stroke="#b06000"/>
-          <text x="760" y="88" font-size="12" font-weight="bold" fill="#202124">Local Web Server (server.py)</text>
-          <text x="760" y="105" font-size="10.5" fill="#5f6368">• Serves static HTML in &lt;2ms (0 API calls)</text>
-          <text x="760" y="120" font-size="10.5" fill="#5f6368">• Background 24h auto-refresh daemon thread</text>
+          <text x="760" y="88" font-size="12" font-weight="bold" fill="#202124">Offline Web PWA + server.py</text>
+          <text x="760" y="105" font-size="10.5" fill="#5f6368">• Service Worker offline cache + &lt;2ms reads</text>
+          <text x="760" y="120" font-size="10.5" fill="#5f6368">• ETag + Gzip REST API (/api/mobile-catalog)</text>
 
           <rect x="745" y="145" width="270" height="65" rx="6" fill="#fff" stroke="#b06000"/>
-          <text x="760" y="168" font-size="12" font-weight="bold" fill="#202124">Local Terminal CLI (cli.py)</text>
-          <text x="760" y="185" font-size="10.5" fill="#5f6368">• Instant queries by service, region, model, or diff</text>
-          <text x="760" y="200" font-size="10.5" fill="#5f6368">• Reads directly from local JSON cache</text>
+          <text x="760" y="168" font-size="12" font-weight="bold" fill="#202124">Modern Native SwiftUI iOS App</text>
+          <text x="760" y="185" font-size="10.5" fill="#5f6368">• Bento Hub, 3D MapKit Globe, Swift Charts</text>
+          <text x="760" y="200" font-size="10.5" fill="#5f6368">• Bundled offline JSON + CoreSpotlight</text>
 
           <rect x="745" y="225" width="270" height="65" rx="6" fill="#fff" stroke="#b06000"/>
-          <text x="760" y="248" font-size="12" font-weight="bold" fill="#202124">Cloud Native Hosting (Optional)</text>
-          <text x="760" y="265" font-size="10.5" fill="#5f6368">• Cloud Run Job + Private GCS Bucket</text>
-          <text x="760" y="280" font-size="10.5" fill="#5f6368">• Cloud CDN + Cloud Armor WAF</text>
+          <text x="760" y="248" font-size="12" font-weight="bold" fill="#202124">Terminal CLI &amp; Serverless Cloud</text>
+          <text x="760" y="265" font-size="10.5" fill="#5f6368">• cli.py (service, models, sla, pricing, updates)</text>
+          <text x="760" y="280" font-size="10.5" fill="#5f6368">• Optional Cloud Run + Cloud CDN (~$0.30/mo)</text>
 
           <!-- Arrows -->
           <line x1="250" y1="90" x2="325" y2="90" stroke="#3c4043" stroke-width="2"/>
@@ -2381,10 +3037,10 @@ def generate_arch_page(catalog: dict[str, Any]) -> None:
     <div class="section-card">
       <h2 class="section-title">🛡️ Quota &amp; Rate-Limit Protection Architecture</h2>
       <ul>
-        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, AI model lookups, matrix comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream Google Cloud endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
+        <li><strong>Daily 24-Hour Cache TTL (<code>data/cache/gcp_catalog.json</code>):</strong> All user searches, region lookups, AI model checks, SLA calculations, pricing comparisons, and CLI queries are served 100% from local static HTML and cached JSON. Upstream Google Cloud endpoints are only queried once every 24 hours (or when explicitly forced via <code>--force</code>).</li>
         <li><strong>Token-Bucket Rate Limiting:</strong> Outbound requests during the daily harvest are paced through a thread-safe token-bucket rate limiter (default 15 requests/sec across 8 bounded worker threads) to prevent burst quota exhaustion on <code>discovery.googleapis.com</code>.</li>
         <li><strong>Exponential Backoff with Full Jitter &amp; <code>Retry-After</code> Parsing:</strong> Any HTTP <code>429 Too Many Requests</code>, <code>403 Rate Limit Exceeded</code>, or <code>5xx</code> response automatically honors the server's <code>Retry-After</code> header or backs off using <code>random.uniform(0.5 * base * 2^attempt, base * 2^attempt)</code> up to 5 attempts.</li>
-        <li><strong>Per-API Disk Checkpointing &amp; Graceful Stale-Cache Fallback:</strong> Every Discovery REST spec (<code>data/cache/discovery/{api}_{version}.json</code>) is atomically written to disk as soon as it arrives. If network connectivity drops mid-run, re-running resumes instantly without re-fetching completed specs, and falls back to the last known good cached spec if an upstream endpoint is temporarily unreachable.</li>
+        <li><strong>Per-API Disk Checkpointing &amp; Offline Sync:</strong> Every Discovery REST spec is atomically written to disk, while the Web PWA Service Worker (<code>sw.js</code>) and Native iOS app bundle (<code>mobile_catalog.json</code>) provide full Airplane-Mode offline capability.</li>
       </ul>
     </div>
 
@@ -2452,44 +3108,34 @@ def generate_faqs_page(catalog: dict[str, Any]) -> None:
     meta = catalog["meta"]
     body = """
     <div class="section-card">
-      <h2 class="section-title">❓ Frequently Asked Questions (FAQs) &amp; Local CLI Guide</h2>
+      <h2 class="section-title">❓ Frequently Asked Questions (FAQs), Offline Mode &amp; CLI Guide</h2>
 
-      <p><strong>Q: Is this an official Google Cloud website or product?</strong></p>
+      <p><strong>Q: Is this an official Google Cloud website or mobile app?</strong></p>
       <ul>
-        <li><strong>No.</strong> This is an <strong>unofficial tool</strong> and is not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
-        <li>While data is automatically harvested from public Google Cloud feeds and Discovery APIs, it is provided "as-is" without warranty. Always refer to the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations" target="_blank" rel="noopener">Vertex AI Model Locations Documentation</a>, <a href="https://cloud.google.com/compute/docs/regions-zones" target="_blank" rel="noopener">Compute Engine Regions &amp; Zones Documentation</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> for the latest information.</li>
+        <li><strong>No.</strong> Both the Web PWA and the Native SwiftUI iOS/iPadOS App are <strong>unofficial tools</strong> and are not affiliated with, endorsed by, or sponsored by Google LLC or Google Cloud.</li>
+        <li>While data is automatically harvested from public Google Cloud feeds, SLA indexes, release notes, and Discovery APIs, it is provided "as-is" without warranty. Always refer to the <a href="https://cloud.google.com/about/locations" target="_blank" rel="noopener">Official Google Cloud Locations Page</a>, <a href="https://cloud.google.com/terms/sla" target="_blank" rel="noopener">Official Google Cloud SLAs</a>, <a href="https://cloud.google.com/pricing" target="_blank" rel="noopener">Official Google Cloud Pricing</a>, and <a href="https://cloud.google.com/docs" target="_blank" rel="noopener">Official Google Cloud Documentation</a> for authoritative information.</li>
       </ul>
 
-      <p><strong>Q: What happens when Google Cloud launches a brand-new service, AI model, region, zone, or API?</strong></p>
+      <p><strong>Q: How do Offline Mode and the Native SwiftUI iOS/iPadOS App work?</strong></p>
       <ul>
-        <li><strong>Zero-Touch Dynamic Discovery:</strong> Every daily harvest dynamically pulls the live product/region feeds (<code>data.json</code>, <code>locations_map.json</code>, <code>multi-region-data.json</code>, <code>global-data.json</code>), live Vertex AI model availability tables, live Compute Engine zone/GPU tables, and the live Google APIs Discovery directory (<code>discovery.googleapis.com/discovery/v1/apis</code>).</li>
-        <li>Any newly launched service, AI model, region, zone, machine series, GPU, or REST API is automatically ingested, matched via documentation URL slug and title similarity, given its own detail view, and highlighted in the <a href="whatsnew.html">What's New</a> tab without requiring any code changes.</li>
+        <li><strong>Offline-Ready Web PWA:</strong> Opening the web app over <code>http://localhost:8080</code> (or HTTPS) registers <code>sw.js</code>, pre-caching all core views, stylesheets, scripts, and <code>data/mobile_catalog.json</code> so you can browse offline in Airplane Mode.</li>
+        <li><strong>Modern Native SwiftUI App (<code>ios/GoogleCloudExplorer</code>):</strong> Built natively for iOS 17+ (iPhone &amp; iPad) with Bento dashboards, a 3D interactive Apple MapKit Globe, Swift Charts SLA/FinOps scrubbers, Customer Stack blueprints, and CoreSpotlight. It embeds <code>mobile_catalog.json</code> directly inside the app bundle for instant 0ms offline launch and delta-syncs via ETag/Gzip against <code>/api/mobile-catalog</code> when online.</li>
       </ul>
 
-      <p><strong>Q: How often is the data refreshed, and how are API quota issues prevented?</strong></p>
-      <ul>
-        <li>By default, the dataset is refreshed <strong>once per day (24-hour TTL = 86,400 seconds)</strong>.</li>
-        <li>All UI interactions, searches, AI model checks, region comparisons, and CLI queries read from the local cache (<code>data/cache/gcp_catalog.json</code>) and pre-rendered static HTML files in <code>dist/</code>—making <strong>zero external API calls</strong> during normal usage.</li>
-        <li>When the daily harvest runs, <code>ResilientFetcher</code> enforces a token-bucket rate limit, checkpoints every individual API specification to disk, and automatically retries any <code>429</code> / <code>403</code> / <code>5xx</code> responses using exponential backoff with full jitter.</li>
-      </ul>
-
-      <p><strong>Q: How do I run the application locally?</strong></p>
-      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + REST API + daily auto-refresh thread)
+      <p><strong>Q: How do I run the Web App and CLI locally?</strong></p>
+      <pre style="background:var(--bg-subtle);border:1px solid var(--border-color);padding:14px;border-radius:8px;overflow-x:auto;font-family:ui-monospace,monospace;font-size:12.5px;"># 1. Start the local web server (serves dist/ + ETag/Gzip REST API + daily auto-refresh thread)
 python3 server.py --port 8080
 
-# 2. Or open the static HTML files directly in any browser:
-open dist/index.html
-
-# 3. Query Services, Regions, or AI Models from the terminal using cli.py:
+# 2. Query Services, Regions, AI Models, SLAs, Pricing &amp; Release Notes via cli.py:
 python3 cli.py service "Vertex AI"
-python3 cli.py service alloydb
-python3 cli.py models gemini
+python3 cli.py sla "Cloud Spanner"
+python3 cli.py pricing asia-south1
+python3 cli.py pricing "BigQuery"
+python3 cli.py updates --type FEATURE
 python3 cli.py models claude --region us-east5
-python3 cli.py region us-central1
-python3 cli.py region asia-south1
 python3 cli.py compare us-central1 europe-west1 asia-south1 --diff
 
-# 4. Force an immediate live re-harvest &amp; static site rebuild:
+# 3. Force an immediate live re-harvest &amp; static site rebuild:
 python3 cli.py refresh --force</pre>
     </div>
     """
@@ -2500,7 +3146,7 @@ python3 cli.py refresh --force</pre>
 
 
 def generate_all(catalog: dict[str, Any] | None = None) -> dict[str, Any]:
-    """Generate the entire static site in dist/ from the catalog."""
+    """Generate the entire static site & offline PWA bundle in dist/ from the catalog."""
     if catalog is None:
         if CATALOG_FILE.exists():
             catalog = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
@@ -2509,6 +3155,7 @@ def generate_all(catalog: dict[str, Any] | None = None) -> dict[str, Any]:
 
     DIST_DIR.mkdir(parents=True, exist_ok=True)
     write_shared_assets()
+    write_pwa_offline_assets(catalog)
     generate_index_page(catalog)
     generate_regions_page(catalog)
     generate_models_page(catalog)
@@ -2516,16 +3163,17 @@ def generate_all(catalog: dict[str, Any] | None = None) -> dict[str, Any]:
     generate_region_detail_pages(catalog)
     generate_capabilities_page(catalog)
     generate_pops_page(catalog)
+    generate_pricing_sla_page(catalog)
     generate_whatsnew_page(catalog)
     generate_arch_page(catalog)
     generate_faqs_page(catalog)
 
     total_pages = (
-        8
+        9
         + len(catalog.get("services", []))
         + len(catalog.get("regions", []))
     )
-    print(f"[Generator] Built {total_pages} static HTML pages in {DIST_DIR}")
+    print(f"[Generator] Built {total_pages} static HTML pages + PWA offline bundle in {DIST_DIR}")
     return catalog
 
 
