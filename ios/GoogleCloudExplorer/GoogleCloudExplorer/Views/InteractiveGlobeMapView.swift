@@ -130,19 +130,19 @@ public struct InteractiveGlobeMapView: View {
                         Button("Asia-Pacific & India") { flyTo(lat: 20, lng: 104, distance: 14_500_000) }
                     } label: {
                         Label("Fly To", systemImage: "location.viewfinder")
-                            .font(.system(size: 12.5, weight: .bold, design: .rounded))
-                            .padding(.horizontal, 11)
+                            .font(.system(size: 12.5, weight: .heavy, design: .rounded))
+                            .padding(.horizontal, 12)
                             .padding(.vertical, 7)
-                            .background(Capsule().fill(CloudPalette.blue).foregroundStyle(.white))
+                            .background(Capsule().fill(store.vibeTheme.primaryAccent))
                             .foregroundStyle(.white)
                     }
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
                 .background(
-                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.10), radius: 10, x: 0, y: 4)
+                        .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 4)
                 )
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -161,10 +161,10 @@ public struct InteractiveGlobeMapView: View {
                                     .padding(.vertical, 7)
                                     .background(
                                         Capsule(style: .continuous)
-                                            .fill(selected ? AnyShapeStyle(CloudPalette.blue) : AnyShapeStyle(.ultraThinMaterial))
+                                            .fill(selected ? AnyShapeStyle(store.vibeTheme.primaryAccent) : AnyShapeStyle(.ultraThinMaterial))
                                     )
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(GenZBouncyButtonStyle())
                         }
                     }
                 }

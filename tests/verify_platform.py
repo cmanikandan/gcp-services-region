@@ -8,8 +8,13 @@ End-to-end automated verification suite for Google Cloud Services & Regional Cap
 
 100% Python 3.10+ standard library only.
 """
+import base64
 import gzip
+import hashlib
 import json
+import plistlib
+import re
+import secrets
 import socket
 import subprocess
 import sys
@@ -355,9 +360,96 @@ def verify_live_server() -> None:
             with urllib.request.urlopen(f"{base}{path}", timeout=5.0) as resp:
                 assert resp.status == 200, f"Unexpected status {resp.status} for {path}"
 
+        # Verify Mobile Auth & Cloud Vault lifecycle (/api/auth/*)
+        def http_json(method: str, path: str, body: dict | None = None, headers: dict[str, str] | None = None) -> tuple[int, dict]:
+            req_headers = {"Content-Type": "application/json"}
+            if headers:
+                req_headers.update(headers)
+            data = json.dumps(body).encode("utf-8") if body is not None else None
+            r = urllib.request.Request(f"{base}{path}", data=data, headers=req_headers, method=method)
+            try:
+                with urllib.request.urlopen(r, timeout=5.0) as res:
+                    return res.status, json.loads(res.read().decode("utf-8"))
+            except urllib.error.HTTPError as err:
+                return err.code, json.loads(err.read().decode("utf-8"))
+
+        st_chl, chl = http_json("POST", "/api/auth/challenge", {"provider": "passkey"})
+        assert st_chl == 200 and chl.get("nonce"), f"Challenge failed: {chl}"
+
+        verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode("ascii")
+        challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode("ascii")).digest()).rstrip(b"=").decode("ascii")
+
+        # Tampered PKCE verifier must be rejected with 401
+        st_bad, _ = http_json(
+            "POST",
+            "/api/auth/login",
+            {"provider": "google_pkce", "handle": "e2e.tamper", "code_verifier": "wrong_verifier", "code_challenge": challenge},
+        )
+        assert st_bad == 401, f"Expected 401 for tampered PKCE verifier, got {st_bad}"
+
+        test_handle = f"e2e.genz.{secrets.token_hex(3)}"
+        st_login, session = http_json(
+            "POST",
+            "/api/auth/login",
+            {
+                "provider": "google_pkce",
+                "handle": test_handle,
+                "avatar_emoji": "🔮",
+                "role_vibe": "aiBuilder",
+                "code_verifier": verifier,
+                "code_challenge": challenge,
+            },
+        )
+        assert st_login == 200, f"Login failed: {session}"
+        access_tok = session["tokens"]["access_token"]
+        refresh_tok = session["tokens"]["refresh_token"]
+        assert access_tok.count(".") == 2, "Expected 3-part HS256 JWT access_token"
+
+        st_unauth, _ = http_json("GET", "/api/auth/me")
+        assert st_unauth == 401, "Expected 401 without Bearer token"
+
+        st_me, me_payload = http_json("GET", "/api/auth/me", headers={"Authorization": f"Bearer {access_tok}"})
+        assert st_me == 200 and me_payload["user"]["handle"] == test_handle
+
+        st_sync, synced = http_json(
+            "PUT",
+            "/api/auth/sync",
+            {
+                "bookmarked_services": ["spanner", "vertex-ai", "cloud-run", "alloydb"],
+                "bookmarked_regions": ["us-central1", "asia-south1", "europe-west4"],
+                "customer_stacks": [
+                    {
+                        "id": "E621E1F8-C36C-495A-93FC-0C247A3E6E5F",
+                        "name": "Gen Z AI Stack",
+                        "subtitle": "99.999% Multi-Region",
+                        "serviceSlugs": ["vertex-ai", "spanner"],
+                        "targetRegionIds": ["us-central1", "asia-south1"],
+                        "topologyMode": "Dual-Region Active-Active",
+                    }
+                ],
+                "vibe_theme": "ultravioletPulse",
+            },
+            headers={"Authorization": f"Bearer {access_tok}"},
+        )
+        assert st_sync == 200 and synced["vault"]["vibe_theme"] == "ultravioletPulse"
+        assert synced["user"]["xp_points"] >= 285
+
+        # Refresh token rotation + replay rejection
+        st_ref, rotated = http_json("POST", "/api/auth/refresh", {"refresh_token": refresh_tok})
+        assert st_ref == 200
+        new_access_tok = rotated["tokens"]["access_token"]
+        st_replay, _ = http_json("POST", "/api/auth/refresh", {"refresh_token": refresh_tok})
+        assert st_replay == 401, "Replayed refresh token must be rejected with 401"
+
+        # Permanent account deletion (App Store Guideline 5.1.1v)
+        st_del, _ = http_json("DELETE", "/api/auth/account", headers={"Authorization": f"Bearer {new_access_tok}"})
+        assert st_del == 200
+        st_after_del, _ = http_json("GET", "/api/auth/me", headers={"Authorization": f"Bearer {new_access_tok}"})
+        assert st_after_del == 401
+
         print(
-            f"[OK] Live HTTP server verified on :{port} "
-            f"(Gzip={len(raw_bytes) / 1024:.1f} KB, ETag={etag}, 304 Not Modified, CORS=*)"
+            f"[OK] Live HTTP server + Mobile Auth Vault verified on :{port} "
+            f"(Gzip={len(raw_bytes) / 1024:.1f} KB, ETag={etag}, PKCE S256, HS256 JWT, Refresh Rotation, Vault Sync & Delete)"
         )
     finally:
         proc.terminate()
@@ -365,6 +457,53 @@ def verify_live_server() -> None:
             proc.wait(timeout=3)
         except subprocess.TimeoutExpired:
             proc.kill()
+
+
+def verify_ios_swift_architecture() -> None:
+    ios_app_dir = ROOT / "ios" / "GoogleCloudExplorer" / "GoogleCloudExplorer"
+    required_swift = [
+        ios_app_dir / "GoogleCloudExplorerApp.swift",
+        ios_app_dir / "ContentView.swift",
+        ios_app_dir / "DesignSystem" / "GlassBentoTheme.swift",
+        ios_app_dir / "Auth" / "AuthModels.swift",
+        ios_app_dir / "Auth" / "KeychainVault.swift",
+        ios_app_dir / "Auth" / "AuthManager.swift",
+        ios_app_dir / "Engine" / "CatalogStore.swift",
+        ios_app_dir / "Engine" / "SLACalculator.swift",
+        ios_app_dir / "Models" / "CatalogModels.swift",
+        ios_app_dir / "Views" / "AuthPortalSheetView.swift",
+        ios_app_dir / "Views" / "PulseBentoHomeView.swift",
+        ios_app_dir / "Views" / "InteractiveGlobeMapView.swift",
+        ios_app_dir / "Views" / "NativeCatalogBrowserView.swift",
+        ios_app_dir / "Views" / "PricingSLAStudioView.swift",
+        ios_app_dir / "Views" / "ReleasePulseTimelineView.swift",
+        ios_app_dir / "Views" / "ServiceAndRegionDetailViews.swift",
+    ]
+    for sf in required_swift:
+        assert sf.exists() and sf.stat().st_size > 80, f"Missing Swift source file: {sf}"
+
+    all_swift = list((ROOT / "ios" / "GoogleCloudExplorer").rglob("*.swift"))
+    for sf in all_swift:
+        src = sf.read_text(encoding="utf-8")
+        # Strip multiline strings, single-line strings, and comments before checking balanced braces
+        cleaned = re.sub(r'"""[\s\S]*?"""', '""', src)
+        cleaned = re.sub(r'"(?:\\.|[^"\\])*"', '""', cleaned)
+        cleaned = re.sub(r"//.*", "", cleaned)
+        cleaned = re.sub(r"/\*[\s\S]*?\*/", "", cleaned)
+        assert cleaned.count("{") == cleaned.count("}"), f"Unbalanced braces in {sf}"
+        assert cleaned.count("(") == cleaned.count(")"), f"Unbalanced parens in {sf}"
+        assert not re.search(r'"[^"]*\bGCP\b[^"]*"', src), f"Forbidden 'GCP' branding in string literal in {sf}"
+
+    # Verify Apple Privacy Manifest & Info.plist are valid plists
+    privacy_plist = plistlib.loads((ios_app_dir / "PrivacyInfo.xcprivacy").read_bytes())
+    assert privacy_plist["NSPrivacyTracking"] is False
+    info_plist = plistlib.loads((ROOT / "ios" / "GoogleCloudExplorer" / "Config" / "Info.plist").read_bytes())
+    assert info_plist["ITSAppUsesNonExemptEncryption"] is False
+
+    print(
+        f"[OK] Native SwiftUI Gen Z iOS & Auth architecture verified across {len(all_swift)} Swift files "
+        "(balanced syntax, zero 'GCP' branding, valid PrivacyInfo.xcprivacy & Info.plist)"
+    )
 
 
 def verify_cli() -> None:
@@ -389,6 +528,7 @@ def verify_cli() -> None:
 if __name__ == "__main__":
     verify_catalogs_and_swift_codable_schema()
     verify_pwa_files()
+    verify_ios_swift_architecture()
     verify_live_server()
     verify_cli()
     print("\nALL PLATFORM VERIFICATION CHECKS PASSED.")

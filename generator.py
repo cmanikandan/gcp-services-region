@@ -849,10 +849,11 @@ def write_pwa_offline_assets(catalog: dict[str, Any]) -> None:
     data_dir.mkdir(parents=True, exist_ok=True)
 
     mobile_payload = build_mobile_catalog(catalog)
-    (data_dir / "mobile_catalog.json").write_text(
-        json.dumps(mobile_payload, separators=(",", ":")),
-        encoding="utf-8",
-    )
+    mobile_json = json.dumps(mobile_payload, separators=(",", ":"))
+    (data_dir / "mobile_catalog.json").write_text(mobile_json, encoding="utf-8")
+    ios_resources_dir = DIST_DIR.parent / "ios" / "GoogleCloudExplorer" / "GoogleCloudExplorer" / "Resources"
+    if ios_resources_dir.is_dir():
+        (ios_resources_dir / "mobile_catalog.json").write_text(mobile_json, encoding="utf-8")
 
     icon_svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <rect width="128" height="128" rx="28" fill="#0b0f19"/>

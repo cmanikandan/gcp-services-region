@@ -1,10 +1,12 @@
 import SwiftUI
 import Charts
 
-// MARK: - Tab 4: Interactive SLA Architecture & Regional FinOps Studio
+// MARK: - Tab 4: Interactive Gen Z SLA Architecture & Regional FinOps Studio
 
 public struct PricingSLAStudioView: View {
     @Bindable var store: CatalogStore
+    @Bindable var auth: AuthManager
+    public var onOpenAuthPortal: () -> Void
 
     @State private var selectedSlugs: [String] = [
         "cloud-load-balancing",
@@ -13,15 +15,21 @@ public struct PricingSLAStudioView: View {
     ]
     @State private var topologyMode: StackTopologyMode = .dualActiveActive
     @State private var showingAddServicePicker = false
+    @State private var savedStackBanner = false
 
     @State private var baselineMonthlySpend: Double = 15_000
     @State private var commitment: CommitmentTier = .cud1Year
     @State private var primaryRegionId: String = "us-central1"
     @State private var secondaryRegionId: String = "asia-south1"
-    @State private var renderedShareImage: Image?
 
-    public init(store: CatalogStore) {
+    public init(
+        store: CatalogStore,
+        auth: AuthManager,
+        onOpenAuthPortal: @escaping () -> Void = {}
+    ) {
         self.store = store
+        self.auth = auth
+        self.onOpenAuthPortal = onOpenAuthPortal
     }
 
     private var selectedServices: [CloudService] {
@@ -68,6 +76,7 @@ public struct PricingSLAStudioView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     compositeSLASimulatorCard
                     regionalFinOpsScrubberCard
+                    stackWrappedPreviewSection
                     regionalBenchmarkChartCard
                     UnofficialDisclaimerRow(syncState: store.syncState)
                 }
@@ -77,6 +86,15 @@ public struct PricingSLAStudioView: View {
             .background(CloudPalette.canvasBackground)
             .navigationTitle("SLA & FinOps Studio")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    AuthToolbarPillButton(
+                        handle: auth.currentUser?.handle,
+                        avatarEmoji: auth.currentUser?.avatarEmoji ?? "⚡",
+                        isSynced: auth.isVaultSyncedLive,
+                        accent: store.vibeTheme.primaryAccent,
+                        action: onOpenAuthPortal
+                    )
+                }
                 ToolbarItem(placement: .primaryAction) {
                     ShareLink(
                         item: shareSummaryText,
@@ -104,8 +122,9 @@ public struct PricingSLAStudioView: View {
         } else {
             costLine = ""
         }
+        let author = auth.currentUser.map { " • Built by @\($0.handle)" } ?? ""
         return """
-        Google Cloud Architecture SLA & FinOps Brief (Unofficial Tool)
+        Google Cloud Stack Wrapped ⚡ (Unofficial Tool\(author))
         • Topology: \(topologyMode.rawValue)
         • Composite Workload SLA: \(slaResult.formattedUptime) (Max downtime: \(slaResult.formattedMonthlyDowntime)/mo)
         • Critical Path: \(names)
@@ -119,15 +138,15 @@ public struct PricingSLAStudioView: View {
         BentoCard(accent: CloudPalette.emerald) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Label("Composite Workload SLA Simulator", systemImage: "shield.lefthalf.filled.badge.checkmark")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                    Label("Composite SLA Simulator", systemImage: "shield.lefthalf.filled.badge.checkmark")
+                        .font(.system(size: 16, weight: .heavy, design: .rounded))
                         .foregroundStyle(CloudPalette.emerald)
                     Spacer()
                     Button {
                         showingAddServicePicker = true
                     } label: {
                         Label("Edit Stack", systemImage: "plus.circle.fill")
-                            .font(.system(size: 12.5, weight: .bold))
+                            .font(.system(size: 12.5, weight: .bold, design: .rounded))
                     }
                 }
 
@@ -143,17 +162,17 @@ public struct PricingSLAStudioView: View {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("COMPOSITE SLA")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 10, weight: .heavy))
                             .foregroundStyle(.secondary)
                         Text(slaResult.formattedUptime)
-                            .font(.system(size: 34, weight: .heavy, design: .rounded))
+                            .font(.system(size: 34, weight: .black, design: .rounded))
                             .foregroundStyle(CloudPalette.emerald)
                             .contentTransition(.numericText())
                     }
                     Divider().frame(height: 44)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("MONTHLY BUDGET")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 10, weight: .heavy))
                             .foregroundStyle(.secondary)
                         Text(slaResult.formattedMonthlyDowntime)
                             .font(.system(size: 20, weight: .bold, design: .monospaced))
@@ -166,8 +185,8 @@ public struct PricingSLAStudioView: View {
                 }
                 .padding(14)
                 .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(CloudPalette.emerald.opacity(0.09))
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .fill(CloudPalette.emerald.opacity(0.10))
                 )
 
                 Text(topologyMode.formulaCaption)
@@ -182,7 +201,7 @@ public struct PricingSLAStudioView: View {
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundStyle(.secondary)
                             Text(svc.name)
-                                .font(.system(size: 13.5, weight: .semibold))
+                                .font(.system(size: 13.5, weight: .semibold, design: .rounded))
                             if slaResult.weakestServiceName == svc.name && selectedServices.count > 1 {
                                 SemanticPill("Bottleneck", tint: CloudPalette.amber)
                             }
@@ -210,6 +229,51 @@ public struct PricingSLAStudioView: View {
                         )
                     }
                 }
+
+                // Save Custom Stack to Cloud Vault Button
+                Button {
+                    saveCurrentStackToVault()
+                } label: {
+                    HStack {
+                        Image(systemName: savedStackBanner ? "checkmark.seal.fill" : "icloud.and.arrow.up.fill")
+                        Text(savedStackBanner ? "Saved to Cloud Vault ✓ (+65 XP)" : "Save Stack to Cloud Vault ⚡")
+                            .font(.system(size: 13.5, weight: .heavy, design: .rounded))
+                        Spacer()
+                        Text(auth.currentUser != nil ? "@\(auth.currentUser!.handle)" : "Local + Sync")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .opacity(0.85)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 11)
+                    .background(
+                        RoundedRectangle(cornerRadius: 15, style: .continuous)
+                            .fill(savedStackBanner ? CloudPalette.emerald : store.vibeTheme.primaryAccent)
+                    )
+                }
+                .buttonStyle(GenZBouncyButtonStyle())
+                .sensoryFeedback(.success, trigger: savedStackBanner)
+            }
+        }
+    }
+
+    private func saveCurrentStackToVault() {
+        let topNames = selectedServices.prefix(3).map(\.name).joined(separator: " + ")
+        let newStack = CustomerStack(
+            name: "\(topologyMode.shortLabel) • \(primaryRegionId)",
+            subtitle: "\(slaResult.formattedUptime) Composite • \(topNames)",
+            serviceSlugs: selectedSlugs,
+            targetRegionIds: Array(Set([primaryRegionId, secondaryRegionId])).sorted(),
+            topologyMode: topologyMode
+        )
+        store.addCustomerStack(newStack)
+        withAnimation(.snappy) {
+            savedStackBanner = true
+        }
+        Task {
+            try? await Task.sleep(for: .seconds(2.2))
+            withAnimation(.snappy) {
+                savedStackBanner = false
             }
         }
     }
@@ -217,25 +281,25 @@ public struct PricingSLAStudioView: View {
     // MARK: - 2. Regional FinOps Cost & CUD Scrubber
 
     private var regionalFinOpsScrubberCard: some View {
-        BentoCard(accent: CloudPalette.blue) {
+        BentoCard(accent: store.vibeTheme.primaryAccent) {
             VStack(alignment: .leading, spacing: 14) {
-                Label("Regional FinOps Spend & CUD Scrubber", systemImage: "slider.horizontal.below.square.and.square.filled")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundStyle(CloudPalette.blue)
+                Label("Regional FinOps & CUD Scrubber", systemImage: "slider.horizontal.below.square.and.square.filled")
+                    .font(.system(size: 16, weight: .heavy, design: .rounded))
+                    .foregroundStyle(store.vibeTheme.primaryAccent)
 
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text("BASELINE WORKLOAD SPEND")
-                            .font(.system(size: 10.5, weight: .bold))
+                            .font(.system(size: 10.5, weight: .heavy))
                             .foregroundStyle(.secondary)
                         Spacer()
                         Text("\(formatUSD(baselineMonthlySpend)) / mo")
-                            .font(.system(size: 16, weight: .heavy, design: .monospaced))
-                            .foregroundStyle(CloudPalette.blue)
+                            .font(.system(size: 17, weight: .black, design: .monospaced))
+                            .foregroundStyle(store.vibeTheme.primaryAccent)
                             .contentTransition(.numericText())
                     }
                     Slider(value: $baselineMonthlySpend, in: 1_000...200_000, step: 1_000)
-                        .tint(CloudPalette.blue)
+                        .tint(store.vibeTheme.primaryAccent)
                 }
 
                 Picker("Commitment Tier", selection: $commitment.animation(.snappy)) {
@@ -280,7 +344,7 @@ public struct PricingSLAStudioView: View {
                             label: r1.regionId,
                             value: formatUSD(cmp.primaryMonthlyUSD),
                             sub: String(format: "%.2fx Compute", r1.pricing.relativeComputeIndex),
-                            tint: CloudPalette.blue
+                            tint: store.vibeTheme.primaryAccent
                         )
                         finOpsMetricBox(
                             label: r2.regionId,
@@ -307,7 +371,7 @@ public struct PricingSLAStudioView: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             Text(value)
-                .font(.system(size: 16, weight: .heavy, design: .rounded))
+                .font(.system(size: 16, weight: .black, design: .rounded))
                 .foregroundStyle(tint)
                 .contentTransition(.numericText())
                 .minimumScaleFactor(0.75)
@@ -325,17 +389,40 @@ public struct PricingSLAStudioView: View {
         )
     }
 
-    // MARK: - 3. Swift Charts Regional Multiplier Benchmark
+    // MARK: - 3. Live "Google Cloud Stack Wrapped" Card Preview
+
+    private var stackWrappedPreviewSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("SHAREABLE STACK WRAPPED CARD ✨")
+                .font(.system(size: 11, weight: .black, design: .rounded))
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                ArchitectureShareCardView(
+                    title: "\(topologyMode.shortLabel) Production Stack",
+                    topology: topologyMode,
+                    slaResult: slaResult,
+                    serviceNames: selectedServices.map(\.name),
+                    primaryRegion: primaryRegionId,
+                    monthlySpendText: "\(formatUSD(costComparison?.primaryMonthlyUSD ?? baselineMonthlySpend))/mo",
+                    vibeTheme: store.vibeTheme,
+                    builderHandle: auth.currentUser?.handle
+                )
+            }
+        }
+    }
+
+    // MARK: - 4. Swift Charts Regional Multiplier Benchmark
 
     private var regionalBenchmarkChartCard: some View {
         BentoCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Label("Global Region Spend Benchmark", systemImage: "chart.bar.fill")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                        .font(.system(size: 15, weight: .heavy, design: .rounded))
                     Spacer()
                     Text("🌱 = Low CO₂")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(CloudPalette.emerald)
                 }
 
@@ -348,7 +435,7 @@ public struct PricingSLAStudioView: View {
                     .cornerRadius(6)
                     .foregroundStyle(
                         reg.regionId == primaryRegionId
-                            ? CloudPalette.blue.gradient
+                            ? store.vibeTheme.primaryAccent.gradient
                             : (reg.regionId == secondaryRegionId ? CloudPalette.amber.gradient : CloudPalette.emerald.opacity(0.65).gradient)
                     )
                     .annotation(position: .trailing) {
@@ -402,7 +489,7 @@ private struct AddStackServiceSheet: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(svc.name)
-                                .font(.system(size: 14.5, weight: .semibold))
+                                .font(.system(size: 14.5, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.primary)
                             Text("\(svc.category) • Max \(svc.sla.maxMonthlyDowntime)")
                                 .font(.system(size: 11.5))

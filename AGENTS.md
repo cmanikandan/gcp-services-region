@@ -54,13 +54,14 @@ gcp-services-region/
 ├── harvester.py               # Quota-resilient multi-source Google Cloud & Vertex AI data harvester
 ├── enrichment.py              # SLA, Regional FinOps pricing, Release Notes XML & mobile_catalog.json builder
 ├── generator.py               # Static HTML5, CSS3 & PWA generator (builds 205 pages + sw.js in dist/)
-├── server.py                  # Local HTTP server + ETag/Gzip/CORS JSON REST API + 24h auto-refresh daemon
+├── mobile_auth.py             # Zero-dependency HS256 JWT, PKCE S256, Passkey nonce & Cloud Vault sync engine
+├── server.py                  # Local HTTP server + ETag/Gzip/CORS JSON REST API + Mobile Auth + 24h daemon
 ├── cli.py                     # Terminal CLI for services, regions, AI models, SLAs, FinOps & release notes
 ├── tests/
-│   └── verify_platform.py     # Zero-dependency E2E verification suite (Swift Codable parity, PWA, HTTP, CLI)
+│   └── verify_platform.py     # Zero-dependency E2E verification suite (Swift Codable parity, Auth, PWA, HTTP, CLI)
 ├── ios/
 │   ├── scripts/               # sync_bundled_catalog.py & generate_app_icon.py (100% Python stdlib)
-│   └── GoogleCloudExplorer/   # Universal Native SwiftUI iOS/iPadOS 17+ App (no SwiftPM Package.swift)
+│   └── GoogleCloudExplorer/   # Gen Z Neo-Bento Native SwiftUI iOS/iPadOS 17+ App + Keychain/Passkey/PKCE Auth
 ├── docs/
 │   └── screenshots/           # High-resolution PNG screenshots embedded in README.md
 ├── data/
@@ -107,6 +108,8 @@ python3 server.py --port 8080
 - **JSON REST Endpoints served by `server.py`** (supports `Accept-Encoding: gzip`, `ETag` / `If-None-Match` -> `304 Not Modified`, and `CORS`):
   - `GET /api/status` — Cache metadata, snapshot timestamp, and entity counts
   - `GET /api/mobile-catalog` — Compact mobile sync payload (`~39.8 KB` gzipped) for iOS/iPadOS & PWA offline sync
+  - `POST /api/auth/challenge` & `POST /api/auth/login` — Passwordless mobile sign-in (Passkey, Apple OIDC, Google PKCE `S256`) returning `HS256` JWT + rotating refresh token
+  - `POST /api/auth/refresh`, `GET /api/auth/me`, `PUT /api/auth/sync`, `POST /api/auth/logout`, `DELETE /api/auth/account` — Mobile Cloud Vault sync & App Store Guideline 5.1.1(v) account deletion
   - `GET /api/pricing-sla` — Service SLAs, downtime budgets, credit schedules & 43-region FinOps multipliers
   - `GET /api/updates` — Official Google Cloud Release Notes + daily regional snapshot diffs
   - `GET /api/services?q=&category=&region=` — Filterable services JSON

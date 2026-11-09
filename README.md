@@ -24,8 +24,8 @@ A fast, zero-dependency **Offline-Ready Web PWA (`dist/`)**, **Universal Native 
 
 1. **Offline-Ready Analytical Web PWA (`dist/`)**:
    - Installable Progressive Web App (`manifest.webmanifest` + `sw.js` Service Worker caching) with full mobile-responsive layouts, Dark/Light themes, 4-region side-by-side comparison matrices, and the **Pricing & SLA Architecture Hub (`dist/pricing-sla.html`)** featuring an interactive Composite Workload SLA Calculator and 43-Region FinOps Cost & CUD Estimator.
-2. **Modern Universal Native SwiftUI iOS & iPadOS App (`ios/GoogleCloudExplorer/`)**:
-   - Purpose-built iOS 17+ native SwiftUI app (`iPhone` 5-tab `TabView` + `iPad` `NavigationSplitView`) with **zero-latency offline startup** (`540.9 KB` bundled `mobile_catalog.json` + `~39.8 KB` ETag/Gzip delta sync), Bento telemetry cards, `Swift Charts` Donut/Bar analytics, a 3D realistic `MapKit` globe with multi-detent frosted-glass inspector sheets, tactile SLA/FinOps scrubbers, `CoreSpotlight` indexing, and `ShareLink` architecture brief cards. See [`ios/GoogleCloudExplorer/README.md`](ios/GoogleCloudExplorer/README.md).
+2. **Modern Gen Z "Neo-Bento Aura" SwiftUI iOS & iPadOS App (`ios/GoogleCloudExplorer/`)**:
+   - Purpose-built iOS 17+ native SwiftUI app (`iPhone` 5-tab `TabView` + `iPad` `NavigationSplitView`) featuring **4 customizable Gen Z Vibe Themes** (`Cyber Matcha 🍵`, `Ultraviolet 🔮`, `Y2K Chrome 💿`, `Sunset Vapor 🌅`), **passwordless Mobile Auth & Cloud Vault Sync** (`CryptoKit` P-256 Passkeys, Sign in with Apple OIDC, Google OAuth 2.0 PKCE `S256`, iOS Keychain storage, Face ID `LocalAuthentication` lock, and zero-gate `Ghost Mode 👻`), **zero-latency offline startup** (`540.9 KB` bundled `mobile_catalog.json` + `~39.8 KB` ETag/Gzip delta sync), 3D realistic `MapKit` globe, tactile SLA/FinOps scrubbers, and `"Google Cloud Stack Wrapped ⚡"` shareable story cards. See [`ios/GoogleCloudExplorer/README.md`](ios/GoogleCloudExplorer/README.md).
 
 ---
 

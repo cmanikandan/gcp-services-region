@@ -90,15 +90,15 @@ public struct ReleasePulseTimelineView: View {
                                             selectedType = rt
                                         } label: {
                                             Text(rt)
-                                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                                .font(.system(size: 12, weight: .bold, design: .rounded))
                                                 .foregroundStyle(active ? .white : .primary)
                                                 .padding(.horizontal, 11)
-                                                .padding(.vertical, 6)
+                                                .padding(.vertical, 6.5)
                                                 .background(
-                                                    Capsule().fill(active ? CloudPalette.blue : CloudPalette.cardBackground)
+                                                    Capsule().fill(active ? store.vibeTheme.primaryAccent : CloudPalette.cardBackground)
                                                 )
                                         }
-                                        .buttonStyle(.plain)
+                                        .buttonStyle(GenZBouncyButtonStyle())
                                     }
                                 }
                             }

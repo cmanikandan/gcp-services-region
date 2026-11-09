@@ -24,10 +24,12 @@ from urllib.parse import parse_qs, urlparse
 from enrichment import build_mobile_catalog
 from generator import DIST_DIR, generate_all
 from harvester import CATALOG_FILE, DEFAULT_TTL_SECONDS, harvest_all
+from mobile_auth import AuthError, MobileAuthVaultService
 
 _CATALOG_LOCK = threading.Lock()
 _CACHED_CATALOG: dict[str, Any] | None = None
 _CACHED_MOBILE_CATALOG: dict[str, Any] | None = None
+_MOBILE_AUTH = MobileAuthVaultService()
 
 
 def get_catalog(force_refresh: bool = False) -> dict[str, Any]:
@@ -70,7 +72,38 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type, If-None-Match")
         super().end_headers()
+
+    def _read_json_body(self) -> dict[str, Any]:
+        length = int(self.headers.get("Content-Length", "0") or 0)
+        if length <= 0:
+            return {}
+        if length > 1_048_576:
+            raise AuthError("Request payload too large", status=413)
+        raw = self.rfile.read(length)
+        if not raw:
+            return {}
+        try:
+            parsed = json.loads(raw.decode("utf-8"))
+            return parsed if isinstance(parsed, dict) else {}
+        except Exception as exc:
+            raise AuthError("Invalid JSON request body", status=400) from exc
+
+    def _extract_bearer_token(self) -> str:
+        header = (self.headers.get("Authorization") or "").strip()
+        if not header.lower().startswith("bearer "):
+            raise AuthError("Missing Authorization: Bearer <token> header", status=401)
+        token = header[7:].strip()
+        if not token:
+            raise AuthError("Empty Bearer token", status=401)
+        return token
+
+    def do_OPTIONS(self) -> None:
+        self.send_response(204)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def _send_json(self, payload: Any, status: int = 200, etag: str | None = None, compact: bool = False) -> None:
         raw = (
@@ -97,6 +130,14 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         qs = parse_qs(parsed.query)
+
+        if path == "/api/auth/me":
+            try:
+                token = self._extract_bearer_token()
+                self._send_json(_MOBILE_AUTH.get_me(token))
+            except AuthError as err:
+                self._send_json({"error": err.message}, status=err.status)
+            return
 
         if path == "/api/status":
             cat = get_catalog()
@@ -250,9 +291,49 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self) -> None:
-        if self.path == "/api/refresh":
+        path = urlparse(self.path).path
+        if path == "/api/refresh":
             cat = get_catalog(force_refresh=True)
             self._send_json({"status": "refreshed", "meta": cat.get("meta", {})})
+            return
+
+        if path in ("/api/auth/challenge", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout"):
+            try:
+                body = self._read_json_body()
+                if path == "/api/auth/challenge":
+                    self._send_json(_MOBILE_AUTH.issue_challenge(str(body.get("provider", "passkey"))))
+                elif path == "/api/auth/login":
+                    self._send_json(_MOBILE_AUTH.login_or_register(body))
+                elif path == "/api/auth/refresh":
+                    self._send_json(_MOBILE_AUTH.refresh_session(str(body.get("refresh_token", ""))))
+                elif path == "/api/auth/logout":
+                    self._send_json(_MOBILE_AUTH.logout(body.get("refresh_token")))
+            except AuthError as err:
+                self._send_json({"error": err.message}, status=err.status)
+            return
+
+        self._send_json({"error": "Not Found"}, status=404)
+
+    def do_PUT(self) -> None:
+        path = urlparse(self.path).path
+        if path == "/api/auth/sync":
+            try:
+                token = self._extract_bearer_token()
+                body = self._read_json_body()
+                self._send_json(_MOBILE_AUTH.sync_vault(token, body))
+            except AuthError as err:
+                self._send_json({"error": err.message}, status=err.status)
+            return
+        self._send_json({"error": "Not Found"}, status=404)
+
+    def do_DELETE(self) -> None:
+        path = urlparse(self.path).path
+        if path == "/api/auth/account":
+            try:
+                token = self._extract_bearer_token()
+                self._send_json(_MOBILE_AUTH.delete_account(token))
+            except AuthError as err:
+                self._send_json({"error": err.message}, status=err.status)
             return
         self._send_json({"error": "Not Found"}, status=404)
 

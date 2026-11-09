@@ -1,19 +1,29 @@
 import SwiftUI
 import Charts
 
-// MARK: - Tab 1: Pulse Bento Intelligence Hub
+// MARK: - Tab 1: Gen Z Pulse Neo-Bento Intelligence Hub
 
 public struct PulseBentoHomeView: View {
     @Bindable var store: CatalogStore
+    @Bindable var auth: AuthManager
     @Binding var selectedTab: ExplorerSection
+    public var onOpenAuthPortal: () -> Void
+
     @State private var omniQuery: String = ""
     @State private var selectedRegionSheet: CloudRegion?
     @State private var selectedStackSheet: CustomerStack?
     @State private var showingSyncSheet = false
 
-    public init(store: CatalogStore, selectedTab: Binding<ExplorerSection>) {
+    public init(
+        store: CatalogStore,
+        auth: AuthManager,
+        selectedTab: Binding<ExplorerSection>,
+        onOpenAuthPortal: @escaping () -> Void = {}
+    ) {
         self.store = store
+        self.auth = auth
         self._selectedTab = selectedTab
+        self.onOpenAuthPortal = onOpenAuthPortal
     }
 
     private struct SLABucket: Identifiable {
@@ -34,7 +44,7 @@ public struct PulseBentoHomeView: View {
         }
         return [
             SLABucket(label: "≥99.999%", count: max(1, five9), tint: CloudPalette.emerald),
-            SLABucket(label: "99.99%", count: max(1, four9), tint: CloudPalette.blue),
+            SLABucket(label: "99.99%", count: max(1, four9), tint: store.vibeTheme.primaryAccent),
             SLABucket(label: "99.95%", count: max(1, three5), tint: CloudPalette.violet),
             SLABucket(label: "99.9%", count: max(1, three9), tint: CloudPalette.cyan)
         ]
@@ -57,10 +67,18 @@ public struct PulseBentoHomeView: View {
         }
         return [
             CostTierBucket(tier: "1.00x Base", count: t1, tint: CloudPalette.emerald),
-            CostTierBucket(tier: "1.04–1.15x", count: t2, tint: CloudPalette.blue),
+            CostTierBucket(tier: "1.04–1.15x", count: t2, tint: store.vibeTheme.primaryAccent),
             CostTierBucket(tier: "1.16x+ Prem", count: t3, tint: CloudPalette.amber)
         ]
     }
+
+    private let quickPromptChips: [(label: String, query: String)] = [
+        ("🔥 99.999% Club", "99.999%"),
+        ("🤖 Claude & Gemini", "Claude"),
+        ("💸 Mumbai Cost", "asia-south1"),
+        ("⚡ H100 GPUs", "H100"),
+        ("🛡️ Spanner SLA", "Spanner SLA")
+    ]
 
     public var body: some View {
         NavigationStack {
@@ -71,6 +89,7 @@ public struct PulseBentoHomeView: View {
                     if !omniQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         omniSearchResultsSection
                     } else {
+                        builderPassportStripCard
                         bentoTelemetryGrid
                         swiftChartsRow
                         customerStacksSection
@@ -91,15 +110,55 @@ public struct PulseBentoHomeView: View {
             #endif
             .refreshable {
                 await store.refreshFromServer(silent: false)
+                await auth.syncVaultIfAuthenticated(with: store)
             }
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingSyncSheet = true
+                ToolbarItem(placement: .topBarLeading) {
+                    Menu {
+                        ForEach(VibeTheme.allCases) { theme in
+                            Button {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                    store.vibeTheme = theme
+                                }
+                            } label: {
+                                Label(
+                                    "\(theme.emoji) \(theme.displayName)",
+                                    systemImage: store.vibeTheme == theme ? "checkmark.circle.fill" : "circle"
+                                )
+                            }
+                        }
                     } label: {
-                        Image(systemName: "icloud.and.arrow.down")
+                        HStack(spacing: 4) {
+                            Text(store.vibeTheme.emoji)
+                                .font(.system(size: 14))
+                            Text("Vibe")
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                        }
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(CloudPalette.cardBackground))
                     }
-                    .accessibilityLabel("Offline Sync & Settings")
+                    .accessibilityLabel("Switch Gen Z Vibe Theme")
+                }
+
+                ToolbarItem(placement: .primaryAction) {
+                    HStack(spacing: 8) {
+                        AuthToolbarPillButton(
+                            handle: auth.currentUser?.handle,
+                            avatarEmoji: auth.currentUser?.avatarEmoji ?? "⚡",
+                            isSynced: auth.isVaultSyncedLive,
+                            accent: store.vibeTheme.primaryAccent,
+                            action: onOpenAuthPortal
+                        )
+
+                        Button {
+                            showingSyncSheet = true
+                        } label: {
+                            Image(systemName: "icloud.and.arrow.down")
+                                .font(.system(size: 14, weight: .bold))
+                        }
+                        .accessibilityLabel("Offline Sync & Settings")
+                    }
                 }
             }
             .sheet(item: $selectedRegionSheet) { reg in
@@ -118,96 +177,150 @@ public struct PulseBentoHomeView: View {
         }
     }
 
-    // MARK: - Sapphire Hero Header + Instant Omni-Search
+    // MARK: - Gen Z Neo-Bento Aura Hero + Instant Omni-Search
 
     private var heroHeaderCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
-                        Image(systemName: "cloud.fill")
-                            .foregroundStyle(.cyan)
-                        Text("GOOGLE CLOUD INTELLIGENCE")
-                            .font(.system(size: 11, weight: .heavy, design: .rounded))
-                            .tracking(0.8)
-                            .foregroundStyle(.white.opacity(0.82))
+                        StickerBadge("\(store.vibeTheme.emoji) ZERO-LATENCY OFFLINE", background: CloudPalette.acidLime, foreground: .black)
+                        Text("Unofficial")
+                            .font(.system(size: 10.5, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.88))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3.5)
+                            .background(Capsule().fill(.white.opacity(0.15)))
                     }
-                    Text("Architecture, SLAs & Regional FinOps")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                    Text("Google Cloud Regions, SLAs & AI Vibe Check")
+                        .font(.system(size: 22, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
+                        .padding(.top, 2)
                 }
                 Spacer()
-                Text("Unofficial")
-                    .font(.system(size: 10.5, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.9))
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(.white.opacity(0.16)))
             }
 
-            // Frosted Omni-Search Bar
+            // Frosted Aura Omni-Search Bar
             HStack(spacing: 10) {
                 Image(systemName: "sparkle.magnifyingglass")
-                    .foregroundStyle(.white.opacity(0.85))
-                TextField("Ask: 'Spanner SLA', 'Mumbai cost', 'Claude', 'H100'…", text: $omniQuery)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(CloudPalette.acidLime)
+                TextField("Drop a query: 'Spanner SLA', 'Mumbai', 'Claude', 'H100'…", text: $omniQuery)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                    .tint(.cyan)
+                    .tint(CloudPalette.acidLime)
                 if !omniQuery.isEmpty {
                     Button {
                         omniQuery = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.white.opacity(0.75))
+                            .foregroundStyle(.white.opacity(0.78))
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 13)
-            .padding(.vertical, 11)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 15, style: .continuous)
-                    .fill(.white.opacity(0.15))
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.white.opacity(0.14))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 15, style: .continuous)
-                            .strokeBorder(.white.opacity(0.22), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .strokeBorder(.white.opacity(0.26), lineWidth: 1.1)
                     )
             )
 
-            // Quick Prompt Chips
+            // Trending Vibe Chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(["Spanner SLA", "asia-south1", "Vertex AI", "99.999%", "Claude"], id: \.self) { chip in
+                    ForEach(quickPromptChips, id: \.label) { chip in
                         Button {
-                            omniQuery = chip
+                            omniQuery = chip.query
                         } label: {
-                            Text(chip)
-                                .font(.system(size: 11.5, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.92))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(Capsule().fill(.white.opacity(0.13)))
+                            Text(chip.label)
+                                .font(.system(size: 11.5, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.95))
+                                .padding(.horizontal, 11)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule(style: .continuous)
+                                        .fill(.white.opacity(0.15))
+                                        .overlay(Capsule().strokeBorder(.white.opacity(0.2), lineWidth: 0.8))
+                                )
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(GenZBouncyButtonStyle())
                     }
                 }
             }
         }
-        .padding(18)
+        .padding(20)
         .background(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color(red: 0.08, green: 0.25, blue: 0.62),
-                            Color(red: 0.04, green: 0.12, blue: 0.30)
-                        ],
+                        colors: store.vibeTheme.heroGradientColors,
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .shadow(color: CloudPalette.blue.opacity(0.24), radius: 14, x: 0, y: 6)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 30, style: .continuous)
+                        .strokeBorder(.white.opacity(0.20), lineWidth: 1.2)
+                )
+                .shadow(color: store.vibeTheme.primaryAccent.opacity(0.26), radius: 16, x: 0, y: 8)
         )
+    }
+
+    // MARK: - Interactive Builder Passport / Ghost Mode Banner
+
+    private var builderPassportStripCard: some View {
+        Button(action: onOpenAuthPortal) {
+            BentoCard(accent: store.vibeTheme.primaryAccent, padding: 14) {
+                HStack(spacing: 12) {
+                    Text(auth.currentUser?.avatarEmoji ?? "🪪")
+                        .font(.system(size: 24))
+                        .frame(width: 44, height: 44)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(store.vibeTheme.primaryAccent.opacity(0.16))
+                        )
+
+                    if let profile = auth.currentUser {
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 6) {
+                                Text("@\(profile.handle)")
+                                    .font(.system(size: 15, weight: .black, design: .rounded))
+                                    .foregroundStyle(.primary)
+                                SemanticPill("\(profile.xpPoints) XP", tint: store.vibeTheme.primaryAccent)
+                            }
+                            Text("\(profile.builderLevel) • \(store.bookmarkedServiceSlugs.count) Svcs & \(store.customerStacks.count) Stacks in Vault")
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
+                    } else {
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack(spacing: 6) {
+                                Text("Ghost Mode Active 👻")
+                                    .font(.system(size: 14.5, weight: .black, design: .rounded))
+                                    .foregroundStyle(.primary)
+                                SemanticPill("Passkey / PKCE", tint: store.vibeTheme.primaryAccent)
+                            }
+                            Text("Tap to claim your @handle & sync Google Cloud SLA stacks with Apple, Google PKCE, or Passkey.")
+                                .font(.system(size: 11.5))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                        }
+                    }
+
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(GenZBouncyButtonStyle())
     }
 
     // MARK: - Live Omni-Search Answer Cards
@@ -217,16 +330,16 @@ public struct PulseBentoHomeView: View {
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text("INSTANT OFFLINE ANSWERS (\(hits.count))")
-                    .font(.system(size: 11.5, weight: .bold))
+                    .font(.system(size: 11.5, weight: .black, design: .rounded))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Clear") { omniQuery = "" }
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
             }
 
             if hits.isEmpty {
                 BentoCard {
-                    Text("No services, regions, AI models, or release notes matched '\(omniQuery)'.")
+                    Text("No Google Cloud services, regions, AI models, or release notes matched '\(omniQuery)'.")
                         .font(.system(size: 13.5))
                         .foregroundStyle(.secondary)
                 }
@@ -238,7 +351,7 @@ public struct PulseBentoHomeView: View {
                             NavigationLink {
                                 ServiceDetailNativeView(store: store, service: svc)
                             } label: {
-                                omniHitRow(hit: hit, icon: "cube.transparent.fill", tint: CloudPalette.blue)
+                                omniHitRow(hit: hit, icon: "cube.transparent.fill", tint: store.vibeTheme.primaryAccent)
                             }
                             .buttonStyle(.plain)
                         }
@@ -255,7 +368,7 @@ public struct PulseBentoHomeView: View {
                         Button {
                             selectedTab = .catalog
                         } label: {
-                            omniHitRow(hit: hit, icon: "Cpu", systemFallback: "sparkles", tint: CloudPalette.violet)
+                            omniHitRow(hit: hit, icon: "sparkles", tint: CloudPalette.violet)
                         }
                         .buttonStyle(.plain)
                     case .update:
@@ -271,14 +384,14 @@ public struct PulseBentoHomeView: View {
         }
     }
 
-    private func omniHitRow(hit: OmniSearchHit, icon: String, systemFallback: String? = nil, tint: Color) -> some View {
+    private func omniHitRow(hit: OmniSearchHit, icon: String, tint: Color) -> some View {
         BentoCard(padding: 13) {
             HStack(spacing: 12) {
-                Image(systemName: systemFallback ?? icon)
+                Image(systemName: icon)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(tint)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(tint.opacity(0.12)))
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(tint.opacity(0.14)))
 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
@@ -297,7 +410,7 @@ public struct PulseBentoHomeView: View {
         }
     }
 
-    // MARK: - 2x2 Bento Telemetry Grid
+    // MARK: - 2x2 Neo-Bento Telemetry Grid
 
     private var bentoTelemetryGrid: some View {
         let counts = store.catalog.meta.counts
@@ -305,13 +418,13 @@ public struct PulseBentoHomeView: View {
             Button { selectedTab = .catalog } label: {
                 bentoStatTile(
                     icon: "square.stack.3d.up.fill",
-                    tint: CloudPalette.blue,
+                    tint: store.vibeTheme.primaryAccent,
                     value: "\(counts.totalServices)",
                     label: "Cloud Services",
                     caption: "\(counts.regionalServices) Regional • \(counts.globalServices) Global"
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(GenZBouncyButtonStyle())
 
             Button { selectedTab = .globe } label: {
                 bentoStatTile(
@@ -319,10 +432,10 @@ public struct PulseBentoHomeView: View {
                     tint: CloudPalette.emerald,
                     value: "\(counts.availableRegions)",
                     label: "Active Regions",
-                    caption: "\(counts.lowCo2Regions) Low CO₂ 🌱 • +\(counts.futureRegions) Future"
+                    caption: "\(counts.lowCo2Regions) Low CO₂ 🌱 • +\(counts.futureRegions) Next"
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(GenZBouncyButtonStyle())
 
             Button { selectedTab = .catalog } label: {
                 bentoStatTile(
@@ -333,7 +446,7 @@ public struct PulseBentoHomeView: View {
                     caption: "\(counts.aiModelFamilies) Families • \(counts.gpuZones) GPU Zones"
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(GenZBouncyButtonStyle())
 
             Button { selectedTab = .studio } label: {
                 bentoStatTile(
@@ -344,7 +457,7 @@ public struct PulseBentoHomeView: View {
                     caption: "\(counts.highSla9999Services ?? 41) Services ≥ 99.99%"
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(GenZBouncyButtonStyle())
         }
     }
 
@@ -355,20 +468,20 @@ public struct PulseBentoHomeView: View {
                     Image(systemName: icon)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(tint)
-                        .frame(width: 32, height: 32)
-                        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(tint.opacity(0.14)))
+                        .frame(width: 34, height: 34)
+                        .background(RoundedRectangle(cornerRadius: 11, style: .continuous).fill(tint.opacity(0.15)))
                     Spacer()
                     Image(systemName: "arrow.up.right")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 11, weight: .black))
                         .foregroundStyle(.tertiary)
                 }
                 Text(value)
-                    .font(.system(size: 28, weight: .heavy, design: .rounded))
+                    .font(.system(size: 29, weight: .black, design: .rounded))
                     .foregroundStyle(.primary)
                     .contentTransition(.numericText())
                 VStack(alignment: .leading, spacing: 2) {
                     Text(label)
-                        .font(.system(size: 13.5, weight: .bold, design: .rounded))
+                        .font(.system(size: 13.5, weight: .heavy, design: .rounded))
                     Text(caption)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
@@ -397,12 +510,12 @@ public struct PulseBentoHomeView: View {
         BentoCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Label("SLA Uptime Tiers", systemImage: "chart.pie.fill")
-                        .font(.system(size: 13.5, weight: .bold, design: .rounded))
+                    Label("Uptime Tiers", systemImage: "chart.pie.fill")
+                        .font(.system(size: 13.5, weight: .heavy, design: .rounded))
                         .foregroundStyle(CloudPalette.emerald)
                     Spacer()
                     Text("99.9%–100%")
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
                         .foregroundStyle(.secondary)
                 }
 
@@ -440,9 +553,9 @@ public struct PulseBentoHomeView: View {
         BentoCard {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Label("Regional Cost Index", systemImage: "chart.bar.xaxis")
-                        .font(.system(size: 13.5, weight: .bold, design: .rounded))
-                        .foregroundStyle(CloudPalette.blue)
+                    Label("FinOps Multipliers", systemImage: "chart.bar.xaxis")
+                        .font(.system(size: 13.5, weight: .heavy, design: .rounded))
+                        .foregroundStyle(store.vibeTheme.primaryAccent)
                     Spacer()
                     Text("vs us-central1")
                         .font(.system(size: 11, weight: .semibold))
@@ -473,16 +586,15 @@ public struct PulseBentoHomeView: View {
     private var customerStacksSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Label("Customer Architecture Stacks", systemImage: "CPU")
-                    .labelStyle(.titleOnly)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                Text("Saved Architecture Stacks ⚡")
+                    .font(.system(size: 16, weight: .black, design: .rounded))
                 Spacer()
                 Button {
                     selectedTab = .studio
                 } label: {
-                    Text("Open SLA Studio →")
-                        .font(.system(size: 12.5, weight: .semibold))
-                        .foregroundStyle(CloudPalette.blue)
+                    Text("SLA Studio →")
+                        .font(.system(size: 12.5, weight: .bold, design: .rounded))
+                        .foregroundStyle(store.vibeTheme.primaryAccent)
                 }
             }
 
@@ -500,15 +612,15 @@ public struct PulseBentoHomeView: View {
                         Button {
                             selectedStackSheet = stack
                         } label: {
-                            BentoCard(accent: CloudPalette.blue, padding: 15) {
+                            BentoCard(accent: store.vibeTheme.primaryAccent, padding: 15) {
                                 VStack(alignment: .leading, spacing: 10) {
                                     HStack {
                                         SemanticPill("🛡️ \(sla.formattedUptime)", tint: CloudPalette.emerald)
-                                        SemanticPill(stack.topologyMode.shortLabel, tint: CloudPalette.blue)
+                                        SemanticPill(stack.topologyMode.shortLabel, tint: store.vibeTheme.primaryAccent)
                                         Spacer()
                                     }
                                     Text(stack.name)
-                                        .font(.system(size: 15.5, weight: .bold, design: .rounded))
+                                        .font(.system(size: 15.5, weight: .heavy, design: .rounded))
                                         .foregroundStyle(.primary)
                                         .lineLimit(1)
                                     Text(stack.subtitle)
@@ -533,7 +645,7 @@ public struct PulseBentoHomeView: View {
                             }
                             .frame(width: 305)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(GenZBouncyButtonStyle())
                     }
                 }
             }
@@ -545,15 +657,15 @@ public struct PulseBentoHomeView: View {
     private var releasePulseCarousel: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Latest Service Updates")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                Text("Fresh Google Cloud Drops 🔥")
+                    .font(.system(size: 16, weight: .black, design: .rounded))
                 Spacer()
                 Button {
                     selectedTab = .updates
                 } label: {
                     Text("All \(store.catalog.releaseNotes.count) Notes →")
-                        .font(.system(size: 12.5, weight: .semibold))
-                        .foregroundStyle(CloudPalette.blue)
+                        .font(.system(size: 12.5, weight: .bold, design: .rounded))
+                        .foregroundStyle(store.vibeTheme.primaryAccent)
                 }
             }
 
@@ -570,7 +682,7 @@ public struct PulseBentoHomeView: View {
                                         .foregroundStyle(.secondary)
                                 }
                                 Text(note.productName)
-                                    .font(.system(size: 14.5, weight: .bold, design: .rounded))
+                                    .font(.system(size: 14.5, weight: .heavy, design: .rounded))
                                     .lineLimit(1)
                                 Text(note.summary)
                                     .font(.system(size: 12))
@@ -590,7 +702,7 @@ public struct PulseBentoHomeView: View {
         if up.contains("FEATURE") || up.contains("LAUNCH") { return CloudPalette.emerald }
         if up.contains("SECURITY") || up.contains("DEPRECATED") { return CloudPalette.coral }
         if up.contains("FIX") || up.contains("CHANGE") { return CloudPalette.amber }
-        return CloudPalette.blue
+        return store.vibeTheme.primaryAccent
     }
 }
 
@@ -624,7 +736,7 @@ public struct CustomerStackInspectorSheet: View {
                                         .font(.system(size: 10, weight: .bold))
                                         .foregroundStyle(.secondary)
                                     Text(sla.formattedUptime)
-                                        .font(.system(size: 30, weight: .heavy, design: .rounded))
+                                        .font(.system(size: 30, weight: .black, design: .rounded))
                                         .foregroundStyle(CloudPalette.emerald)
                                 }
                                 VStack(alignment: .leading) {
@@ -644,7 +756,7 @@ public struct CustomerStackInspectorSheet: View {
                     BentoCard {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Regional Readiness Audit")
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.system(size: 15, weight: .heavy, design: .rounded))
                             ForEach(readiness, id: \.regionId) { rep in
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
@@ -676,7 +788,7 @@ public struct CustomerStackInspectorSheet: View {
                     BentoCard {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Included Stack Services (\(svcs.count))")
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.system(size: 15, weight: .heavy, design: .rounded))
                             ForEach(svcs) { svc in
                                 HStack {
                                     Text(svc.name)

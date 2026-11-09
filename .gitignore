@@ -1,6 +1,8 @@
 # Ignore raw & per-API discovery cache files (keep master gcp_catalog.json & generated static site)
 data/cache/raw/
 data/cache/discovery/
+data/cache/mobile_users.json
+data/cache/auth_secret.key
 __pycache__/
 *.py[cod]
 *$py.class

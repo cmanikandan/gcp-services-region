@@ -24,25 +24,44 @@ All mandatory Apple App Store Connect assets and metadata manifests are pre-buil
 
 ---
 
-## ✨ Native Architecture & 5-Tab Experience
+## ✨ Gen Z "Neo-Bento Aura" UI & 5-Tab Experience
 
+- **4 Live Aura Vibe Themes (`DesignSystem/GlassBentoTheme.swift`)**:
+  - Switch instantaneously between **🍵 Cyber Matcha** (acid lime + electric cobalt), **🔮 Ultraviolet** (hyper violet + cyber pink), **💿 Y2K Chrome** (liquid sky + holo lavender), and **🌅 Sunset Vapor** (solar coral + neon tangerine) with tactile `GenZBouncyButtonStyle` spring physics (`0.965x`), `StickerBadge` pills, and `.sensoryFeedback` haptics.
 - **Adaptive Layout (`ContentView.swift`)**:
-  - **iPhone (`compact` width)**: Native 5-tab `TabView` (`Pulse`, `Globe`, `Catalog`, `SLA & Cost`, `Updates`).
-  - **iPad (`regular` width)**: Native `NavigationSplitView` sidebar + detail workspace.
+  - **iPhone (`compact` width)**: Native 5-tab `TabView` (`Pulse`, `Globe`, `Catalog`, `SLA & Cost`, `Updates`) + top-right `@handle` / `Sign In ✨` Builder Passport pill.
+  - **iPad (`regular` width)**: Native `NavigationSplitView` sidebar with Builder Passport card + detail workspace.
 - **Tab 1 — Pulse Home (`PulseBentoHomeView.swift`)**:
-  - Live **Omni-Search** instant answer cards across 153 services, 43 regions, and 91+ AI models.
-  - **2×2 Bento Telemetry Grid** + **`Swift Charts` `SectorMark` SLA Donut** + **Regional Cost Tier `BarMark` Distribution**.
-  - **Customer Architecture Stacks** carousel with instant readiness audit + **Official Release Notes** story cards.
+  - Aura mesh hero with live **Omni-Search**, trending vibe chips (`🔥 99.999% Club`, `🤖 Claude & Gemini`, `💸 Mumbai Cost`, `⚡ H100 GPUs`), and interactive **Builder Passport / Ghost Mode** strip.
+  - **2×2 Neo-Bento Telemetry Grid** + **`Swift Charts` `SectorMark` SLA Donut** + **Regional FinOps `BarMark` Distribution**.
+  - **Saved Architecture Stacks** carousel + **Fresh Google Cloud Drops 🔥** horizontal story cards.
 - **Tab 2 — Interactive 3D Globe (`InteractiveGlobeMapView.swift`)**:
-  - Hardware-accelerated 3D realistic `MapKit` globe (`MapStyle.imagery(elevation: .realistic)`) with fly-to region camera animations.
-  - Floating frosted filter pills (`All 43`, `🌱 Low CO₂`, `🤖 Vertex AI`, `⚡ GPU Zones`, `🚀 Future`, `🌐 Edge PoPs`) and multi-detent `.regularMaterial` bottom sheets (`RegionInspectorSheetView`).
+  - Hardware-accelerated 3D realistic `MapKit` globe with fly-to region camera animations, Vibe-themed floating HUD pills (`All 43`, `🌱 Low CO₂`, `🤖 Vertex AI`, `⚡ GPU Zones`, `🚀 Future`, `🌐 Edge PoPs`), and multi-detent frosted-glass inspector sheets.
 - **Tab 3 — Native Catalog Browser (`NativeCatalogBrowserView.swift`)**:
-  - Segmented native browser for **153 Google Cloud Services** (with `RingGaugeView` regional coverage rings, SLA badges, Free Tier pills, and swipe/tap bookmarks) and **91+ AI & Foundation Models** (`AIModelInspectorSheet`).
-- **Tab 4 — Pricing & Composite SLA Studio (`PricingSLAStudioView.swift`)**:
-  - **Composite Workload SLA Simulator**: Toggle critical-path services across **Single-Region Serial (`R₁ × R₂ × …`)**, **Dual-Region Active-Active (`1 − (1 − R)²`)**, and **Tri-Region Quorum** with live monthly/annual downtime budgets.
-  - **Regional FinOps & CUD Scrubber**: Tactile monthly spend slider + `On-Demand` / `1Y CUD` / `3Y CUD` picker + `Swift Charts` regional cost bar benchmark + one-tap **`ShareLink`** card export (`ImageRenderer`).
+  - Segmented native browser for **153 Google Cloud Services** (`RingGaugeView` coverage rings, SLA badges, Free Tier pills, and Cloud Vault bookmarks) and **91+ AI & Foundation Models** (`AIModelInspectorSheet`).
+- **Tab 4 — SLA & FinOps Studio (`PricingSLAStudioView.swift`)**:
+  - **Composite Workload SLA Simulator**: Toggle critical-path services across **Single-Region Serial**, **Dual-Region Active-Active**, and **Tri-Region Quorum**, and **1-tap Save Stack to Cloud Vault ⚡ (`+65 XP`)**.
+  - **Regional FinOps & CUD Scrubber + "Google Cloud Stack Wrapped ⚡" Card**: Tactile monthly spend slider, `On-Demand` / `1Y CUD` / `3Y CUD` picker, live Spotify-Wrapped-style **`ArchitectureShareCardView`** with `@handle` attribution, and `ShareLink` export.
 - **Tab 5 — Release Pulse Timeline (`ReleasePulseTimelineView.swift`)**:
-  - Magazine-style **Official Google Cloud Release Notes** (`Feature`, `Announcement`, `Security`, `Deprecated`) + **Regional Snapshot Diffs** with a 1-tap **My Stack** filter.
+  - Magazine-style **Official Google Cloud Release Notes** + **Regional Snapshot Diffs** with a 1-tap **My Stack** filter.
+
+---
+
+## 🔐 Passwordless Mobile Auth & Cloud Vault Architecture (`Auth/`)
+
+Designed around real-world iOS App Store guidelines and enterprise security boundaries:
+
+1. **Zero-Gate "Ghost Mode 👻" First (Apple Guideline 5.1.1v)**:
+   - Cold launch never blocks behind a login wall. All 153 services, 43 regions, 3D Globe layers, and SLA/FinOps calculators work **100% anonymously & offline** out of the box.
+2. **Multi-Provider Passwordless Sign-In (Apple Guideline 4.8)**:
+   - **Device Passkey (`CryptoKit` `P256.Signing.PrivateKey`)**: Mints a hardware-grade P-256 keypair stored in Keychain and signs server challenge nonces (`POST /api/auth/challenge`).
+   - **Sign in with Apple (`AuthenticationServices`)**: Native `SignInWithAppleButton` with `SHA-256` OIDC nonce protection (plus automatic local dev simulation in unsigned Xcode Simulator builds).
+   - **Google Identity (`OAuth 2.0 PKCE S256`)**: Generates a 32-byte CSPRNG `code_verifier` and `BASE64URL(SHA256(verifier))` `code_challenge` via `CryptoKit`, verified by `server.py` (`mobile_auth.py`).
+   - **Strict Zero-IAM Security Boundary**: Never requests or stores Google Cloud IAM tokens, service account keys, or billing permissions—authentication strictly syncs Explorer bookmarks, custom SLA stacks, Builder XP, and Vibe Themes.
+3. **iOS Keychain Storage, Token Rotation & Face ID Vault Lock**:
+   - Stores `HS256` Bearer JWTs (`1h` TTL) and single-use rotating refresh tokens (`30d` TTL) inside the **iOS Keychain (`KeychainVault.swift`)** with `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`—never in `UserDefaults`.
+   - Optional **Face ID / Touch ID / Passcode Vault Lock (`LocalAuthentication`)** gates synced enterprise stacks on launch (`BiometricVaultLockOverlay`).
+   - Includes **1-Tap Account & Vault Deletion (`DELETE /api/auth/account`)** right inside the Builder Passport sheet per Apple App Store Guideline 5.1.1(v), plus seamless offline session fallback when `server.py` is unreachable.
 
 ---
 
@@ -55,7 +74,7 @@ All mandatory Apple App Store Connect assets and metadata manifests are pre-buil
      python3 ios/scripts/sync_bundled_catalog.py
      ```
 2. **Delta Sync Engine (`CatalogSyncActor` in `Engine/CatalogStore.swift`)**:
-   - Sends `If-None-Match` + `Accept-Encoding: gzip` to `/api/mobile-catalog` (`~39.8 KB` over the wire when changed, `0 bytes` on `304 Not Modified`) and persists updates atomically to `Application Support/mobile_catalog_latest.json`.
+   - Sends `If-None-Match` + `Accept-Encoding: gzip` to `/api/mobile-catalog` (`~39.8 KB` over the wire when changed, `0 bytes` on `304 Not Modified`) and persists updates atomically to `Application Support/`.
 
 ---
 

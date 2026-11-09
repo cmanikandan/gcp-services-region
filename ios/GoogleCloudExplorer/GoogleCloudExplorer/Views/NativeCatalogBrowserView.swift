@@ -109,15 +109,15 @@ public struct NativeCatalogBrowserView: View {
                                         withAnimation(.snappy) { selectedCategory = cat }
                                     } label: {
                                         Text(cat)
-                                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 12, weight: .bold, design: .rounded))
                                             .foregroundStyle(active ? .white : .primary)
                                             .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .padding(.vertical, 6.5)
                                             .background(
-                                                Capsule().fill(active ? CloudPalette.blue : CloudPalette.cardBackground)
+                                                Capsule().fill(active ? store.vibeTheme.primaryAccent : CloudPalette.cardBackground)
                                             )
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(GenZBouncyButtonStyle())
                                 }
                             }
                         }

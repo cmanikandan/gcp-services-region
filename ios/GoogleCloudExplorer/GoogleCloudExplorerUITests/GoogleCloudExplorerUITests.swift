@@ -24,4 +24,24 @@ final class GoogleCloudExplorerUITests: XCTestCase {
             }
         }
     }
+
+    @MainActor
+    func testPasswordlessPasskeyAuthAndBuilderPassportFlow() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        // Open Cloud Vault Sign-In Portal from toolbar button if currently in Ghost Mode
+        let signInButton = app.buttons["Sign In to Cloud Vault"]
+        if signInButton.waitForExistence(timeout: 3) {
+            signInButton.tap()
+            let passkeyBtn = app.buttons.containing(NSPredicate(format: "label CONTAINS 'Mint Device Passkey'")).firstMatch
+            if passkeyBtn.waitForExistence(timeout: 3) {
+                passkeyBtn.tap()
+            }
+            let doneBtn = app.buttons["Done"]
+            if doneBtn.waitForExistence(timeout: 3) {
+                doneBtn.tap()
+            }
+        }
+    }
 }

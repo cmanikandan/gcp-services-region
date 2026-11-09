@@ -111,24 +111,42 @@ public final class CatalogStore {
     public var syncEndpointURLString: String {
         didSet { UserDefaults.standard.set(syncEndpointURLString, forKey: Self.endpointKey) }
     }
+    public var vibeTheme: VibeTheme {
+        didSet {
+            UserDefaults.standard.set(vibeTheme.rawValue, forKey: Self.vibeThemeKey)
+            notifyVaultMutationIfNeeded()
+        }
+    }
     public var bookmarkedServiceSlugs: Set<String> {
-        didSet { saveBookmarks() }
+        didSet {
+            saveBookmarks()
+            notifyVaultMutationIfNeeded()
+        }
     }
     public var bookmarkedRegionIds: Set<String> {
-        didSet { saveBookmarks() }
+        didSet {
+            saveBookmarks()
+            notifyVaultMutationIfNeeded()
+        }
     }
     public var customerStacks: [CustomerStack] {
-        didSet { saveCustomerStacks() }
+        didSet {
+            saveCustomerStacks()
+            notifyVaultMutationIfNeeded()
+        }
     }
     public var deepLinkedServiceSlug: String?
     public var deepLinkedRegionId: String?
+    public var onVaultMutated: (() -> Void)?
 
     public private(set) var servicesBySlug: [String: CloudService] = [:]
     public private(set) var servicesByName: [String: CloudService] = [:]
     public private(set) var regionsById: [String: CloudRegion] = [:]
 
     private let syncActor = CatalogSyncActor()
+    private var suppressVaultMutationCallback = false
     private static let endpointKey = "gce.syncEndpoint"
+    private static let vibeThemeKey = "gce.vibeTheme"
     private static let svcBookmarksKey = "gce.bookmarkedServices"
     private static let regBookmarksKey = "gce.bookmarkedRegions"
     private static let stacksKey = "gce.customerStacks"
@@ -139,6 +157,9 @@ public final class CatalogStore {
         self.syncState = .bundledOffline(generatedAt: loaded.meta.generatedAt)
         self.syncEndpointURLString = UserDefaults.standard.string(forKey: Self.endpointKey)
             ?? "http://127.0.0.1:8080/api/mobile-catalog"
+
+        let savedVibeRaw = UserDefaults.standard.string(forKey: Self.vibeThemeKey) ?? VibeTheme.cyberMatcha.rawValue
+        self.vibeTheme = VibeTheme(rawValue: savedVibeRaw) ?? .cyberMatcha
 
         let savedSvcs = UserDefaults.standard.stringArray(forKey: Self.svcBookmarksKey)
             ?? ["spanner", "cloud-run", "vertex-ai", "bigquery", "alloydb"]
@@ -157,6 +178,52 @@ public final class CatalogStore {
         }
 
         rebuildLookupCaches()
+    }
+
+    public var authAPIBaseURL: URL? {
+        guard let url = URL(string: syncEndpointURLString.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let scheme = url.scheme,
+              let host = url.host else {
+            return nil
+        }
+        var comps = URLComponents()
+        comps.scheme = scheme
+        comps.host = host
+        comps.port = url.port
+        return comps.url
+    }
+
+    public func exportVaultPayload() -> CloudUserVault {
+        CloudUserVault(
+            bookmarkedServices: Array(bookmarkedServiceSlugs).sorted(),
+            bookmarkedRegions: Array(bookmarkedRegionIds).sorted(),
+            customerStacks: customerStacks,
+            vibeTheme: vibeTheme.rawValue,
+            updatedEpoch: Int(Date().timeIntervalSince1970)
+        )
+    }
+
+    public func applyRemoteVault(_ vault: CloudUserVault) {
+        suppressVaultMutationCallback = true
+        defer { suppressVaultMutationCallback = false }
+
+        if !vault.bookmarkedServices.isEmpty {
+            bookmarkedServiceSlugs = Set(vault.bookmarkedServices)
+        }
+        if !vault.bookmarkedRegions.isEmpty {
+            bookmarkedRegionIds = Set(vault.bookmarkedRegions)
+        }
+        if !vault.customerStacks.isEmpty {
+            customerStacks = vault.customerStacks
+        }
+        if let theme = VibeTheme(rawValue: vault.vibeTheme) {
+            vibeTheme = theme
+        }
+    }
+
+    private func notifyVaultMutationIfNeeded() {
+        guard !suppressVaultMutationCallback else { return }
+        onVaultMutated?()
     }
 
     public static func loadBundledCatalog() -> MobileCatalog {
