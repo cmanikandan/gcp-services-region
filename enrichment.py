@@ -847,6 +847,13 @@ def build_mobile_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
     """
     compact_services = []
     for s in catalog.get("services", []):
+        raw_mrs = s.get("multi_regions", [])
+        clean_mrs = [
+            (mr.get("code") or mr.get("geography") or str(mr))
+            if isinstance(mr, dict)
+            else str(mr)
+            for mr in raw_mrs
+        ]
         compact_services.append(
             {
                 "name": s["name"],
@@ -858,7 +865,7 @@ def build_mobile_catalog(catalog: dict[str, Any]) -> dict[str, Any]:
                 "regions": s["regions"],
                 "region_count": s["region_count"],
                 "coverage_pct": s["coverage_pct"],
-                "multi_regions": s.get("multi_regions", []),
+                "multi_regions": clean_mrs,
                 "api_names": s.get("api_names", []),
                 "total_api_methods": s.get("total_api_methods", 0),
                 "sla": s.get("sla", {}),

@@ -24,6 +24,45 @@ All mandatory Apple App Store Connect assets and metadata manifests are pre-buil
 
 ---
 
+## 🧭 Step-by-Step User Guide: How to Use the iPhone & iPad App
+
+When you open **Google Cloud Explorer** on your iPhone or iPad, it runs **100% offline out of the box** using the pre-bundled `mobile_catalog.json` snapshot (`153` Google Cloud services, `43` regions, `91+` AI models, `149` formal SLAs, and `30` release notes). No Google Cloud login or setup is required.
+
+### 1. Tab 1 — **Pulse** (Home Dashboard & Omni-Search)
+- **Notice the Unofficial Badge**: The top hero card clearly marks the app as an **`UNOFFICIAL TOOL`** (and the bottom footer links to the sync/disclaimer sheet).
+- **Change Your Vibe Theme (Top-Left `🍵 Vibe` Menu)**: Tap **`🍵 Vibe`** in the top-left toolbar to switch between **Cyber Matcha**, **Ultraviolet**, **Y2K Chrome**, and **Sunset Vapor**.
+- **Search Anything Instantly**: Type in the frosted search bar (or tap a trending chip like **`🔥 99.999% Club`**, **`🤖 Claude & Gemini`**, **`💸 Mumbai Cost`**, or **`⚡ H100 GPUs`**) to get instant offline answers across services, regions, AI models, and release notes.
+- **Ask Gemini Cloud Architect ✨**: Tap the **Gemini Cloud Architect ✨** card to ask architectural questions (e.g., *"Compare Cloud Spanner vs AlloyDB SLA"* or *"Which Low CO₂ regions in Europe have H100 GPUs?"*). Works offline automatically, or you can tap **Key 🔑** to add a Gemini API key in the iOS Keychain.
+- **Inspect Saved Architecture Stacks**: Scroll down to tap any blueprint in **Saved Architecture Stacks ⚡** to view its composite uptime and regional readiness.
+
+### 2. Tab 2 — **Globe** (Interactive 3D MapKit Globe)
+- **Filter Map Pins**: Tap the floating filter pills at the top (**`All 43`**, **`🌱 Low CO₂`**, **`🤖 Vertex AI`**, **`⚡ GPU Zones`**, **`🚀 Future`**, **`🌐 Edge PoPs`**).
+- **Inspect Any Region**: Tap a region pin on the 3D globe or a card in the bottom carousel to fly the camera to that location and open a detail sheet showing its **FinOps cost index**, **1Y/3Y CUD discounts**, **CPU/GPU hardware by zone**, and **available services/models**.
+
+### 3. Tab 3 — **Catalog** (153 Cloud Services & 91+ AI Models)
+- **Switch Modes**: Use the top segmented control to toggle between **Cloud Services** and **AI & Foundation Models**.
+- **Drill into Service SLAs & APIs**: Tap any service to inspect its **Single-Zone / Regional / Multi-Region SLA tiers**, **max monthly downtime**, **credit schedule (`10%`/`25%`/`50%`)**, **regional availability**, and **Discovery REST API methods**. Tap the bookmark icon to save it.
+- **Check AI Model Endpoints**: Switch to **AI Models**, filter by family (**Gemini**, **Claude**, **Llama**, **DeepSeek**, **Mistral**, **Veo**) or region, and tap any model to view all supported Google Cloud regions.
+
+### 4. Tab 4 — **SLA & Cost** (Composite SLA Simulator & FinOps Studio)
+1. **Choose Topology**: Select **Single-Region Serial**, **Dual-Region Active-Active**, or **Tri-Region Quorum**.
+2. **Select Your Critical-Path Services**: Tap services to add/remove them from your workload stack. Watch the **Composite Uptime %** and **Monthly Downtime Budget** recalculate live.
+3. **Simulate Regional Spend & CUDs**: Adjust the monthly baseline spend slider, toggle **On-Demand / 1Y CUD / 3Y CUD**, and compare regional cost multipliers across target regions.
+4. **Save, Audit, or Share**:
+   - Tap **Save Stack to Cloud Vault ⚡** to persist your custom stack.
+   - Tap **Audit Stack with Gemini ✨** for an AI review of single points of failure.
+   - Scroll down and tap **Share Stack Wrapped Card** to export a high-res architecture summary image via the iOS Share Sheet.
+
+### 5. Tab 5 — **Updates** (Official Release Notes & Snapshot Diffs)
+- Browse the latest official Google Cloud Release Notes and regional capability additions.
+- Toggle **My Stack Only** to filter updates strictly to your bookmarked services and saved stacks.
+
+### 6. Optional Top-Right Toolbar Actions (`Sign In ✨` & `Offline Sync`)
+- **Builder Passport (`Sign In ✨`)**: Optional passwordless profile (Device Passkey, Sign in with Apple, or Google PKCE) to claim a `@handle`, track Builder XP, enable **Face ID Vault Lock**, or sync stacks with `server.py`.
+- **Offline Sync & Settings (`icloud.and.arrow.down` icon)**: View the embedded catalog snapshot date or configure your Mac's local server URL (`http://<mac-ip>:8080`) to pull live delta updates over Wi-Fi.
+
+---
+
 ## ✨ Gen Z "Neo-Bento Aura" UI & 5-Tab Experience
 
 - **4 Live Aura Vibe Themes (`DesignSystem/GlassBentoTheme.swift`)**:
@@ -124,7 +163,7 @@ xcodebuild build \
 Because this is an independent, unofficial community reference app, Apple App Review requires that third-party titles do **not** imply official endorsement by Google LLC:
 - **Recommended App Store Name**: `Cloud Region & SLA Explorer` (or `Region & SLA Companion`)
 - **Recommended Subtitle**: `Unofficial Reference for Google Cloud`
-- **Home Screen Display Name (`PRODUCT_DISPLAY_NAME` in `Shared.xcconfig`)**: `Cloud Explorer`
+- **Home Screen Display Name (`PRODUCT_DISPLAY_NAME` in `Shared.xcconfig`)**: `Google Cloud Explorer`
 - **App Description**: Keep a clear notice in the first paragraph stating that the app is an independent, unofficial reference tool powered by public Google Cloud location, SLA, and release-note feeds.
 
 ### 3. Refresh the Offline Bundle & Create a Signed Archive

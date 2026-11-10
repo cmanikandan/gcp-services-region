@@ -121,6 +121,35 @@ public struct CloudService: Codable, Sendable, Identifiable, Hashable {
         case apiNames = "api_names"
         case totalApiMethods = "total_api_methods"
     }
+
+    private struct LegacyMultiRegionDict: Codable {
+        let code: String?
+        let geography: String?
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        slug = try c.decode(String.self, forKey: .slug)
+        category = try c.decode(String.self, forKey: .category)
+        url = try c.decode(String.self, forKey: .url)
+        scope = try c.decode(String.self, forKey: .scope)
+        isGlobal = try c.decode(Bool.self, forKey: .isGlobal)
+        regions = try c.decode([String].self, forKey: .regions)
+        regionCount = try c.decode(Int.self, forKey: .regionCount)
+        coveragePct = try c.decode(Double.self, forKey: .coveragePct)
+        if let strArray = try? c.decode([String].self, forKey: .multiRegions) {
+            multiRegions = strArray
+        } else if let objArray = try? c.decode([LegacyMultiRegionDict].self, forKey: .multiRegions) {
+            multiRegions = objArray.compactMap { $0.code ?? $0.geography }
+        } else {
+            multiRegions = []
+        }
+        apiNames = (try? c.decode([String].self, forKey: .apiNames)) ?? []
+        totalApiMethods = (try? c.decode(Int.self, forKey: .totalApiMethods)) ?? 0
+        sla = try c.decode(ServiceSLA.self, forKey: .sla)
+        pricing = try c.decode(ServicePricing.self, forKey: .pricing)
+    }
 }
 
 public struct ServiceSLA: Codable, Sendable, Hashable {

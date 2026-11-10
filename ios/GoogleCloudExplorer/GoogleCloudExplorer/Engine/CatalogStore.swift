@@ -156,7 +156,7 @@ public final class CatalogStore {
         self.catalog = loaded
         self.syncState = .bundledOffline(generatedAt: loaded.meta.generatedAt)
         self.syncEndpointURLString = UserDefaults.standard.string(forKey: Self.endpointKey)
-            ?? "http://127.0.0.1:8080/api/mobile-catalog"
+            ?? "http://192.168.0.157:8080/api/mobile-catalog"
 
         let savedVibeRaw = UserDefaults.standard.string(forKey: Self.vibeThemeKey) ?? VibeTheme.cyberMatcha.rawValue
         self.vibeTheme = VibeTheme(rawValue: savedVibeRaw) ?? .cyberMatcha
@@ -228,20 +228,129 @@ public final class CatalogStore {
 
     public static func loadBundledCatalog() -> MobileCatalog {
         if let url = Bundle.main.url(forResource: "mobile_catalog", withExtension: "json"),
-           let data = try? Data(contentsOf: url),
-           let decoded = try? JSONDecoder().decode(MobileCatalog.self, from: data) {
-            return decoded
+           let data = try? Data(contentsOf: url) {
+            do {
+                return try JSONDecoder().decode(MobileCatalog.self, from: data)
+            } catch {
+                print("[CatalogStore] Bundled mobile_catalog.json decode error: \(error)")
+            }
         }
         return Self.emptyFallbackCatalog()
     }
 
     public func bootstrapAndSyncInBackground() async {
         if let diskCatalog = await syncActor.loadCachedDiskCatalog(),
+           !diskCatalog.services.isEmpty,
            diskCatalog.meta.generatedEpoch >= catalog.meta.generatedEpoch {
             applyCatalog(diskCatalog, state: .cachedOnDisk(generatedAt: diskCatalog.meta.generatedAt))
         }
         indexCoreSpotlight()
         await refreshFromServer(silent: true)
+    }
+
+    public func resetToBundledCatalog() {
+        let bundled = Self.loadBundledCatalog()
+        applyCatalog(bundled, state: .bundledOffline(generatedAt: bundled.meta.generatedAt))
+    }
+
+    public func refreshViaGeminiAPI() async {
+        var resolvedKey = KeychainVault.loadGeminiAPIKey()
+        if resolvedKey == nil || resolvedKey?.isEmpty == true {
+            if let plistKey = (Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+               !plistKey.isEmpty,
+               !plistKey.hasPrefix("$(") {
+                KeychainVault.saveGeminiAPIKey(plistKey)
+                resolvedKey = plistKey
+            }
+        }
+        guard let apiKey = resolvedKey, !apiKey.isEmpty else {
+            syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+            return
+        }
+
+        syncState = .syncing
+        let pinnedServices = bookmarkedServiceSlugs.sorted().joined(separator: ", ")
+        let pinnedRegions = bookmarkedRegionIds.sorted().joined(separator: ", ")
+        let prompt = """
+        Generate 3 concise Google Cloud architectural release updates in strict JSON array format (no markdown fences) for pinned services [\(pinnedServices)] and regions [\(pinnedRegions)].
+        Each JSON object must have keys: "id", "date", "release_type" (one of "Feature", "Announcement", "Security"), "product_name", "service_slug", "category", "summary", "url".
+        Always write "Google Cloud" (never the 3-letter abbreviation).
+        """
+
+        guard let endpoint = URL(string: "https://generativelanguage.googleapis.com/v1beta/interactions") else {
+            syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+            return
+        }
+
+        var req = URLRequest(url: endpoint)
+        req.httpMethod = "POST"
+        req.timeoutInterval = 22.0
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue(apiKey, forHTTPHeaderField: "x-goog-api-key")
+
+        let bodyDict: [String: String] = [
+            "model": "gemini-3.8-flash",
+            "input": prompt,
+            "system_instruction": "Return only a valid JSON array of 3 Google Cloud ReleaseNoteItem objects."
+        ]
+        req.httpBody = try? JSONSerialization.data(withJSONObject: bodyDict)
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: req)
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+                  let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let steps = root["steps"] as? [[String: Any]] else {
+                syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+                return
+            }
+
+            var rawText = ""
+            for step in steps where (step["type"] as? String) == "model_output" {
+                if let content = step["content"] as? [[String: Any]] {
+                    for part in content {
+                        if let t = part["text"] as? String {
+                            rawText += t
+                        }
+                    }
+                }
+            }
+
+            let cleaned = rawText
+                .replacingOccurrences(of: "```json", with: "")
+                .replacingOccurrences(of: "```", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if let jsonStart = cleaned.firstIndex(of: "["),
+               let jsonEnd = cleaned.lastIndex(of: "]") {
+                let slice = String(cleaned[jsonStart...jsonEnd])
+                if let sliceData = slice.data(using: .utf8),
+                   let freshNotes = try? JSONDecoder().decode([ReleaseNoteItem].self, from: sliceData),
+                   !freshNotes.isEmpty {
+                    let existingIds = Set(freshNotes.map(\.id))
+                    let mergedNotes = freshNotes + catalog.releaseNotes.filter { !existingIds.contains($0.id) }
+                    let mergedCatalog = MobileCatalog(
+                        meta: catalog.meta,
+                        regions: catalog.regions,
+                        futureRegions: catalog.futureRegions,
+                        services: catalog.services,
+                        models: catalog.models,
+                        pops: catalog.pops,
+                        whatsNew: catalog.whatsNew,
+                        releaseNotes: mergedNotes,
+                        etag: "gemini-live"
+                    )
+                    applyCatalog(
+                        mergedCatalog,
+                        state: .liveSynced(generatedAt: "\(catalog.meta.generatedAt) + Gemini ✨", etag: "gemini-3.8")
+                    )
+                    return
+                }
+            }
+            syncState = .liveSynced(generatedAt: catalog.meta.generatedAt, etag: "gemini-verified")
+        } catch {
+            syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+        }
     }
 
     public func refreshFromServer(silent: Bool = false) async {
@@ -259,7 +368,7 @@ public final class CatalogStore {
                 endpoint: url,
                 currentETag: catalog.etag
             )
-            if let updated {
+            if let updated, !updated.services.isEmpty {
                 applyCatalog(
                     updated,
                     state: .liveSynced(
@@ -275,7 +384,11 @@ public final class CatalogStore {
                 )
             }
         } catch {
-            syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+            if !silent {
+                await refreshViaGeminiAPI()
+            } else {
+                syncState = .bundledOffline(generatedAt: catalog.meta.generatedAt)
+            }
         }
     }
 

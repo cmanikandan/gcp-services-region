@@ -483,6 +483,23 @@ public struct OfflineSyncSettingsSheet: View {
                     LabeledContent("Snapshot Timestamp", value: store.catalog.meta.generatedAt)
                     LabeledContent("Catalog ETag", value: store.catalog.etag ?? "bundled")
                     LabeledContent("Bundled Entities", value: "\(store.catalog.services.count) Svcs • \(store.catalog.regions.count) Regions • \(store.catalog.models.count) Models")
+
+                    Button {
+                        Task { await store.refreshViaGeminiAPI() }
+                    } label: {
+                        HStack {
+                            Label("Enrich Live Updates via Gemini API ✨", systemImage: "sparkles")
+                                .fontWeight(.bold)
+                            Spacer()
+                            if store.syncState == .syncing {
+                                ProgressView()
+                            }
+                        }
+                    }
+
+                    Button("Reload Bundled Offline Catalog (153 Svcs / 43 Regions)") {
+                        store.resetToBundledCatalog()
+                    }
                 }
 
                 Section {

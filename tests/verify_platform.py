@@ -141,6 +141,9 @@ def verify_catalogs_and_swift_codable_schema() -> None:
             },
             ctx,
         )
+        assert all(isinstance(mr, str) for mr in svc["multi_regions"]), (
+            f"Expected list[str] for {ctx}.multi_regions, got {svc['multi_regions']}"
+        )
         assert_keys(
             svc["sla"],
             {

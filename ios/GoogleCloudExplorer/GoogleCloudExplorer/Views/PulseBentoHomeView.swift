@@ -197,20 +197,19 @@ public struct PulseBentoHomeView: View {
     private var heroHeaderCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
                         StickerBadge("\(store.vibeTheme.emoji) ZERO-LATENCY OFFLINE", background: CloudPalette.acidLime, foreground: .black)
-                        Text("Unofficial")
-                            .font(.system(size: 10.5, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.88))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3.5)
-                            .background(Capsule().fill(.white.opacity(0.15)))
+                        StickerBadge("UNOFFICIAL TOOL", background: .white.opacity(0.22), foreground: .white)
                     }
                     Text("Google Cloud Regions, SLAs & AI Vibe Check")
                         .font(.system(size: 22, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .padding(.top, 2)
+                    Text("Unofficial independent companion • Always verify SLAs & SKUs in official Google Cloud docs (cloud.google.com/docs).")
+                        .font(.system(size: 11.5, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.84))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
             }

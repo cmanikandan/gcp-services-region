@@ -4,6 +4,8 @@ Generates all three 1024x1024 24-bit opaque RGB App Store icon variants
 (Light/Default, iOS 18+ Dark, and iOS 18+ Tinted monochrome) for GoogleCloudExplorer
 using 100% Python 3.10+ standard library (struct + zlib + math).
 
+Features an anti-aliased 4-color Google Cloud ribbon emblem with a Gemini AI
+4-point sparkle star on a Neo-Bento glass canvas.
 Note: Apple App Store Connect strictly requires 1024x1024 PNGs with NO alpha channel
 (color type 2 = 24-bit RGB opaque).
 """
@@ -36,8 +38,35 @@ def write_png_rgb(path: Path, width: int, height: int, rows: list[bytes]) -> Non
     path.write_bytes(png_bytes)
 
 
+def smoothstep(edge0: float, edge1: float, x: float) -> float:
+    t = max(0.0, min(1.0, (x - edge0) / (edge1 - edge0)))
+    return t * t * (3.0 - 2.0 * t)
+
+
+def sd_capsule(px: float, py: float, ax: float, ay: float, bx: float, by: float, r: float) -> float:
+    pax, pay = px - ax, py - ay
+    bax, bay = bx - ax, by - ay
+    h = max(0.0, min(1.0, (pax * bax + pay * bay) / (bax * bax + bay * bay)))
+    return math.hypot(pax - bax * h, pay - bay * h) - r
+
+
+def cloud_outer_sdf(nx: float, ny: float) -> float:
+    # Exact Euclidean union of horizontal base pill + upper cloud dome
+    d_base = sd_capsule(nx, ny, -0.25, 0.13, 0.25, 0.13, 0.225)
+    d_dome = math.hypot(nx + 0.03, ny + 0.05) - 0.285
+    return min(d_base, d_dome)
+
+
+def cloud_inner_sdf(nx: float, ny: float) -> float:
+    # Exact uniform-thickness (0.145) inner cloud cutout
+    d_base = sd_capsule(nx, ny, -0.25, 0.13, 0.25, 0.13, 0.080)
+    d_dome = math.hypot(nx + 0.03, ny + 0.05) - 0.140
+    return min(d_base, d_dome)
+
+
 def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
     cx = cy = size / 2.0
+    aa = 2.8 / size
     rows: list[bytes] = []
 
     for y in range(size):
@@ -49,84 +78,108 @@ def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
             dist = math.hypot(nx, ny)
             diag = (nx + ny) * 0.5
 
+            # 1. Background Canvas
             if mode == "light":
-                # Crisp Royal Sapphire-to-Cobalt gradient canvas for Light Home Screens & App Store
-                r = 16.0 + max(0.0, 1.0 - dist * 0.85) * 28.0 + max(0.0, -diag) * 34.0
-                g = 56.0 + max(0.0, 1.0 - dist * 0.85) * 68.0 + max(0.0, -diag) * 62.0
-                b = 148.0 + max(0.0, 1.0 - dist * 0.80) * 90.0 + max(0.0, -diag) * 40.0
+                # Crisp Porcelain-to-Sky-Tint studio canvas for Light mode
+                r = 245.0 - dist * 14.0 - max(0.0, diag) * 10.0
+                g = 248.0 - dist * 12.0 - max(0.0, diag) * 8.0
+                b = 255.0 - dist * 5.0
             elif mode == "dark":
-                # Deep Obsidian-to-Sapphire night canvas for iOS 18+ Dark Mode
-                r = 6.0 + max(0.0, 1.0 - dist * 0.85) * 16.0 + max(0.0, -diag) * 18.0
-                g = 11.0 + max(0.0, 1.0 - dist * 0.85) * 38.0 + max(0.0, -diag) * 42.0
-                b = 24.0 + max(0.0, 1.0 - dist * 0.80) * 98.0 + max(0.0, -diag) * 78.0
+                # Deep Cyber-Obsidian to Midnight Sapphire canvas
+                r = 9.0 + max(0.0, 1.0 - dist * 0.9) * 15.0 + max(0.0, -diag) * 14.0
+                g = 14.0 + max(0.0, 1.0 - dist * 0.9) * 26.0 + max(0.0, -diag) * 24.0
+                b = 28.0 + max(0.0, 1.0 - dist * 0.85) * 58.0 + max(0.0, -diag) * 44.0
             else:
-                # Monochrome black-to-charcoal base for iOS 18+ Tinted Home Screen icons
-                lum = 12.0 + max(0.0, 1.0 - dist * 0.85) * 26.0
+                # Monochrome charcoal base for iOS 18+ Tinted Home Screen icons
+                lum = 14.0 + max(0.0, 1.0 - dist * 0.85) * 24.0
                 r = g = b = lum
 
-            # Outer orbital SLA uptime ring (radius ~0.64)
-            ring1 = abs(dist - 0.64)
-            if ring1 < 0.034:
-                t = (1.0 - (ring1 / 0.034)) ** 2
+            # Subtle orbital halo ring
+            if abs(dist - 0.78) < 0.007:
+                ring_alpha = 1.0 - abs(dist - 0.78) / 0.007
+                if mode == "light":
+                    r = r * (1.0 - ring_alpha * 0.16) + 66.0 * (ring_alpha * 0.16)
+                    g = g * (1.0 - ring_alpha * 0.16) + 133.0 * (ring_alpha * 0.16)
+                    b = b * (1.0 - ring_alpha * 0.16) + 244.0 * (ring_alpha * 0.16)
+                elif mode == "dark":
+                    r += 32.0 * ring_alpha
+                    g += 62.0 * ring_alpha
+                    b += 118.0 * ring_alpha
+
+            # 2. Cloud Ribbon Evaluation
+            d_outer = cloud_outer_sdf(nx, ny - 0.02)
+            d_inner = cloud_inner_sdf(nx, ny - 0.02)
+
+            # Soft drop shadow under cloud
+            d_shadow = cloud_outer_sdf(nx - 0.012, ny - 0.055)
+            if d_shadow < 0.085 and d_outer > -0.01:
+                sh = (1.0 - max(0.0, d_shadow) / 0.085) ** 2 * (0.18 if mode == "light" else 0.44)
+                r *= 1.0 - sh
+                g *= 1.0 - sh
+                b *= 1.0 - sh
+
+            outer_alpha = 1.0 - smoothstep(-aa, aa, d_outer)
+            inner_alpha = 1.0 - smoothstep(-aa, aa, d_inner)
+            ribbon_alpha = max(0.0, outer_alpha - inner_alpha)
+
+            # 4-Color Google Cloud Ribbon Coloring
+            if ribbon_alpha > 0.0:
+                ang = math.degrees(math.atan2(ny - 0.04, nx + 0.02))
                 if mode == "tinted":
-                    cr = cg = cb = 235.0
-                else:
-                    angle = (math.atan2(ny, nx) + math.pi) / (2.0 * math.pi)
-                    if angle < 0.55:
-                        cr, cg, cb = (130.0, 195.0, 255.0) if mode == "light" else (66.0, 133.0, 244.0)
-                    elif angle < 0.82:
-                        cr, cg, cb = 64.0, 224.0, 130.0
+                    if -155.0 <= ang < -52.0:
+                        cr = cg = cb = 215.0
+                    elif -52.0 <= ang < 42.0:
+                        cr = cg = cb = 250.0
+                    elif 42.0 <= ang < 128.0:
+                        cr = cg = cb = 192.0
                     else:
-                        cr, cg, cb = 255.0, 206.0, 68.0
-                r = r * (1.0 - t) + cr * t
-                g = g * (1.0 - t) + cg * t
-                b = b * (1.0 - t) + cb * t
-
-            # Inner 3D Cloud Region Globe sphere (radius 0.44)
-            if dist < 0.44:
-                sphere_z = math.sqrt(max(0.0, 0.44 * 0.44 - nx * nx - ny * ny)) / 0.44
-                spec = max(0.0, (-nx * 0.55 - ny * 0.55 + sphere_z * 0.62)) ** 4
-
-                if mode == "tinted":
-                    gl = 60.0 + 135.0 * sphere_z + 60.0 * spec
-                    sr = sg = sb = gl
-                elif mode == "light":
-                    sr = 42.0 + 78.0 * sphere_z + 135.0 * spec
-                    sg = 108.0 + 112.0 * sphere_z + 125.0 * spec
-                    sb = 212.0 + 43.0 * sphere_z + 60.0 * spec
+                        cr = cg = cb = 232.0
                 else:
-                    sr = 18.0 + 48.0 * sphere_z + 150.0 * spec
-                    sg = 52.0 + 108.0 * sphere_z + 170.0 * spec
-                    sb = 128.0 + 115.0 * sphere_z + 110.0 * spec
+                    if -155.0 <= ang < -52.0:
+                        # Upper-Left Dome: Google Red (#EA4335)
+                        cr, cg, cb = 234.0, 67.0, 53.0
+                    elif -52.0 <= ang < 42.0:
+                        # Top-Right Dome & Right Lobe: Google Blue (#4285F4)
+                        cr, cg, cb = 66.0, 133.0, 244.0
+                    elif 42.0 <= ang < 128.0:
+                        # Bottom Base: Google Green (#34A853)
+                        cr, cg, cb = 52.0, 168.0, 83.0
+                    else:
+                        # Left Lobe: Google Yellow (#FBBC04)
+                        cr, cg, cb = 251.0, 188.0, 4.0
 
-                lat_band = abs((ny / 0.44) * 3.0 - round((ny / 0.44) * 3.0))
-                lon_angle = math.atan2(nx, max(0.08, sphere_z * 0.44))
-                lon_band = abs(lon_angle * 2.6 - round(lon_angle * 2.6))
-                if lat_band < 0.055 or lon_band < 0.055:
-                    boost = 58.0 if mode == "tinted" else 52.0
-                    sr = min(255.0, sr + boost)
-                    sg = min(255.0, sg + (boost if mode == "tinted" else 74.0))
-                    sb = min(255.0, sb + (boost if mode == "tinted" else 95.0))
+                    # Subtle 3D satin highlight along the middle of the ribbon
+                    mid_dist = abs(d_outer + 0.0725)
+                    bevel = max(0.0, 1.0 - mid_dist / 0.0725) ** 1.5
+                    cr = min(255.0, cr + bevel * 16.0)
+                    cg = min(255.0, cg + bevel * 16.0)
+                    cb = min(255.0, cb + bevel * 16.0)
 
-                r, g, b = sr, sg, sb
+                r = r * (1.0 - ribbon_alpha) + cr * ribbon_alpha
+                g = g * (1.0 - ribbon_alpha) + cg * ribbon_alpha
+                b = b * (1.0 - ribbon_alpha) + cb * ribbon_alpha
 
-            # Active regional beacon nodes on globe
-            beacons = (
-                ((-0.16, -0.10, 255.0, 255.0, 255.0), (0.14, -0.06, 240.0, 240.0, 240.0), (0.05, 0.16, 245.0, 245.0, 245.0))
-                if mode == "tinted"
-                else (
-                    (-0.16, -0.10, 68.0, 245.0, 142.0),   # Low CO2 Emerald node
-                    (0.14, -0.06, 225.0, 245.0, 255.0),   # Primary Multi-Region node
-                    (0.05, 0.16, 255.0, 214.0, 74.0),     # 99.999% SLA Gold node
-                )
-            )
-            for bx, by, br, bg, bb in beacons:
-                bdist = math.hypot(nx - bx, ny - by)
-                if bdist < 0.058:
-                    bt = (1.0 - bdist / 0.058) ** 1.5
-                    r = r * (1.0 - bt) + br * bt
-                    g = g * (1.0 - bt) + bg * bt
-                    b = b * (1.0 - bt) + bb * bt
+            # 3. Gemini AI 4-Point Sparkle Star at upper-right crest (0.31, -0.25)
+            sx = abs(nx - 0.31)
+            sy = abs(ny + 0.25)
+            star_d = (sx ** 0.58 + sy ** 0.58) - (0.145 ** 0.58)
+            star_alpha = 1.0 - smoothstep(-aa * 1.4, aa * 1.4, star_d)
+            if star_alpha > 0.0:
+                if mode == "tinted":
+                    sr = sg = sb = 255.0
+                elif mode == "light":
+                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.35)) * 3.5))
+                    sr = 138.0 * (1.0 - t_star) + 36.0 * t_star
+                    sg = 68.0 * (1.0 - t_star) + 161.0 * t_star
+                    sb = 248.0 * (1.0 - t_star) + 250.0 * t_star
+                else:
+                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.35)) * 3.5))
+                    sr = 181.0 * (1.0 - t_star) + 110.0 * t_star
+                    sg = 255.0 * (1.0 - t_star) + 235.0 * t_star
+                    sb = 46.0 * (1.0 - t_star) + 255.0 * t_star
+                r = r * (1.0 - star_alpha) + sr * star_alpha
+                g = g * (1.0 - star_alpha) + sg * star_alpha
+                b = b * (1.0 - star_alpha) + sb * star_alpha
 
             row[idx] = max(0, min(255, int(r)))
             row[idx + 1] = max(0, min(255, int(g)))

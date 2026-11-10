@@ -5,7 +5,7 @@
 // Project Identity
 // ==========================================
 PRODUCT_NAME = GoogleCloudExplorer
-PRODUCT_DISPLAY_NAME = Cloud Explorer
+PRODUCT_DISPLAY_NAME = Google Cloud Explorer
 PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.googlecloudexplorer
 DEVELOPMENT_TEAM = DUN9JJFSRK
 MARKETING_VERSION = 2.0.0

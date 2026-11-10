@@ -149,6 +149,15 @@ public final class GeminiCopilotService {
     }
 
     public func bootstrapAPIKeyIfNeeded() {
+        if let plistKey = (Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+           !plistKey.isEmpty,
+           !plistKey.hasPrefix("$(") {
+            KeychainVault.saveGeminiAPIKey(plistKey)
+            updateKeyStatus(plistKey)
+            return
+        }
+
         if let existing = KeychainVault.loadGeminiAPIKey(), !existing.isEmpty {
             updateKeyStatus(existing)
             return
@@ -160,15 +169,6 @@ public final class GeminiCopilotService {
            !envKey.hasPrefix("$(") {
             KeychainVault.saveGeminiAPIKey(envKey)
             updateKeyStatus(envKey)
-            return
-        }
-
-        if let plistKey = (Bundle.main.object(forInfoDictionaryKey: "GEMINI_API_KEY") as? String)?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-           !plistKey.isEmpty,
-           !plistKey.hasPrefix("$(") {
-            KeychainVault.saveGeminiAPIKey(plistKey)
-            updateKeyStatus(plistKey)
             return
         }
 

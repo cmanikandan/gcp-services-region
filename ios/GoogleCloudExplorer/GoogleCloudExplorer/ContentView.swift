@@ -155,7 +155,7 @@ public struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Cloud Explorer")
+            .navigationTitle("Google Cloud Explorer")
         } detail: {
             switch selectedSection {
             case .pulse:

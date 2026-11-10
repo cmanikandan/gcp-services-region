@@ -40,7 +40,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8B41F65B2DEDD0D6001A66F9"
-               BuildableName = "GoogleCloudExplorer.xctest"
+               BuildableName = "GoogleCloudExplorerUITests.xctest"
                BlueprintName = "GoogleCloudExplorerUITests"
                ReferencedContainer = "container:GoogleCloudExplorer.xcodeproj">
             </BuildableReference>
