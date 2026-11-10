@@ -25,6 +25,7 @@ from typing import Any
 
 from generator import generate_all
 from harvester import CATALOG_FILE, DEFAULT_TTL_SECONDS, harvest_all
+from server import query_gemini_architect
 
 
 def load_cached_catalog() -> dict[str, Any]:
@@ -311,6 +312,10 @@ def main() -> None:
     p_cmp.add_argument("regions", nargs="+", help="2 or more region codes (e.g. us-central1 europe-west1 asia-south1)")
     p_cmp.add_argument("--diff", action="store_true", help="Show only services where availability differs")
 
+    p_ask = sub.add_parser("ask", help="Ask the Gemini 3.8 Google Cloud Architect Copilot a question")
+    p_ask.add_argument("prompt", help="Architectural, SLA, regional, or FinOps question")
+    p_ask.add_argument("--model", default="gemini-3.8-flash", help="Gemini model ID (default: gemini-3.8-flash)")
+
     p_ref = sub.add_parser("refresh", help="Refresh Google Cloud API catalog cache and rebuild static HTML site")
     p_ref.add_argument("--force", action="store_true", help="Force live API harvest even if 24h cache is still fresh")
 
@@ -337,6 +342,13 @@ def main() -> None:
         cmd_region(catalog, args.query)
     elif args.cmd == "compare":
         cmd_compare(catalog, args.regions, diff_only=args.diff)
+    elif args.cmd == "ask":
+        result = query_gemini_architect(prompt=args.prompt, catalog=catalog, model=args.model)
+        print("=" * 88)
+        print(f"Gemini Google Cloud Architect Copilot [{result.get('model')} • {result.get('source')}]")
+        print("=" * 88)
+        print(result.get("output_text", ""))
+        print("=" * 88)
 
 
 if __name__ == "__main__":

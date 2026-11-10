@@ -16,10 +16,14 @@ import argparse
 import gzip
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
+from pathlib import Path
 import threading
 import time
 from typing import Any
+import urllib.error
 from urllib.parse import parse_qs, urlparse
+import urllib.request
 
 from enrichment import build_mobile_catalog
 from generator import DIST_DIR, generate_all
@@ -30,6 +34,117 @@ _CATALOG_LOCK = threading.Lock()
 _CACHED_CATALOG: dict[str, Any] | None = None
 _CACHED_MOBILE_CATALOG: dict[str, Any] | None = None
 _MOBILE_AUTH = MobileAuthVaultService()
+_ENV_FILE = Path(__file__).resolve().parent / ".env"
+
+
+def _resolve_gemini_api_key(override_key: str | None = None) -> str:
+    if override_key and override_key.strip():
+        return override_key.strip()
+    env_key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if env_key:
+        return env_key
+    if _ENV_FILE.exists():
+        for line in _ENV_FILE.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith("GEMINI_API_KEY="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'")
+    return ""
+
+
+def query_gemini_architect(
+    prompt: str,
+    catalog: dict[str, Any],
+    model: str = "gemini-3.8-flash",
+    previous_interaction_id: str | None = None,
+    api_key_override: str | None = None,
+) -> dict[str, Any]:
+    q = prompt.strip()
+    if not q:
+        raise AuthError("Prompt cannot be empty", status=400)
+
+    counts = catalog.get("meta", {}).get("counts", {})
+    q_low = q.lower()
+    matched_svcs = [
+        f"{s['name']} (SLA {s.get('sla', {}).get('headline_display', 'N/A')}, {s['region_count']} regions)"
+        for s in catalog.get("services", [])
+        if q_low in s["name"].lower() or s["name"].lower() in q_low
+    ][:6]
+    matched_regs = [
+        f"{r['region_id']} ({r['region_name']}, {r.get('pricing', {}).get('relative_compute_index', 1.0):.2f}x compute)"
+        for r in catalog.get("regions", [])
+        if r["region_id"].lower() in q_low or r["region_name"].lower() in q_low
+    ][:6]
+
+    sys_inst = (
+        "You are the Gemini Google Cloud Architect Copilot inside the unofficial Google Cloud Explorer platform. "
+        "Always write 'Google Cloud' (never 'G'+'C'+'P'). Provide concise, accurate answers grounded in: "
+        f"{counts.get('total_services', 153)} services, {counts.get('available_regions', 43)} active regions "
+        f"({counts.get('low_co2_regions', 15)} Low CO2), and {counts.get('ai_models', 91)} AI models. "
+        f"Matched services: {', '.join(matched_svcs) or 'none'}. "
+        f"Matched regions: {', '.join(matched_regs) or 'none'}."
+    )
+
+    api_key = _resolve_gemini_api_key(api_key_override)
+    if api_key:
+        body: dict[str, Any] = {
+            "model": model or "gemini-3.8-flash",
+            "input": q,
+            "system_instruction": sys_inst,
+        }
+        if previous_interaction_id:
+            body["previous_interaction_id"] = previous_interaction_id
+
+        req = urllib.request.Request(
+            "https://generativelanguage.googleapis.com/v1beta/interactions",
+            data=json.dumps(body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key,
+            },
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=25.0) as resp:
+                raw_data = json.loads(resp.read().decode("utf-8"))
+                out_parts: list[str] = []
+                for step in raw_data.get("steps", []):
+                    if step.get("type") == "model_output":
+                        for item in step.get("content", []):
+                            if item.get("text"):
+                                out_parts.append(item["text"])
+                output_text = "\n".join(out_parts).strip()
+                if output_text:
+                    return {
+                        "id": raw_data.get("id"),
+                        "model": raw_data.get("model", model),
+                        "status": raw_data.get("status", "completed"),
+                        "output_text": output_text,
+                        "usage": raw_data.get("usage", {}),
+                        "source": "gemini_interactions_api",
+                    }
+        except Exception as err:
+            fallback_note = f" (Fallback: {err})"
+        else:
+            fallback_note = ""
+    else:
+        fallback_note = " (Local Catalog Fallback — set GEMINI_API_KEY for live Gemini 3.8 Flash)"
+
+    summary_lines = [
+        f"Grounded Google Cloud Catalog Answer{fallback_note}:",
+        f"• Catalog totals: {counts.get('total_services', 153)} Google Cloud Services, {counts.get('available_regions', 43)} Regions, {counts.get('ai_models', 91)} AI Models.",
+    ]
+    if matched_svcs:
+        summary_lines.append(f"• Matching Services: {', '.join(matched_svcs)}")
+    if matched_regs:
+        summary_lines.append(f"• Matching Regions: {', '.join(matched_regs)}")
+    return {
+        "id": None,
+        "model": "local-catalog-engine",
+        "status": "completed",
+        "output_text": "\n".join(summary_lines),
+        "usage": {},
+        "source": "offline_catalog_fallback",
+    }
 
 
 def get_catalog(force_refresh: bool = False) -> dict[str, Any]:
@@ -295,6 +410,22 @@ class GCPExplorerHandler(SimpleHTTPRequestHandler):
         if path == "/api/refresh":
             cat = get_catalog(force_refresh=True)
             self._send_json({"status": "refreshed", "meta": cat.get("meta", {})})
+            return
+
+        if path == "/api/gemini/ask":
+            try:
+                body = self._read_json_body()
+                cat = get_catalog()
+                res = query_gemini_architect(
+                    prompt=str(body.get("prompt", "")),
+                    catalog=cat,
+                    model=str(body.get("model", "gemini-3.8-flash")),
+                    previous_interaction_id=body.get("previous_interaction_id"),
+                    api_key_override=body.get("api_key"),
+                )
+                self._send_json(res)
+            except AuthError as err:
+                self._send_json({"error": err.message}, status=err.status)
             return
 
         if path in ("/api/auth/challenge", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout"):

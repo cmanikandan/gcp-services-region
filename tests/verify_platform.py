@@ -368,7 +368,7 @@ def verify_live_server() -> None:
             data = json.dumps(body).encode("utf-8") if body is not None else None
             r = urllib.request.Request(f"{base}{path}", data=data, headers=req_headers, method=method)
             try:
-                with urllib.request.urlopen(r, timeout=5.0) as res:
+                with urllib.request.urlopen(r, timeout=25.0) as res:
                     return res.status, json.loads(res.read().decode("utf-8"))
             except urllib.error.HTTPError as err:
                 return err.code, json.loads(err.read().decode("utf-8"))
@@ -447,6 +447,14 @@ def verify_live_server() -> None:
         st_after_del, _ = http_json("GET", "/api/auth/me", headers={"Authorization": f"Bearer {new_access_tok}"})
         assert st_after_del == 401
 
+        # Verify Gemini Architect endpoint (/api/gemini/ask)
+        st_gem, gem_payload = http_json(
+            "POST",
+            "/api/gemini/ask",
+            {"prompt": "Compare Cloud Spanner and AlloyDB SLA in 2 bullet points.", "model": "gemini-3.8-flash"},
+        )
+        assert st_gem == 200 and len(gem_payload.get("output_text", "")) > 20, f"Gemini ask failed: {gem_payload}"
+
         print(
             f"[OK] Live HTTP server + Mobile Auth Vault verified on :{port} "
             f"(Gzip={len(raw_bytes) / 1024:.1f} KB, ETag={etag}, PKCE S256, HS256 JWT, Refresh Rotation, Vault Sync & Delete)"
@@ -469,9 +477,11 @@ def verify_ios_swift_architecture() -> None:
         ios_app_dir / "Auth" / "KeychainVault.swift",
         ios_app_dir / "Auth" / "AuthManager.swift",
         ios_app_dir / "Engine" / "CatalogStore.swift",
+        ios_app_dir / "Engine" / "GeminiCopilotService.swift",
         ios_app_dir / "Engine" / "SLACalculator.swift",
         ios_app_dir / "Models" / "CatalogModels.swift",
         ios_app_dir / "Views" / "AuthPortalSheetView.swift",
+        ios_app_dir / "Views" / "GeminiCopilotSheetView.swift",
         ios_app_dir / "Views" / "PulseBentoHomeView.swift",
         ios_app_dir / "Views" / "InteractiveGlobeMapView.swift",
         ios_app_dir / "Views" / "NativeCatalogBrowserView.swift",
@@ -499,6 +509,7 @@ def verify_ios_swift_architecture() -> None:
     assert privacy_plist["NSPrivacyTracking"] is False
     info_plist = plistlib.loads((ROOT / "ios" / "GoogleCloudExplorer" / "Config" / "Info.plist").read_bytes())
     assert info_plist["ITSAppUsesNonExemptEncryption"] is False
+    assert info_plist.get("GEMINI_API_KEY") == "$(GEMINI_API_KEY)", "Info.plist must use $(GEMINI_API_KEY) variable placeholder"
 
     print(
         f"[OK] Native SwiftUI Gen Z iOS & Auth architecture verified across {len(all_swift)} Swift files "
@@ -512,6 +523,7 @@ def verify_cli() -> None:
         ["sla", "Cloud Spanner"],
         ["pricing", "asia-south1"],
         ["updates"],
+        ["ask", "What is Cloud Spanner Multi-Region SLA?"],
     ]
     for args in cmds:
         res = subprocess.run(

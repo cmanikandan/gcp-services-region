@@ -10,9 +10,13 @@ __pycache__/
 .DS_Store
 *.tmp
 
-# Xcode per-user state & derived build artifacts
+# Xcode per-user state, local secrets & derived build artifacts
 DerivedData/
 **/xcuserdata/
 **/*.xcuserstate
 *.xcresult
 build/
+.env
+.env.*
+**/LocalSecrets.xcconfig
+**/Secrets.xcconfig

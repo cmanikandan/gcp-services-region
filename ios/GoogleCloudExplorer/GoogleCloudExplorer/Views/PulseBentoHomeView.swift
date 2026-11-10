@@ -6,6 +6,7 @@ import Charts
 public struct PulseBentoHomeView: View {
     @Bindable var store: CatalogStore
     @Bindable var auth: AuthManager
+    @Bindable var copilot: GeminiCopilotService
     @Binding var selectedTab: ExplorerSection
     public var onOpenAuthPortal: () -> Void
 
@@ -13,15 +14,19 @@ public struct PulseBentoHomeView: View {
     @State private var selectedRegionSheet: CloudRegion?
     @State private var selectedStackSheet: CustomerStack?
     @State private var showingSyncSheet = false
+    @State private var showingGeminiCopilotSheet = false
+    @State private var pendingGeminiPrompt: String?
 
     public init(
         store: CatalogStore,
         auth: AuthManager,
+        copilot: GeminiCopilotService,
         selectedTab: Binding<ExplorerSection>,
         onOpenAuthPortal: @escaping () -> Void = {}
     ) {
         self.store = store
         self.auth = auth
+        self.copilot = copilot
         self._selectedTab = selectedTab
         self.onOpenAuthPortal = onOpenAuthPortal
     }
@@ -89,6 +94,7 @@ public struct PulseBentoHomeView: View {
                     if !omniQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         omniSearchResultsSection
                     } else {
+                        geminiCopilotBannerCard
                         builderPassportStripCard
                         bentoTelemetryGrid
                         swiftChartsRow
@@ -173,6 +179,15 @@ public struct PulseBentoHomeView: View {
             }
             .sheet(isPresented: $showingSyncSheet) {
                 OfflineSyncSettingsSheet(store: store)
+            }
+            .sheet(isPresented: $showingGeminiCopilotSheet) {
+                GeminiCopilotSheetView(
+                    store: store,
+                    copilot: copilot,
+                    initialPrompt: pendingGeminiPrompt
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
             }
         }
     }
@@ -271,6 +286,56 @@ public struct PulseBentoHomeView: View {
         )
     }
 
+    // MARK: - Gemini 3.8 Cloud Architect Copilot Banner
+
+    private var geminiCopilotBannerCard: some View {
+        Button {
+            pendingGeminiPrompt = nil
+            showingGeminiCopilotSheet = true
+        } label: {
+            BentoCard(accent: CloudPalette.violet, padding: 14) {
+                HStack(spacing: 12) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 20, weight: .black))
+                        .foregroundStyle(.white)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [CloudPalette.violet, store.vibeTheme.primaryAccent],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                        )
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 6) {
+                            Text("Gemini Cloud Architect ✨")
+                                .font(.system(size: 14.5, weight: .black, design: .rounded))
+                                .foregroundStyle(.primary)
+                            SemanticPill(
+                                copilot.apiKeyConfigured ? copilot.selectedModel.rawValue : "Configure Key",
+                                tint: copilot.apiKeyConfigured ? CloudPalette.emerald : CloudPalette.amber
+                            )
+                        }
+                        Text("Ask Gemini 3.8 Flash about Google Cloud SLAs, Low CO₂ regions, H100 GPUs, or FinOps CUDs.")
+                            .font(.system(size: 11.5))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(GenZBouncyButtonStyle())
+    }
+
     // MARK: - Interactive Builder Passport / Ghost Mode Banner
 
     private var builderPassportStripCard: some View {
@@ -333,6 +398,19 @@ public struct PulseBentoHomeView: View {
                     .font(.system(size: 11.5, weight: .black, design: .rounded))
                     .foregroundStyle(.secondary)
                 Spacer()
+                Button {
+                    pendingGeminiPrompt = omniQuery
+                    showingGeminiCopilotSheet = true
+                } label: {
+                    Label("Ask Gemini ✨", systemImage: "sparkles")
+                        .font(.system(size: 11.5, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Capsule().fill(CloudPalette.violet))
+                }
+                .buttonStyle(GenZBouncyButtonStyle())
+
                 Button("Clear") { omniQuery = "" }
                     .font(.system(size: 12, weight: .bold, design: .rounded))
             }

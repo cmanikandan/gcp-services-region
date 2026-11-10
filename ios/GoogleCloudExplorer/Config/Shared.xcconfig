@@ -7,8 +7,13 @@
 PRODUCT_NAME = GoogleCloudExplorer
 PRODUCT_DISPLAY_NAME = Cloud Explorer
 PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.googlecloudexplorer
+DEVELOPMENT_TEAM = DUN9JJFSRK
 MARKETING_VERSION = 2.0.0
 CURRENT_PROJECT_VERSION = 1
+
+// Optional local Gemini API key override (gitignored LocalSecrets.xcconfig)
+GEMINI_API_KEY =
+#include? "LocalSecrets.xcconfig"
 
 // ==========================================
 // Platform Configuration

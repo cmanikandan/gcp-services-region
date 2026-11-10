@@ -32,9 +32,13 @@ All mandatory Apple App Store Connect assets and metadata manifests are pre-buil
   - **iPhone (`compact` width)**: Native 5-tab `TabView` (`Pulse`, `Globe`, `Catalog`, `SLA & Cost`, `Updates`) + top-right `@handle` / `Sign In ✨` Builder Passport pill.
   - **iPad (`regular` width)**: Native `NavigationSplitView` sidebar with Builder Passport card + detail workspace.
 - **Tab 1 — Pulse Home (`PulseBentoHomeView.swift`)**:
-  - Aura mesh hero with live **Omni-Search**, trending vibe chips (`🔥 99.999% Club`, `🤖 Claude & Gemini`, `💸 Mumbai Cost`, `⚡ H100 GPUs`), and interactive **Builder Passport / Ghost Mode** strip.
+  - Aura mesh hero with live **Omni-Search**, trending vibe chips (`🔥 99.999% Club`, `🤖 Claude & Gemini`, `💸 Mumbai Cost`, `⚡ H100 GPUs`), **Gemini 3.8 Cloud Architect Copilot ✨** banner, and interactive **Builder Passport / Ghost Mode** strip.
   - **2×2 Neo-Bento Telemetry Grid** + **`Swift Charts` `SectorMark` SLA Donut** + **Regional FinOps `BarMark` Distribution**.
   - **Saved Architecture Stacks** carousel + **Fresh Google Cloud Drops 🔥** horizontal story cards.
+- **Gemini 3.8 Cloud Architect Copilot (`Engine/GeminiCopilotService.swift` & `Views/GeminiCopilotSheetView.swift`)**:
+  - Stateful multi-turn AI Copilot powered by the **Gemini Interactions API** (`POST https://generativelanguage.googleapis.com/v1beta/interactions` with `previous_interaction_id`) across **`gemini-3.8-flash`**, **`gemini-3.5-flash-lite`**, and **`gemini-4-argon`**.
+  - Grounded on all 153 Google Cloud services, 43 active regions, 91+ AI models, and composite SLA math, with hardware-backed **iOS Keychain API key storage** (`KeychainVault.swift`), gitignored `Config/LocalSecrets.xcconfig` support, and automatic offline catalog fallback.
+  - Includes a **1-Tap Gemini Architecture & SLA Audit** right inside the **SLA & FinOps Studio (`PricingSLAStudioView.swift`)**.
 - **Tab 2 — Interactive 3D Globe (`InteractiveGlobeMapView.swift`)**:
   - Hardware-accelerated 3D realistic `MapKit` globe with fly-to region camera animations, Vibe-themed floating HUD pills (`All 43`, `🌱 Low CO₂`, `🤖 Vertex AI`, `⚡ GPU Zones`, `🚀 Future`, `🌐 Edge PoPs`), and multi-detent frosted-glass inspector sheets.
 - **Tab 3 — Native Catalog Browser (`NativeCatalogBrowserView.swift`)**:

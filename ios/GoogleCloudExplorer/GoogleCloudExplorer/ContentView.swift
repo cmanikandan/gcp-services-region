@@ -28,6 +28,7 @@ public enum ExplorerSection: String, CaseIterable, Identifiable, Hashable {
 public struct ContentView: View {
     @State private var store = CatalogStore()
     @State private var auth = AuthManager()
+    @State private var copilot = GeminiCopilotService()
     @State private var selectedSection: ExplorerSection = .pulse
     @State private var showingAuthSheet = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -91,6 +92,7 @@ public struct ContentView: View {
             PulseBentoHomeView(
                 store: store,
                 auth: auth,
+                copilot: copilot,
                 selectedTab: $selectedSection,
                 onOpenAuthPortal: { showingAuthSheet = true }
             )
@@ -105,7 +107,7 @@ public struct ContentView: View {
                 .tabItem { Label(ExplorerSection.catalog.rawValue, systemImage: ExplorerSection.catalog.systemImage) }
                 .tag(ExplorerSection.catalog)
 
-            PricingSLAStudioView(store: store, auth: auth, onOpenAuthPortal: { showingAuthSheet = true })
+            PricingSLAStudioView(store: store, auth: auth, copilot: copilot, onOpenAuthPortal: { showingAuthSheet = true })
                 .tabItem { Label(ExplorerSection.studio.rawValue, systemImage: ExplorerSection.studio.systemImage) }
                 .tag(ExplorerSection.studio)
 
@@ -160,6 +162,7 @@ public struct ContentView: View {
                 PulseBentoHomeView(
                     store: store,
                     auth: auth,
+                    copilot: copilot,
                     selectedTab: $selectedSection,
                     onOpenAuthPortal: { showingAuthSheet = true }
                 )
@@ -168,7 +171,7 @@ public struct ContentView: View {
             case .catalog:
                 NativeCatalogBrowserView(store: store)
             case .studio:
-                PricingSLAStudioView(store: store, auth: auth, onOpenAuthPortal: { showingAuthSheet = true })
+                PricingSLAStudioView(store: store, auth: auth, copilot: copilot, onOpenAuthPortal: { showingAuthSheet = true })
             case .updates:
                 ReleasePulseTimelineView(store: store)
             }

@@ -6,9 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		8B41F65D2DEDD0D6001A66F9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,7 +18,7 @@
 
 /* Begin PBXFileReference section */
 		8B41F6452DEDD0D5001A66F9 /* GoogleCloudExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleCloudExplorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorer.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleCloudExplorer.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GoogleCloudExplorerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -30,6 +27,7 @@
 			membershipExceptions = (
 				Debug.xcconfig,
 				Info.plist,
+				LocalSecrets.xcconfig,
 				Release.xcconfig,
 				Shared.xcconfig,
 				Tests.xcconfig,
@@ -92,7 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				8B41F6452DEDD0D5001A66F9 /* GoogleCloudExplorer.app */,
-				8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorer.xctest */,
+				8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -150,7 +148,7 @@
 			packageProductDependencies = (
 			);
 			productName = GoogleCloudExplorerUITests;
-			productReference = 8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorer.xctest */;
+			productReference = 8B41F65C2DEDD0D6001A66F9 /* GoogleCloudExplorerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -165,9 +163,13 @@
 				TargetAttributes = {
 					8B41F6442DEDD0D5001A66F9 = {
 						CreatedOnToolsVersion = 16.3;
+						DevelopmentTeam = DUN9JJFSRK;
+						ProvisioningStyle = Automatic;
 					};
 					8B41F65B2DEDD0D6001A66F9 = {
 						CreatedOnToolsVersion = 16.3;
+						DevelopmentTeam = DUN9JJFSRK;
+						ProvisioningStyle = Automatic;
 						TestTargetID = 8B41F6442DEDD0D5001A66F9;
 					};
 				};
@@ -287,7 +289,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -345,7 +347,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

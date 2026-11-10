@@ -6,6 +6,7 @@ import Charts
 public struct PricingSLAStudioView: View {
     @Bindable var store: CatalogStore
     @Bindable var auth: AuthManager
+    @Bindable var copilot: GeminiCopilotService
     public var onOpenAuthPortal: () -> Void
 
     @State private var selectedSlugs: [String] = [
@@ -16,6 +17,9 @@ public struct PricingSLAStudioView: View {
     @State private var topologyMode: StackTopologyMode = .dualActiveActive
     @State private var showingAddServicePicker = false
     @State private var savedStackBanner = false
+    @State private var geminiAuditTurn: GeminiChatTurn?
+    @State private var isAuditingWithGemini = false
+    @State private var showingFullGeminiSheet = false
 
     @State private var baselineMonthlySpend: Double = 15_000
     @State private var commitment: CommitmentTier = .cud1Year
@@ -25,10 +29,12 @@ public struct PricingSLAStudioView: View {
     public init(
         store: CatalogStore,
         auth: AuthManager,
+        copilot: GeminiCopilotService,
         onOpenAuthPortal: @escaping () -> Void = {}
     ) {
         self.store = store
         self.auth = auth
+        self.copilot = copilot
         self.onOpenAuthPortal = onOpenAuthPortal
     }
 
@@ -75,6 +81,7 @@ public struct PricingSLAStudioView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     compositeSLASimulatorCard
+                    geminiStackAuditCard
                     regionalFinOpsScrubberCard
                     stackWrappedPreviewSection
                     regionalBenchmarkChartCard
@@ -110,6 +117,11 @@ public struct PricingSLAStudioView: View {
                     selectedSlugs: $selectedSlugs
                 )
                 .presentationDetents([.medium, .large])
+            }
+            .sheet(isPresented: $showingFullGeminiSheet) {
+                GeminiCopilotSheetView(store: store, copilot: copilot)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
@@ -274,6 +286,102 @@ public struct PricingSLAStudioView: View {
             try? await Task.sleep(for: .seconds(2.2))
             withAnimation(.snappy) {
                 savedStackBanner = false
+            }
+        }
+    }
+
+    // MARK: - 1b. Gemini 3.8 Live Stack & FinOps Audit Card
+
+    private var geminiStackAuditCard: some View {
+        BentoCard(accent: CloudPalette.violet) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label("Gemini 3.8 Architecture & SLA Audit", systemImage: "sparkles")
+                        .font(.system(size: 15.5, weight: .heavy, design: .rounded))
+                        .foregroundStyle(CloudPalette.violet)
+                    Spacer()
+                    Button {
+                        showingFullGeminiSheet = true
+                    } label: {
+                        Text("Full Chat →")
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundStyle(CloudPalette.violet)
+                    }
+                }
+
+                Text("Audit your active \(topologyMode.shortLabel) stack (\(slaResult.formattedUptime) composite uptime across \(primaryRegionId) & \(secondaryRegionId)) with Gemini.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    Task {
+                        isAuditingWithGemini = true
+                        let turn = await copilot.auditArchitectureStack(
+                            services: selectedServices,
+                            topology: topologyMode,
+                            slaResult: slaResult,
+                            primaryRegion: primaryRegion,
+                            secondaryRegion: secondaryRegion,
+                            monthlySpendUSD: baselineMonthlySpend,
+                            commitment: commitment,
+                            store: store
+                        )
+                        withAnimation(.snappy) {
+                            geminiAuditTurn = turn
+                            isAuditingWithGemini = false
+                        }
+                    }
+                } label: {
+                    HStack {
+                        if isAuditingWithGemini {
+                            ProgressView().tint(.white)
+                        } else {
+                            Image(systemName: "wand.and.stars")
+                        }
+                        Text(isAuditingWithGemini ? "Auditing Stack with Gemini 3.8…" : "Audit Active Stack with Gemini ✨")
+                            .font(.system(size: 13.5, weight: .heavy, design: .rounded))
+                        Spacer()
+                        Text(copilot.selectedModel.rawValue)
+                            .font(.system(size: 10.5, weight: .bold, design: .monospaced))
+                            .opacity(0.88)
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 11)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(
+                                LinearGradient(
+                                    colors: [CloudPalette.violet, store.vibeTheme.primaryAccent],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                    )
+                }
+                .buttonStyle(GenZBouncyButtonStyle())
+                .disabled(isAuditingWithGemini)
+
+                if let turn = geminiAuditTurn {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            SemanticPill(turn.modelId ?? "gemini-3.8-flash", tint: CloudPalette.violet)
+                            if let tok = turn.totalTokens {
+                                SemanticPill("\(tok) tokens", tint: CloudPalette.emerald)
+                            }
+                            Spacer()
+                        }
+                        Text(LocalizedStringKey(turn.text))
+                            .font(.system(size: 13, design: .rounded))
+                            .foregroundStyle(.primary)
+                            .textSelection(.enabled)
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(CloudPalette.elevatedBackground)
+                    )
+                }
             }
         }
     }

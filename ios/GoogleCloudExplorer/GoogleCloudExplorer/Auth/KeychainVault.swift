@@ -71,6 +71,29 @@ public enum DevicePasskeySigner {
 public enum KeychainVault {
     private static let serviceName = "com.unofficial.googlecloudexplorer.authvault"
     private static let sessionAccount = "gce.mobile.session.v1"
+    private static let geminiKeyAccount = "gce.gemini.apikey.v1"
+
+    public static func saveGeminiAPIKey(_ apiKey: String) {
+        let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            deleteGeminiAPIKey()
+            return
+        }
+        saveRawData(Data(trimmed.utf8), account: geminiKeyAccount)
+    }
+
+    public static func loadGeminiAPIKey() -> String? {
+        guard let data = readRawData(account: geminiKeyAccount),
+              let raw = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    public static func deleteGeminiAPIKey() {
+        deleteRawData(account: geminiKeyAccount)
+    }
 
     public static func saveSession(_ session: StoredKeychainSession) {
         guard let encoded = try? JSONEncoder().encode(session) else { return }
