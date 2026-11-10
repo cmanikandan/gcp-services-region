@@ -1,0 +1,42 @@
+name: Daily 24h Google Cloud Catalog Refresh
+
+on:
+  schedule:
+    # Runs automatically every 24 hours at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  harvest-and-publish:
+    name: Harvest Upstream Google Cloud Feeds & Update Mobile/Web Catalog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12 (100% Standard Library)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run upstream Google Cloud harvester, static PWA generator & iOS bundle sync
+        run: |
+          python3 harvester.py --force
+          python3 generator.py
+          python3 ios/scripts/sync_bundled_catalog.py
+          python3 tests/verify_platform.py
+
+      - name: Commit & push updated 24h catalog if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cache/gcp_catalog.json data/cache/snapshots/ dist/ ios/GoogleCloudExplorer/GoogleCloudExplorer/Resources/mobile_catalog.json
+          if git diff --staged --quiet; then
+            echo "No upstream catalog changes detected today."
+          else
+            git commit -m "chore(catalog): automated 24h Google Cloud catalog & iOS bundle refresh"
+            git push origin HEAD:main
+          fi

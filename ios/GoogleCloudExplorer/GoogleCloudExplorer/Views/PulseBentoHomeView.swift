@@ -12,6 +12,7 @@ public struct PulseBentoHomeView: View {
 
     @State private var omniQuery: String = ""
     @State private var selectedRegionSheet: CloudRegion?
+    @State private var selectedModelSheet: AIModel?
     @State private var selectedStackSheet: CustomerStack?
     @State private var showingSyncSheet = false
     @State private var showingGeminiCopilotSheet = false
@@ -169,6 +170,11 @@ public struct PulseBentoHomeView: View {
             }
             .sheet(item: $selectedRegionSheet) { reg in
                 RegionInspectorSheetView(store: store, region: reg)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            }
+            .sheet(item: $selectedModelSheet) { model in
+                AIModelInspectorSheet(model: model, regionsById: store.regionsById)
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             }
@@ -443,7 +449,12 @@ public struct PulseBentoHomeView: View {
                         }
                     case .model:
                         Button {
-                            selectedTab = .catalog
+                            if let model = store.catalog.models.first(where: { $0.modelId == hit.targetSlugOrId }) {
+                                selectedModelSheet = model
+                            } else {
+                                store.requestedCatalogMode = "models"
+                                selectedTab = .catalog
+                            }
                         } label: {
                             omniHitRow(hit: hit, icon: "sparkles", tint: CloudPalette.violet)
                         }
@@ -492,7 +503,10 @@ public struct PulseBentoHomeView: View {
     private var bentoTelemetryGrid: some View {
         let counts = store.catalog.meta.counts
         return LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            Button { selectedTab = .catalog } label: {
+            Button {
+                store.requestedCatalogMode = "services"
+                selectedTab = .catalog
+            } label: {
                 bentoStatTile(
                     icon: "square.stack.3d.up.fill",
                     tint: store.vibeTheme.primaryAccent,
@@ -514,7 +528,10 @@ public struct PulseBentoHomeView: View {
             }
             .buttonStyle(GenZBouncyButtonStyle())
 
-            Button { selectedTab = .catalog } label: {
+            Button {
+                store.requestedCatalogMode = "models"
+                selectedTab = .catalog
+            } label: {
                 bentoStatTile(
                     icon: "sparkles",
                     tint: CloudPalette.violet,

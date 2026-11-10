@@ -176,6 +176,24 @@ public struct NativeCatalogBrowserView: View {
                     store.deepLinkedServiceSlug = nil
                 }
             }
+            .onAppear {
+                if store.requestedCatalogMode == "models" {
+                    mode = .aiModels
+                    store.requestedCatalogMode = nil
+                } else if store.requestedCatalogMode == "services" {
+                    mode = .services
+                    store.requestedCatalogMode = nil
+                }
+            }
+            .onChange(of: store.requestedCatalogMode) { _, reqMode in
+                if reqMode == "models" {
+                    mode = .aiModels
+                    store.requestedCatalogMode = nil
+                } else if reqMode == "services" {
+                    mode = .services
+                    store.requestedCatalogMode = nil
+                }
+            }
         }
     }
 

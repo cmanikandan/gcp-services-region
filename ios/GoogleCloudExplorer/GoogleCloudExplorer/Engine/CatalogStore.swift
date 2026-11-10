@@ -137,15 +137,22 @@ public final class CatalogStore {
     }
     public var deepLinkedServiceSlug: String?
     public var deepLinkedRegionId: String?
+    public var requestedCatalogMode: String?
     public var onVaultMutated: (() -> Void)?
 
     public private(set) var servicesBySlug: [String: CloudService] = [:]
     public private(set) var servicesByName: [String: CloudService] = [:]
     public private(set) var regionsById: [String: CloudRegion] = [:]
 
+    public static let githubOnlineCatalogURL = "https://raw.githubusercontent.com/cmanikandan/gcp-services-region/main/dist/data/mobile_catalog.json"
+    public static let localMacCatalogURL = "http://192.168.0.157:8080/api/mobile-catalog"
+    public static let autoRefreshTTLSeconds: Int = 86_400
+
     private let syncActor = CatalogSyncActor()
     private var suppressVaultMutationCallback = false
+    private var periodicRefreshTask: Task<Void, Never>?
     private static let endpointKey = "gce.syncEndpoint"
+    private static let lastSyncEpochKey = "gce.lastSyncEpoch"
     private static let vibeThemeKey = "gce.vibeTheme"
     private static let svcBookmarksKey = "gce.bookmarkedServices"
     private static let regBookmarksKey = "gce.bookmarkedRegions"
@@ -155,8 +162,13 @@ public final class CatalogStore {
         let loaded = initialCatalog ?? Self.loadBundledCatalog()
         self.catalog = loaded
         self.syncState = .bundledOffline(generatedAt: loaded.meta.generatedAt)
-        self.syncEndpointURLString = UserDefaults.standard.string(forKey: Self.endpointKey)
-            ?? "http://192.168.0.157:8080/api/mobile-catalog"
+        let savedEndpoint = UserDefaults.standard.string(forKey: Self.endpointKey)
+        if let savedEndpoint, !savedEndpoint.contains("127.0.0.1") {
+            self.syncEndpointURLString = savedEndpoint
+        } else {
+            self.syncEndpointURLString = Self.githubOnlineCatalogURL
+            UserDefaults.standard.set(Self.githubOnlineCatalogURL, forKey: Self.endpointKey)
+        }
 
         let savedVibeRaw = UserDefaults.standard.string(forKey: Self.vibeThemeKey) ?? VibeTheme.cyberMatcha.rawValue
         self.vibeTheme = VibeTheme(rawValue: savedVibeRaw) ?? .cyberMatcha
@@ -238,6 +250,15 @@ public final class CatalogStore {
         return Self.emptyFallbackCatalog()
     }
 
+    public var lastAutoSyncDateString: String {
+        let ep = UserDefaults.standard.integer(forKey: Self.lastSyncEpochKey)
+        guard ep > 0 else { return "Bundled Snapshot (\(catalog.meta.generatedAt))" }
+        let date = Date(timeIntervalSince1970: TimeInterval(ep))
+        let fmt = RelativeDateTimeFormatter()
+        fmt.unitsStyle = .abbreviated
+        return "\(fmt.localizedString(for: date, relativeTo: Date())) (24h Auto-Refresh)"
+    }
+
     public func bootstrapAndSyncInBackground() async {
         if let diskCatalog = await syncActor.loadCachedDiskCatalog(),
            !diskCatalog.services.isEmpty,
@@ -246,6 +267,22 @@ public final class CatalogStore {
         }
         indexCoreSpotlight()
         await refreshFromServer(silent: true)
+        startPeriodic24hRefreshLoop()
+    }
+
+    private func startPeriodic24hRefreshLoop() {
+        periodicRefreshTask?.cancel()
+        periodicRefreshTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3600))
+                guard let self, !Task.isCancelled else { break }
+                let now = Int(Date().timeIntervalSince1970)
+                let lastSync = UserDefaults.standard.integer(forKey: Self.lastSyncEpochKey)
+                if now - lastSync >= Self.autoRefreshTTLSeconds {
+                    await self.refreshFromServer(silent: true)
+                }
+            }
+        }
     }
 
     public func resetToBundledCatalog() {
@@ -368,6 +405,7 @@ public final class CatalogStore {
                 endpoint: url,
                 currentETag: catalog.etag
             )
+            UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: Self.lastSyncEpochKey)
             if let updated, !updated.services.isEmpty {
                 applyCatalog(
                     updated,
@@ -384,6 +422,28 @@ public final class CatalogStore {
                 )
             }
         } catch {
+            // Try fallback endpoint (e.g. Local Mac Wi-Fi server if GitHub raw was primary, or vice-versa)
+            let fallbackStr = syncEndpointURLString.contains("github")
+                ? Self.localMacCatalogURL
+                : Self.githubOnlineCatalogURL
+            if let fallbackURL = URL(string: fallbackStr),
+               let (fallbackUpdated, fallbackETag) = try? await syncActor.fetchRemoteCatalog(
+                   endpoint: fallbackURL,
+                   currentETag: catalog.etag
+               ) {
+                UserDefaults.standard.set(Int(Date().timeIntervalSince1970), forKey: Self.lastSyncEpochKey)
+                if let fallbackUpdated, !fallbackUpdated.services.isEmpty {
+                    applyCatalog(
+                        fallbackUpdated,
+                        state: .liveSynced(
+                            generatedAt: fallbackUpdated.meta.generatedAt,
+                            etag: fallbackETag ?? "200"
+                        )
+                    )
+                    indexCoreSpotlight()
+                    return
+                }
+            }
             if !silent {
                 await refreshViaGeminiAPI()
             } else {
