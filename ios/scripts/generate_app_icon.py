@@ -4,8 +4,8 @@ Generates all three 1024x1024 24-bit opaque RGB App Store icon variants
 (Light/Default, iOS 18+ Dark, and iOS 18+ Tinted monochrome) for GoogleCloudExplorer
 using 100% Python 3.10+ standard library (struct + zlib + math).
 
-Features an anti-aliased 4-color Google Cloud ribbon emblem with a Gemini AI
-4-point sparkle star on a Neo-Bento glass canvas.
+Features an anti-aliased 4-color Google Cloud ribbon emblem, a Gemini AI
+4-point sparkle star, and a bold "UNOFFICIAL" pill badge on the icon.
 Note: Apple App Store Connect strictly requires 1024x1024 PNGs with NO alpha channel
 (color type 2 = 24-bit RGB opaque).
 """
@@ -64,6 +64,108 @@ def cloud_inner_sdf(nx: float, ny: float) -> float:
     return min(d_base, d_dome)
 
 
+# Vector stroke segments for each letter in "UNOFFICIAL" in local glyph coordinates:
+# lx in [-0.36, +0.36], ly in [-0.50, +0.50]
+GLYPH_SEGMENTS: dict[str, list[tuple[float, float, float, float]]] = {
+    "U": [
+        (-0.32, -0.50, -0.32, 0.24),
+        (0.32, -0.50, 0.32, 0.24),
+        (-0.32, 0.24, -0.16, 0.48),
+        (-0.16, 0.48, 0.16, 0.48),
+        (0.16, 0.48, 0.32, 0.24),
+    ],
+    "N": [
+        (-0.32, -0.50, -0.32, 0.50),
+        (-0.32, -0.50, 0.32, 0.50),
+        (0.32, -0.50, 0.32, 0.50),
+    ],
+    "O": [
+        (-0.32, -0.24, -0.32, 0.24),
+        (0.32, -0.24, 0.32, 0.24),
+        (-0.32, -0.24, -0.15, -0.48),
+        (-0.15, -0.48, 0.15, -0.48),
+        (0.15, -0.48, 0.32, -0.24),
+        (-0.32, 0.24, -0.15, 0.48),
+        (-0.15, 0.48, 0.15, 0.48),
+        (0.15, 0.48, 0.32, 0.24),
+    ],
+    "F": [
+        (-0.30, -0.50, -0.30, 0.50),
+        (-0.30, -0.50, 0.30, -0.50),
+        (-0.30, -0.02, 0.22, -0.02),
+    ],
+    "I": [
+        (0.0, -0.50, 0.0, 0.50),
+        (-0.20, -0.50, 0.20, -0.50),
+        (-0.20, 0.50, 0.20, 0.50),
+    ],
+    "C": [
+        (-0.32, -0.24, -0.32, 0.24),
+        (-0.32, -0.24, -0.14, -0.48),
+        (-0.14, -0.48, 0.18, -0.48),
+        (0.18, -0.48, 0.30, -0.30),
+        (-0.32, 0.24, -0.14, 0.48),
+        (-0.14, 0.48, 0.18, 0.48),
+        (0.18, 0.48, 0.30, 0.30),
+    ],
+    "A": [
+        (-0.36, 0.50, 0.0, -0.50),
+        (0.0, -0.50, 0.36, 0.50),
+        (-0.22, 0.16, 0.22, 0.16),
+    ],
+    "L": [
+        (-0.30, -0.50, -0.30, 0.50),
+        (-0.30, 0.50, 0.30, 0.50),
+    ],
+}
+
+WORD_TEXT = "UNOFFICIAL"
+# Center x positions for each of the 10 letters in "UNOFFICIAL" across [-0.41, +0.41]
+LETTER_CENTERS_X: list[tuple[str, float]] = [
+    ("U", -0.415),
+    ("N", -0.315),
+    ("O", -0.215),
+    ("F", -0.118),
+    ("F", -0.028),
+    ("I", 0.050),
+    ("C", 0.132),
+    ("I", 0.212),
+    ("A", 0.298),
+    ("L", 0.398),
+]
+
+
+def unofficial_text_sdf(nx: float, ny: float, center_y: float = 0.57) -> float:
+    # Quick bounding-box reject outside the text band
+    dy = ny - center_y
+    if abs(dy) > 0.085 or abs(nx) > 0.48:
+        return 1.0
+
+    scale_x = 0.044
+    scale_y = 0.048
+    ly = dy / scale_y
+    best = 1.0
+
+    for ch, cx in LETTER_CENTERS_X:
+        if abs(nx - cx) > 0.048:
+            continue
+        lx = (nx - cx) / scale_x
+        for ax, ay, bx, by in GLYPH_SEGMENTS[ch]:
+            # Distance in normalized canvas space
+            d = sd_capsule(
+                nx,
+                ny,
+                cx + ax * scale_x,
+                center_y + ay * scale_y,
+                cx + bx * scale_x,
+                center_y + by * scale_y,
+                0.0082,
+            )
+            if d < best:
+                best = d
+    return best
+
+
 def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
     cx = cy = size / 2.0
     aa = 2.8 / size
@@ -95,23 +197,24 @@ def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
                 r = g = b = lum
 
             # Subtle orbital halo ring
-            if abs(dist - 0.78) < 0.007:
-                ring_alpha = 1.0 - abs(dist - 0.78) / 0.007
+            if abs(dist - 0.82) < 0.006:
+                ring_alpha = 1.0 - abs(dist - 0.82) / 0.006
                 if mode == "light":
-                    r = r * (1.0 - ring_alpha * 0.16) + 66.0 * (ring_alpha * 0.16)
-                    g = g * (1.0 - ring_alpha * 0.16) + 133.0 * (ring_alpha * 0.16)
-                    b = b * (1.0 - ring_alpha * 0.16) + 244.0 * (ring_alpha * 0.16)
+                    r = r * (1.0 - ring_alpha * 0.15) + 66.0 * (ring_alpha * 0.15)
+                    g = g * (1.0 - ring_alpha * 0.15) + 133.0 * (ring_alpha * 0.15)
+                    b = b * (1.0 - ring_alpha * 0.15) + 244.0 * (ring_alpha * 0.15)
                 elif mode == "dark":
-                    r += 32.0 * ring_alpha
-                    g += 62.0 * ring_alpha
-                    b += 118.0 * ring_alpha
+                    r += 30.0 * ring_alpha
+                    g += 60.0 * ring_alpha
+                    b += 115.0 * ring_alpha
 
-            # 2. Cloud Ribbon Evaluation
-            d_outer = cloud_outer_sdf(nx, ny - 0.02)
-            d_inner = cloud_inner_sdf(nx, ny - 0.02)
+            # 2. Cloud Ribbon Evaluation (shifted slightly upward to ny + 0.10 to make room for UNOFFICIAL pill)
+            cny = ny + 0.11
+            d_outer = cloud_outer_sdf(nx, cny)
+            d_inner = cloud_inner_sdf(nx, cny)
 
             # Soft drop shadow under cloud
-            d_shadow = cloud_outer_sdf(nx - 0.012, ny - 0.055)
+            d_shadow = cloud_outer_sdf(nx - 0.012, cny - 0.035)
             if d_shadow < 0.085 and d_outer > -0.01:
                 sh = (1.0 - max(0.0, d_shadow) / 0.085) ** 2 * (0.18 if mode == "light" else 0.44)
                 r *= 1.0 - sh
@@ -124,7 +227,7 @@ def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
 
             # 4-Color Google Cloud Ribbon Coloring
             if ribbon_alpha > 0.0:
-                ang = math.degrees(math.atan2(ny - 0.04, nx + 0.02))
+                ang = math.degrees(math.atan2(cny - 0.02, nx + 0.02))
                 if mode == "tinted":
                     if -155.0 <= ang < -52.0:
                         cr = cg = cb = 215.0
@@ -159,27 +262,67 @@ def render_variant(out_path: Path, mode: str, size: int = 1024) -> None:
                 g = g * (1.0 - ribbon_alpha) + cg * ribbon_alpha
                 b = b * (1.0 - ribbon_alpha) + cb * ribbon_alpha
 
-            # 3. Gemini AI 4-Point Sparkle Star at upper-right crest (0.31, -0.25)
+            # 3. Gemini AI 4-Point Sparkle Star at upper-right crest (0.31, -0.37)
             sx = abs(nx - 0.31)
-            sy = abs(ny + 0.25)
+            sy = abs(ny + 0.37)
             star_d = (sx ** 0.58 + sy ** 0.58) - (0.145 ** 0.58)
             star_alpha = 1.0 - smoothstep(-aa * 1.4, aa * 1.4, star_d)
             if star_alpha > 0.0:
                 if mode == "tinted":
                     sr = sg = sb = 255.0
                 elif mode == "light":
-                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.35)) * 3.5))
+                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.47)) * 3.5))
                     sr = 138.0 * (1.0 - t_star) + 36.0 * t_star
                     sg = 68.0 * (1.0 - t_star) + 161.0 * t_star
                     sb = 248.0 * (1.0 - t_star) + 250.0 * t_star
                 else:
-                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.35)) * 3.5))
+                    t_star = max(0.0, min(1.0, (nx - 0.20 + (ny + 0.47)) * 3.5))
                     sr = 181.0 * (1.0 - t_star) + 110.0 * t_star
                     sg = 255.0 * (1.0 - t_star) + 235.0 * t_star
                     sb = 46.0 * (1.0 - t_star) + 255.0 * t_star
                 r = r * (1.0 - star_alpha) + sr * star_alpha
                 g = g * (1.0 - star_alpha) + sg * star_alpha
                 b = b * (1.0 - star_alpha) + sb * star_alpha
+
+            # 4. Bold "UNOFFICIAL" Pill Badge at bottom (ny = +0.57)
+            d_pill = sd_capsule(nx, ny, -0.42, 0.57, 0.42, 0.57, 0.115)
+            pill_alpha = 1.0 - smoothstep(-aa, aa, d_pill)
+            if pill_alpha > 0.0:
+                if mode == "light":
+                    pr, pg, pb = 15.0, 23.0, 42.0
+                elif mode == "dark":
+                    pr, pg, pb = 22.0, 36.0, 68.0
+                else:
+                    pr = pg = pb = 38.0
+
+                # Subtle border ring around the UNOFFICIAL pill
+                border_t = 1.0 - smoothstep(0.0, 0.012, abs(d_pill + 0.006))
+                if mode == "light":
+                    br, bg, bb = 66.0, 133.0, 244.0
+                elif mode == "dark":
+                    br, bg, bb = 181.0, 255.0, 46.0
+                else:
+                    br = bg = bb = 210.0
+
+                pr = pr * (1.0 - border_t * 0.75) + br * (border_t * 0.75)
+                pg = pg * (1.0 - border_t * 0.75) + bg * (border_t * 0.75)
+                pb = pb * (1.0 - border_t * 0.75) + bb * (border_t * 0.75)
+
+                r = r * (1.0 - pill_alpha) + pr * pill_alpha
+                g = g * (1.0 - pill_alpha) + pg * pill_alpha
+                b = b * (1.0 - pill_alpha) + pb * pill_alpha
+
+                # Crisp vector "UNOFFICIAL" lettering inside the pill
+                d_txt = unofficial_text_sdf(nx, ny, 0.57)
+                txt_alpha = 1.0 - smoothstep(-aa * 0.9, aa * 0.9, d_txt)
+                if txt_alpha > 0.0:
+                    if mode == "dark":
+                        tr, tg, tb = 181.0, 255.0, 46.0  # Acid-lime high-contrast text on dark pill
+                    else:
+                        tr = tg = tb = 255.0
+                    r = r * (1.0 - txt_alpha) + tr * txt_alpha
+                    g = g * (1.0 - txt_alpha) + tg * txt_alpha
+                    b = b * (1.0 - txt_alpha) + tb * txt_alpha
 
             row[idx] = max(0, min(255, int(r)))
             row[idx + 1] = max(0, min(255, int(g)))
